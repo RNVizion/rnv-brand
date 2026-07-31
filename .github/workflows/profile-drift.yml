@@ -1,0 +1,119 @@
+name: Profile drift
+
+# Checks every repo in the ecosystem against profile.json, the machine source for
+# identity facts. Surfaces drift independently and the drift is invisible from
+# inside the surface that's wrong; this is the thing that notices without anyone
+# remembering to look.
+#
+# It never edits. On drift it opens one issue and keeps it updated; when the drift
+# clears it closes the issue itself. So the issue list is the state: an open
+# "Profile drift" issue means something disagrees, no issue means nothing does.
+on:
+  schedule:
+    - cron: "0 13 * * 1"        # Mondays, 13:00 UTC
+  push:
+    branches: [main]
+    paths:
+      - "profile.json"           # change a fact, find out immediately what disagrees
+      - "scripts/refresh_profile.py"
+      - ".github/workflows/profile-drift.yml"
+  workflow_dispatch:
+    inputs:
+      verify_facts:
+        description: "Also verify the manifest against source (slower)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  issues: write                  # needed to open, update, and close the drift issue
+
+concurrency:
+  group: profile-drift
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Stdlib only, by design: no dependency can rot underneath the checker.
+      - name: Check every surface
+        id: surfaces
+        run: |
+          set +e
+          python scripts/refresh_profile.py --all --quiet > report.txt 2>&1
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+          cat report.txt
+
+      # Verifies the manifest against reality rather than surfaces against the
+      # manifest. Without it, a stale fact is enforced everywhere with total
+      # confidence. Skipped on push so a one-line edit doesn't wait on fetches.
+      - name: Verify facts against source
+        id: facts
+        if: github.event_name != 'push' && inputs.verify_facts != false
+        run: |
+          set +e
+          python scripts/refresh_profile.py --verify-facts --quiet > facts.txt 2>&1
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+          cat facts.txt
+
+      - name: Open or update the drift issue
+        if: steps.surfaces.outputs.exit != '0' || steps.facts.outputs.exit != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "The profile checker found surfaces that disagree with \`profile.json\`."
+            echo
+            echo "Run: [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo
+            echo '### Surfaces'
+            echo '```'
+            cat report.txt
+            echo '```'
+            if [ -f facts.txt ]; then
+              echo '### Manifest vs source'
+              echo '```'
+              cat facts.txt
+              echo '```'
+            fi
+            echo
+            echo "---"
+            echo "Fix the surface, or if the fact itself changed, update \`profile.json\` first and push; that re-runs this check."
+            echo
+            echo "_Closes itself when the next run comes back clean._"
+          } > body.md
+
+          existing=$(gh issue list --state open --label profile-drift \
+                       --json number --jq '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --body-file body.md
+            echo "updated issue #$existing"
+          else
+            gh label create profile-drift --color d2bc93 \
+              --description "profile.json and a surface disagree" 2>/dev/null || true
+            gh issue create --title "Profile drift detected" \
+                            --label profile-drift --body-file body.md
+          fi
+
+      - name: Close the drift issue when clean
+        if: steps.surfaces.outputs.exit == '0' && steps.facts.outputs.exit != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --label profile-drift --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Clean as of run [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}). Every surface agrees with the manifest."
+            echo "closed issue #$n"
+          done
+
+      - name: Fail the run on drift
+        if: steps.surfaces.outputs.exit != '0' || steps.facts.outputs.exit != '0'
+        run: |
+          echo "Profile drift detected; see the open issue." >&2
+          exit 1
