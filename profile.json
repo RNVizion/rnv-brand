@@ -1,9 +1,7 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees.",
-
   "version": "1.0.0",
   "updated": "2026-07-31",
-
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
     "name": "Christian Smith",
@@ -15,63 +13,134 @@
     "github": "github.com/RNVizion",
     "site": "rnvizion.dev",
     "location": "Washington, DC",
-    "appears_in": ["rnvizion.github.io", "RNVizion", "resumes", "linkedin", "huggingface", "dev.to"]
+    "appears_in": [
+      "rnvizion.github.io",
+      "RNVizion",
+      "resumes",
+      "linkedin",
+      "huggingface",
+      "dev.to"
+    ]
   },
-
   "role": {
     "_comment": "Current employment. Tracked because it appears on six surfaces and WILL change; when it does, the old title goes straight into retired[].",
     "title": "AR/VR Sales & Support Specialist",
     "employer": "Meta",
     "program": "Best Buy retail program",
     "short": "AR/VR at Meta",
-    "appears_in": ["rnvizion.github.io", "RNVizion", "resumes", "linkedin", "huggingface", "dev.to"]
+    "appears_in": [
+      "rnvizion.github.io",
+      "RNVizion",
+      "resumes",
+      "linkedin",
+      "huggingface",
+      "dev.to"
+    ]
   },
-
   "tagline": {
     "_comment": "The one-line positioning. Variants are allowed and expected; the checker looks for the stem, not the whole sentence, so a page can extend it without failing.",
     "stem": "production AI systems",
     "canonical": "Building production AI systems, and the developer tools they run on.",
-    "appears_in": ["rnvizion.github.io", "RNVizion", "resumes", "linkedin"]
+    "appears_in": [
+      "rnvizion.github.io",
+      "RNVizion",
+      "resumes",
+      "linkedin"
+    ]
   },
-
   "bio": {
     "_comment": "The standing author bio. Ships on every post; must match /bio/.",
     "canonical": "is a Python developer building production AI systems on the Claude API, an AR/VR Sales & Support Specialist at Meta, and a self-described modern-day Renaissance man. He ships retrieval systems, LLM agents, and the developer tools they run on; he also writes fiction, makes art, builds things by hand, and is figuring out the rest as he goes.",
-    "must_appear_in": ["_templates/post-template.html", "blog/*/index.html"],
-    "appears_in": ["rnvizion.github.io"]
+    "must_appear_in": [
+      "_templates/post-template.html",
+      "blog/*/index.html"
+    ],
+    "appears_in": [
+      "rnvizion.github.io"
+    ]
   },
-
   "facts": {
     "_comment": "Values on more than one surface that have drifted before. 'sources' are files the checker reads; 'appears_in' is the wider map including surfaces it cannot reach.",
     "projects": {
       "value": "9",
-      "sources": ["index.html"],
-      "appears_in": ["rnvizion.github.io", "resumes", "linkedin"],
-      "note": "Stat block and the count of project articles must agree."
+      "sources": [
+        "index.html"
+      ],
+      "appears_in": [
+        "rnvizion.github.io",
+        "resumes",
+        "linkedin"
+      ],
+      "note": "Stat block and the count of project articles must agree.",
+      "derive": {
+        "method": "exact",
+        "note": "Cross-checked two ways: <article class=\"project\"> count in index.html, and the length of products[]."
+      }
     },
     "tests": {
-      "value": "5,021",
-      "sources": ["index.html"],
-      "appears_in": ["rnvizion.github.io", "resumes", "linkedin"],
-      "note": "og-image.png is generated from this; never typed twice."
+      "value": "5,000+",
+      "sources": [
+        "index.html"
+      ],
+      "appears_in": [
+        "rnvizion.github.io",
+        "resumes",
+        "linkedin"
+      ],
+      "note": "og-image.png is generated from this; never typed twice.",
+      "derive": {
+        "method": "floor_display",
+        "repos": [
+          "rnv-text-transformer",
+          "rnv-color-palette-manager",
+          "rnv-color-picker",
+          "rnv-icon-builder",
+          "rnv-color-mixer",
+          "rnv-mcp-identity",
+          "rnv-color-mcp",
+          "rnv-ask-the-corpus"
+        ],
+        "note": "Source 'def test_' count is a floor: parametrized tests expand at runtime. The checker verifies the displayed floor is actually supported by source, and says when the next rung on the ladder has been earned."
+      },
+      "floor_observed": 4906,
+      "ladder": [
+        "5,000+",
+        "10,000+",
+        "15,000+",
+        "20,000+"
+      ],
+      "_comment": "Public surfaces carry a floor that steps in 5k increments, not an exact count. The exact figure came from a CI run and cannot be re-derived without running every suite; the floor can be, from source. Move the display to the next rung only when the source floor clears it."
     },
     "eval_cases": {
       "value": "58",
       "sources": [],
-      "appears_in": ["resumes"],
-      "note": "Shape-only on public surfaces per the standing rule. Split is 37 in-corpus, 21 out-of-corpus."
+      "appears_in": [
+        "resumes"
+      ],
+      "note": "Shape-only on public surfaces per the standing rule. Split is 37 in-corpus, 21 out-of-corpus.",
+      "derive": {
+        "method": "exact",
+        "repo": "rnv-ask-the-corpus",
+        "file": "eval/cases.jsonl",
+        "split": {
+          "in_corpus": 37,
+          "out_of_corpus": 21
+        },
+        "note": "Exactly derivable: one JSON object per line, each carrying a 'kind'."
+      }
     }
   },
-
   "eval_thresholds": {
     "_comment": "The three gates. Declared in rnv-ask-the-corpus/eval/thresholds.json and quoted on the resume; the checker verifies the two agree.",
     "retrieval_accuracy": 85.0,
     "ooc_refusal_accuracy": 90.0,
     "false_refusal_rate": 10.0,
     "source_of_truth": "rnv-ask-the-corpus/eval/thresholds.json",
-    "appears_in": ["rnv-ask-the-corpus", "resumes"]
+    "appears_in": [
+      "rnv-ask-the-corpus",
+      "resumes"
+    ]
   },
-
   "products": [
     {
       "_comment": "The three-layer naming rule as data. display = product name, repo = slug, deployment = platform ID. Where they diverge, the reason is recorded so nobody 'corrects' it later.",
@@ -106,66 +175,199 @@
       "platform": "Hugging Face Space",
       "note": "Apache-2.0 reference implementation. Never 'open standard' or 'open proposal'."
     },
-    { "display": "RNV Text Transformer", "repo": "rnv-text-transformer" },
-    { "display": "RNV Color Palette Manager", "repo": "rnv-color-palette-manager" },
-    { "display": "RNV Color Picker", "repo": "rnv-color-picker" },
-    { "display": "RNV Icon Builder", "repo": "rnv-icon-builder" },
-    { "display": "RNV Color Mixer", "repo": "rnv-color-mixer" }
+    {
+      "display": "RNV Text Transformer",
+      "repo": "rnv-text-transformer"
+    },
+    {
+      "display": "RNV Color Palette Manager",
+      "repo": "rnv-color-palette-manager"
+    },
+    {
+      "display": "RNV Color Picker",
+      "repo": "rnv-color-picker"
+    },
+    {
+      "display": "RNV Icon Builder",
+      "repo": "rnv-icon-builder"
+    },
+    {
+      "display": "RNV Color Mixer",
+      "repo": "rnv-color-mixer"
+    }
   ],
-
   "repos": {
     "_comment": "Every repo the checker knows how to fetch and check with --all. 'checks' selects which groups apply; a library repo has no bio to check.",
-    "rnvizion.github.io": { "checks": ["retired", "contact", "renames", "bio", "facts", "products"] },
-    "RNVizion":           { "checks": ["retired", "contact", "renames", "products"] },
-    "rnv-color-mcp":      { "checks": ["retired", "contact", "renames", "products"] },
-    "rnv-mcp-identity":   { "checks": ["retired", "contact", "renames", "products"] },
-    "rnv-ask-the-corpus": { "checks": ["retired", "contact", "renames", "products", "thresholds"] },
-    "rnv-publishing-agent": { "checks": ["retired", "contact", "renames", "products"] },
-    "rnv-text-transformer": { "checks": ["retired", "contact", "renames"] },
-    "rnv-color-palette-manager": { "checks": ["retired", "contact", "renames"] },
-    "rnv-color-picker":   { "checks": ["retired", "contact", "renames"] },
-    "rnv-icon-builder":   { "checks": ["retired", "contact", "renames"] },
-    "rnv-color-mixer":    { "checks": ["retired", "contact", "renames"] },
-    "rnv-brand":          { "checks": ["retired", "contact"] },
-    "rnv-live":           { "checks": ["retired", "contact", "renames"] },
-    "rnv-evcalc":         { "checks": ["retired", "contact", "renames"] }
+    "rnvizion.github.io": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames",
+        "bio",
+        "facts",
+        "products"
+      ]
+    },
+    "RNVizion": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames",
+        "products"
+      ]
+    },
+    "rnv-color-mcp": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames",
+        "products"
+      ]
+    },
+    "rnv-mcp-identity": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames",
+        "products"
+      ]
+    },
+    "rnv-ask-the-corpus": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames",
+        "products",
+        "thresholds"
+      ]
+    },
+    "rnv-publishing-agent": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames",
+        "products"
+      ]
+    },
+    "rnv-text-transformer": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames"
+      ]
+    },
+    "rnv-color-palette-manager": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames"
+      ]
+    },
+    "rnv-color-picker": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames"
+      ]
+    },
+    "rnv-icon-builder": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames"
+      ]
+    },
+    "rnv-color-mixer": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames"
+      ]
+    },
+    "rnv-brand": {
+      "checks": [
+        "retired",
+        "contact"
+      ]
+    },
+    "rnv-live": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames"
+      ]
+    },
+    "rnv-evcalc": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames"
+      ]
+    }
   },
-
   "retired": [
     {
       "phrase": "open standard",
       "reason": "AIII stood down its standards bid 2026-07-23; it is an Apache-2.0 reference implementation.",
-      "exempt": ["NOTICE"],
+      "exempt": [
+        "NOTICE"
+      ],
       "exempt_reason": "NOTICE states AIII interoperates with open standards including MCP and IETF/WIMSE. Composing on standards is not claiming to be one."
     },
-    { "phrase": "open proposal", "reason": "Same as above." },
-    { "phrase": "open identity standard", "reason": "Same as above." },
-    { "phrase": "standards initiative", "reason": "Same as above." },
+    {
+      "phrase": "open proposal",
+      "reason": "Same as above."
+    },
+    {
+      "phrase": "open identity standard",
+      "reason": "Same as above."
+    },
+    {
+      "phrase": "standards initiative",
+      "reason": "Same as above."
+    },
     {
       "phrase": "MCP Publishing Agent",
       "reason": "Renamed to RNV Publishing Agent 2026-07-28.",
-      "exempt": ["eval/cases.jsonl"],
+      "exempt": [
+        "eval/cases.jsonl"
+      ],
       "exempt_reason": "The res-count case note names it. A note field, not matched against retrieval. This is the case the 'Honest and Wrong' essay is built on."
     },
-    { "phrase": "regulated cannabis", "reason": "Hotbox DC is described as 'a regulated startup'." },
-    { "phrase": "builds desktop tools", "reason": "Retired author bio. Replaced 2026-07-28." },
-    { "phrase": "Featured Projects", "reason": "Heading is 'Selected Projects'; parsers map it more reliably." },
-    { "phrase": "christian-smith-40b957161", "reason": "Old LinkedIn vanity URL, retired 2026-07-29." },
+    {
+      "phrase": "regulated cannabis",
+      "reason": "Hotbox DC is described as 'a regulated startup'."
+    },
+    {
+      "phrase": "builds desktop tools",
+      "reason": "Retired author bio. Replaced 2026-07-28."
+    },
+    {
+      "phrase": "Featured Projects",
+      "reason": "Heading is 'Selected Projects'; parsers map it more reliably."
+    },
+    {
+      "phrase": "christian-smith-40b957161",
+      "reason": "Old LinkedIn vanity URL, retired 2026-07-29."
+    },
     {
       "phrase": "5,003",
       "reason": "Stale test aggregate.",
-      "exempt": ["scripts/generate_site_og.py"],
+      "exempt": [
+        "scripts/generate_site_og.py"
+      ],
       "exempt_reason": "The docstring cites the 5,003-vs-5,021 drift as the reason the script exists."
     },
-    { "phrase": "40-case", "reason": "Eval suite is 58 cases; public surfaces use shape-only phrasing anyway." }
+    {
+      "phrase": "40-case",
+      "reason": "Eval suite is 58 cases; public surfaces use shape-only phrasing anyway."
+    }
   ],
-
   "renamed_repos": {
     "_comment": "GitHub redirects cover these, but a link teaches the old name.",
     "ask-the-corpus": "rnv-ask-the-corpus",
     "publishing-agent": "rnv-publishing-agent"
   },
-
   "protected": {
     "_comment": "Strings that look like the renamed repos but must NEVER be rewritten. Hugging Face Space IDs are deliberately exempt from the rnv- prefix.",
     "strings": [
@@ -174,7 +376,6 @@
       "repo_id=\"RNVizion/ask-the-corpus\""
     ]
   },
-
   "manual_surfaces": [
     {
       "name": "LinkedIn",
@@ -191,12 +392,19 @@
     {
       "name": "Hugging Face profile",
       "url": "https://huggingface.co/RNVizion",
-      "check": ["Bio current", "Space descriptions current", "Space IDs unchanged (they are prefix-exempt)"]
+      "check": [
+        "Bio current",
+        "Space descriptions current",
+        "Space IDs unchanged (they are prefix-exempt)"
+      ]
     },
     {
       "name": "dev.to profile",
       "url": "https://dev.to",
-      "check": ["Bio current", "Syndicated posts carry the canonical author bio"]
+      "check": [
+        "Bio current",
+        "Syndicated posts carry the canonical author bio"
+      ]
     },
     {
       "name": "MCP registry",
