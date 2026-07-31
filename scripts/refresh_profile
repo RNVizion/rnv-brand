@@ -292,6 +292,144 @@ def check_docx(cfg, docx_dir, rep):
         rep.checks += 1
 
 
+
+
+# --------------------------------------------------------------------------
+# fact verification — derive what can be derived, bound what cannot
+# --------------------------------------------------------------------------
+def _count_test_functions(root: Path) -> int:
+    n = 0
+    for py in root.rglob("*.py"):
+        rel = py.relative_to(root).as_posix()
+        if any(rel.startswith(d) or f"/{d}/" in f"/{rel}" for d in SKIP_DIRS):
+            continue
+        body = py.read_text(encoding="utf-8", errors="ignore")
+        n += len(re.findall(r"^\s*(?:async\s+)?def test_", body, re.M))
+    return n
+
+
+def _count_parametrized_files(root: Path) -> int:
+    n = 0
+    for py in root.rglob("*.py"):
+        body = py.read_text(encoding="utf-8", errors="ignore")
+        if "parametrize" in body:
+            n += 1
+    return n
+
+
+def verify_facts(cfg, rep, workdir: Path):
+    """Check the manifest against reality, not just surfaces against the manifest.
+
+    Without this the manifest is a single point of truth that nothing verifies:
+    ship a test suite, and the checker faithfully enforces a stale number across
+    every surface with total confidence. That is the same failure the eval suite
+    had once, a scorecard graded against answers that were asserted rather than
+    checked.
+
+    Not every fact is derivable, and the honest move is to say which. Project and
+    eval-case counts come out of the files exactly. The test total cannot: source
+    counting yields a floor because parametrized tests expand at runtime. So the
+    floor is what gets enforced, and the gap is reported rather than hidden.
+    """
+    facts = cfg["facts"]
+
+    # ---- eval cases: exact ----
+    spec = facts.get("eval_cases", {})
+    d = spec.get("derive", {})
+    if d.get("method") == "exact" and d.get("repo"):
+        root = fetch_repo(d["repo"], workdir)
+        if root is None:
+            rep.warn("verify", d["repo"], "could not fetch; eval cases unverified")
+        else:
+            f = root / d["file"]
+            if not f.exists():
+                rep.warn("verify", d["file"], "not found")
+            else:
+                rows = [json.loads(l) for l in f.read_text(encoding="utf-8").splitlines() if l.strip()]
+                actual = len(rows)
+                kinds = {}
+                for r in rows:
+                    kinds[r.get("kind")] = kinds.get(r.get("kind"), 0) + 1
+                if str(actual) != str(spec["value"]):
+                    rep.fail("verify", d["file"],
+                             f"manifest says {spec['value']} eval cases; the file has {actual}")
+                else:
+                    print(f"    derived  eval_cases = {actual}  {kinds}")
+                for k, v in d.get("split", {}).items():
+                    if kinds.get(k) != v:
+                        rep.fail("verify", d["file"],
+                                 f"manifest split says {k}={v}; the file has {kinds.get(k)}")
+            rep.checks += 1
+
+    # ---- projects: exact, cross-checked two ways ----
+    spec = facts.get("projects", {})
+    if spec.get("derive", {}).get("method") == "exact":
+        declared = str(spec["value"])
+        n_products = len([p for p in cfg["products"] if p.get("display")])
+        if str(n_products) != declared:
+            rep.fail("verify", "profile.json",
+                     f"manifest says {declared} projects; products[] lists {n_products}")
+        else:
+            print(f"    derived  projects = {n_products}  (from products[])")
+        rep.checks += 1
+
+    # ---- tests: floor only ----
+    spec = facts.get("tests", {})
+    d = spec.get("derive", {})
+    if d.get("method") in ("floor", "floor_display"):
+        floor, param_files, missing = 0, 0, []
+        for name in d.get("repos", []):
+            root = fetch_repo(name, workdir)
+            if root is None:
+                missing.append(name)
+                continue
+            floor += _count_test_functions(root)
+            param_files += _count_parametrized_files(root)
+        raw = str(spec["value"]).replace(",", "").replace("+", "")
+        declared = int(raw)
+        ladder = [int(x.replace(",", "").replace("+", "")) for x in spec.get("ladder", [])]
+        is_display = d.get("method") == "floor_display"
+        if missing:
+            rep.warn("verify", "tests",
+                     f"could not fetch {', '.join(missing)}; floor is incomplete")
+        gap = declared - floor
+        print(f"    derived  tests floor = {floor:,}  displayed = {spec['value']}  "
+              f"gap = {gap:+,}  ({param_files} parametrized file(s))")
+
+        if not is_display:
+            # an exact claim can never sit below a source floor
+            if declared < floor:
+                rep.fail("verify", "profile.json",
+                         f"declared {declared:,} is BELOW the source floor {floor:,}; "
+                         f"a source count can only understate, so the manifest is stale")
+        else:
+            # a displayed floor fails the other way: by claiming more than source
+            # can carry. Below the floor is not an error, it is underselling, and
+            # the ladder says when the next rung has been earned.
+            if declared > floor and param_files == 0:
+                rep.fail("verify", "profile.json",
+                         f"display claims {spec['value']} but the source floor is {floor:,} "
+                         f"and nothing is parametrized, so nothing can expand at runtime")
+            elif declared > floor * 1.25:
+                # runtime expansion is real but bounded; a quarter above the source
+                # floor is already generous for the number of parametrized files here
+                per = gap / param_files if param_files else gap
+                rep.fail("verify", "profile.json",
+                         f"display claims {spec['value']} against a source floor of {floor:,}. "
+                         f"That needs {per:,.0f} extra runtime tests per parametrized file, "
+                         f"which is not plausible; read the figure off a CI run")
+            elif declared > floor:
+                print(f"    note     {spec['value']} sits {gap:,} above the source floor; "
+                      f"supported by runtime expansion across {param_files} parametrized "
+                      f"file(s), not provable from source alone")
+            earned = max([r for r in ladder if r <= floor], default=None)
+            if earned and earned > declared:
+                rep.warn("verify", "profile.json",
+                         f"the source floor {floor:,} has earned the next rung: "
+                         f"display says {spec['value']}, {earned:,}+ is now supportable")
+        rep.checks += 1
+
+
 # --------------------------------------------------------------------------
 def print_manual(cfg):
     i, r = cfg["identity"], cfg["role"]
@@ -329,6 +467,8 @@ def main():
     ap.add_argument("--only", help="comma-separated check groups")
     ap.add_argument("--quiet", action="store_true", help="skip the manual checklist")
     ap.add_argument("--manual", action="store_true", help="print only the checklist")
+    ap.add_argument("--verify-facts", action="store_true",
+                    help="check the manifest against reality, not just surfaces against the manifest")
     args = ap.parse_args()
 
     mp = Path(args.manifest)
@@ -345,6 +485,13 @@ def main():
     rep = Report()
     scanned = []
 
+    if args.verify_facts:
+        print("\nVERIFYING FACTS against source")
+        print("=" * 70)
+        with tempfile.TemporaryDirectory() as tmp:
+            verify_facts(cfg, rep, Path(tmp))
+        scanned.append("manifest")
+
     if args.root:
         root = Path(args.root)
         name = root.resolve().name
@@ -360,8 +507,8 @@ def main():
                     continue
                 run_repo(cfg, name, root, rep, only)
                 scanned.append(name)
-    elif not args.docx:
-        ap.error("give --all, --repo, --root, --docx, or --manual")
+    elif not args.docx and not args.verify_facts:
+        ap.error("give --all, --repo, --root, --docx, --verify-facts, or --manual")
 
     if args.docx:
         check_docx(cfg, args.docx, rep)
