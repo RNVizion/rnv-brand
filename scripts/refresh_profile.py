@@ -26,7 +26,7 @@ suite's own history will legitimately quote retired phrasing, which means the
 checker needs somewhere for a true-but-historical string to live. A path skip is
 the tempting answer and the wrong one: it is unbounded, it is silent, and it
 never dies, so coverage shrinks a file at a time and a green run stops meaning
-what it used to mean. Three mechanisms replace it:
+what it used to mean. Four mechanisms replace it:
 
   · a bounded exemption, {"path": ..., "max": 1}, keeps the file checked and
     asserts a known quantity; occurrence two fails
@@ -35,6 +35,12 @@ what it used to mean. Three mechanisms replace it:
     stopped matching substrings and started testing structure
   · an exemption ledger prints what fired and warns on any exemption that
     matched nothing, because a dead exemption is coverage lost for no benefit
+  · ARCHIVE_EXCLUDE declares whole paths that are historical record by
+    definition — dated snapshots whose job is preserving the phrasing of
+    their day — and skips retirement checks there wholesale. It differs from
+    the path skip condemned above in the two ways that matter: it is a class
+    chosen once rather than files excused one retirement at a time, and the
+    ledger prints it every sweep, so the boundary stays visible
 
 A bare string in exempt[] still works and still means unbounded; the ledger names
 those so they can be tightened rather than forgotten.
@@ -85,6 +91,21 @@ TEXT_EXT = {".html", ".md", ".py", ".yml", ".yaml", ".json", ".xml", ".txt", ".s
 # the eval scorer hit once the corpus began describing the machine.
 SELF_EXCLUDE = {"profile.json", "scripts/refresh_profile.py", "refresh_profile.py"}
 
+# Historical record by definition: dated snapshots whose whole purpose is
+# preserving the phrasing of their day. Retirement checks (retired phrases and
+# retired product names) skip these wholesale — the June baseline IS a 40-case
+# run and must keep saying so, or the archive stops being an archive. Everything
+# else still applies: contact, renames, and facts read these files like any
+# other, because history is exempt from retirement, not from being read. The
+# ledger prints this exclusion every full sweep. Add a path here only when its
+# contents are frozen by intent: eval history, changelogs, dated reports.
+ARCHIVE_EXCLUDE = ("docs/eval-history/",)
+
+
+def _archived(rel: str) -> bool:
+    return any(rel.startswith(a) for a in ARCHIVE_EXCLUDE)
+
+
 # Point-of-use marker. "retired-ok" on the line, or the line above, excuses one
 # occurrence. Bare form excuses any phrase; "retired-ok: 40-case" excuses only
 # that one, which is the form to prefer because it cannot over-excuse later.
@@ -101,27 +122,76 @@ def norm(s: str) -> str:
 # One walk, one read, reused by every check that scans text. The old shape read
 # every file once per retired phrase: twelve passes over fourteen repos, which is
 # most of the workflow's twenty-minute budget spent re-reading the same bytes.
-_FILE_CACHE: dict[str, list[tuple[str, str]]] = {}
+# The walk also records what it saw and what it read, because the exemption
+# ledger cannot judge a dead exemption without knowing whether the file it
+# points at was ever opened.
+_FILE_CACHE: dict[str, tuple[list[tuple[str, str]], frozenset, frozenset]] = {}
 
 
-def text_files(root: Path) -> list[tuple[str, str]]:
-    """Return [(relative path, body)] for every text file under root, cached."""
+def _skipped(rel: str) -> bool:
+    """Skip-dir test by whole path component, never by prefix. The old test was
+    rel.startswith(d), and ".github" starts with ".git": every workflow file in
+    every repo was invisible, including the one that runs this checker. Wrapping
+    both sides in slashes makes `.git` match only the `.git` segment, and keeps
+    multi-segment entries like assets/fonts working."""
+    return any(f"/{d}/" in f"/{rel}/" for d in SKIP_DIRS)
+
+
+def _sniffs_text(p: Path) -> bool:
+    """True when an extensionless file reads as UTF-8 text. NOTICE, LICENSE,
+    CODEOWNERS, Dockerfile and their kin carry no suffix, and an extension
+    whitelist reads right past them — which is how a live exemption spent a week
+    reported dead. Sniffing the class closes it instead of enumerating it. A
+    trailing multibyte character cut by the sample window is tolerated."""
+    try:
+        with p.open("rb") as fh:
+            head = fh.read(8192)
+    except OSError:
+        return False
+    if b"\x00" in head:
+        return False
+    for trim in range(4):
+        try:
+            head[: len(head) - trim].decode("utf-8")
+            return True
+        except UnicodeDecodeError:
+            continue
+    return False
+
+
+def _collect(root: Path):
     key = str(root.resolve())
     cached = _FILE_CACHE.get(key)
     if cached is not None:
         return cached
-    out: list[tuple[str, str]] = []
+    files: list[tuple[str, str]] = []
+    present: set[str] = set()
     for p in sorted(root.rglob("*")):
-        if not p.is_file() or p.suffix.lower() not in TEXT_EXT:
+        if not p.is_file():
             continue
         rel = p.relative_to(root).as_posix()
+        if _skipped(rel):
+            continue
+        present.add(rel)
         if rel in SELF_EXCLUDE:
             continue
-        if any(rel.startswith(d) or f"/{d}/" in f"/{rel}" for d in SKIP_DIRS):
+        if not (p.suffix.lower() in TEXT_EXT or (p.suffix == "" and _sniffs_text(p))):
             continue
-        out.append((rel, p.read_text(encoding="utf-8", errors="ignore")))
+        files.append((rel, p.read_text(encoding="utf-8", errors="ignore")))
+    out = (files, frozenset(present), frozenset(r for r, _ in files))
     _FILE_CACHE[key] = out
     return out
+
+
+def text_files(root: Path) -> list[tuple[str, str]]:
+    """Return [(relative path, body)] for every text file under root, cached."""
+    return _collect(root)[0]
+
+
+def tree_presence(root: Path) -> tuple[frozenset, frozenset]:
+    """(files that exist under root, files that were actually read)."""
+    _, present, scanned = _collect(root)
+    return present, scanned
 
 
 def clear_file_cache() -> None:
@@ -170,6 +240,21 @@ class Report:
         self.exempt_use: dict[tuple[str, str], int] = {}
         # phrase -> occurrences excused by a point-of-use marker
         self.marked: dict[str, int] = {}
+        # every file that exists under a scanned root, and every file read.
+        # The gap between the two is what lets the ledger tell "the phrase is
+        # gone" from "the file was never opened" — advice that differs by 180°.
+        self.present: set[str] = set()
+        self.scanned_files: set[str] = set()
+        # (scope, rel) skipped by ARCHIVE_EXCLUDE, counted for the ledger
+        self.archived: set[tuple[str, str]] = set()
+
+    def absorb_tree(self, root: Path):
+        present, scanned = tree_presence(root)
+        self.present |= present
+        self.scanned_files |= scanned
+
+    def mark_archived(self, scope: str, rel: str):
+        self.archived.add((scope, rel))
 
     def fail(self, scope, surface, msg):
         self.findings.append(("FAIL", scope, surface, msg))
@@ -216,10 +301,16 @@ def exempt_entries(entry: dict) -> list[dict]:
     return out
 
 
+def path_matches(rel: str, pat: str) -> bool:
+    """One predicate for both exemption matching and the ledger's presence
+    test. If these two used different rules, an exemption could fire against a
+    file the ledger swears does not exist."""
+    return fnmatch.fnmatch(rel, pat) or rel.endswith(pat)
+
+
 def exempt_for(entries: list[dict], rel: str) -> dict | None:
     for e in entries:
-        pat = e["path"]
-        if fnmatch.fnmatch(rel, pat) or rel.endswith(pat):
+        if path_matches(rel, e["path"]):
             return e
     return None
 
@@ -253,6 +344,9 @@ def check_retired(cfg, root, rep, scope):
     phrases = [(e["phrase"], e.get("reason", ""), exempt_entries(e)) for e in cfg["retired"]]
 
     for rel, body in text_files(root):
+        if _archived(rel):
+            rep.mark_archived(scope, rel)
+            continue
         lower = body.lower()
         # cheap pre-filter; splitting lines for every file times every phrase is
         # the expensive part, and most files contain none of these strings
@@ -351,13 +445,21 @@ def check_facts(cfg, root, rep, scope):
                      f"declares no source file; '{spec.get('value')}' is checked on no "
                      f"reachable surface. Add the page that prints it")
             continue
+        # 'match' is the literal phrase the page must print; 'value' is the
+        # semantic fact. A bare value is a useless needle — "60" matches a CSS
+        # font weight — which is how a stale resume once passed this check with
+        # total confidence. Fall back to value when no match is given, so a
+        # fact without one keeps working exactly as before.
+        needle = spec.get("match") or spec["value"]
         for src in sources:
             p = root / src
             if not p.exists():
                 rep.warn(scope, src, f"declared source for '{name}' not found")
                 continue
-            if spec["value"] not in p.read_text(encoding="utf-8", errors="ignore"):
-                rep.fail(scope, src, f"'{name}' should read {spec['value']}; not present")
+            if needle not in p.read_text(encoding="utf-8", errors="ignore"):
+                what = (f"the phrase \u201c{needle}\u201d (match for value {spec['value']})"
+                        if needle != spec["value"] else f"{spec['value']}")
+                rep.fail(scope, src, f"'{name}' should print {what}; not present")
             rep.checks += 1
     # the stat block and the rendered article count must agree
     idx = root / "index.html"
@@ -379,6 +481,9 @@ def check_products(cfg, root, rep, scope):
     if not retired_names:
         return
     for rel, body in text_files(root):
+        if _archived(rel):
+            rep.mark_archived(scope, rel)
+            continue
         for old, new in retired_names:
             if old not in body:
                 continue
@@ -470,7 +575,7 @@ def check_docx(cfg, docx_dir, rep):
 def _iter_py(root: Path):
     for py in root.rglob("*.py"):
         rel = py.relative_to(root).as_posix()
-        if any(rel.startswith(d) or f"/{d}/" in f"/{rel}" for d in SKIP_DIRS):
+        if _skipped(rel):
             continue
         yield py
 
@@ -604,6 +709,25 @@ def verify_facts(cfg, rep, workdir: Path):
         print(f"    derived  tests floor = {floor:,}  displayed = {spec['value']}  "
               f"gap = {gap:+,}  ({param_files} parametrized file(s))")
 
+        # floor_observed is the manifest's record of the last derivation. Until
+        # this check existed it had no reader, so it drifted silently inside the
+        # file whose job is preventing silent drift. This checker never edits,
+        # by contract, so the finding carries the exact replacement value and a
+        # human commits it — the same division of labour as every other check.
+        recorded = spec.get("floor_observed")
+        if recorded is not None:
+            if floor > recorded:
+                rep.note("verify", "profile.json",
+                         f"floor_observed records {recorded:,} but source now derives "
+                         f"{floor:,}; refresh it to {floor} in the next manifest edit")
+            elif floor < recorded:
+                rep.warn("verify", "profile.json",
+                         f"floor_observed records {recorded:,} but source derives only "
+                         f"{floor:,} with every repo fetched; tests were removed or a "
+                         f"repo shrank, and the recorded floor is no longer supported")
+            else:
+                print(f"    ok       floor_observed = {recorded:,} matches the derivation")
+
         if not is_display:
             # an exact claim can never sit below a source floor
             if declared < floor:
@@ -668,10 +792,35 @@ def report_exemptions(cfg, rep):
         print(f"\n  {marked_total} occurrence(s) excused by a {MARKER} marker at the point of use:")
         for phrase, n in sorted(rep.marked.items(), key=lambda kv: -kv[1]):
             print(f"      {n:>3}  \"{phrase}\"")
+    if rep.archived:
+        print(f"\n  {len(rep.archived)} file(s) under a declared archive path, excluded "
+              f"from retirement checks:")
+        for a in ARCHIVE_EXCLUDE:
+            n = sum(1 for _, rel in rep.archived if rel.startswith(a))
+            print(f"      {n:>3}  {a}**")
+
+    # A dead exemption has three explanations, and only one of them ends in
+    # "delete it". The old warning assumed the file was read and knew only the
+    # other two; acting on it once nearly removed a live exemption whose file
+    # the walk had never opened.
     for phrase, path in dead:
-        rep.warn("exemptions", path,
-                 f'covers nothing; "{phrase}" no longer appears there. Delete it, or the '
-                 f"file moved and the exemption is now hiding a different one")
+        matched = [r for r in rep.present if path_matches(r, path)]
+        if not matched:
+            rep.warn("exemptions", path,
+                     f'covers nothing, and no file matching "{path}" exists in any '
+                     f"scanned repo. The file moved or was deleted; repoint the "
+                     f"exemption or delete it")
+        elif not any(r in rep.scanned_files for r in matched):
+            ex = sorted(matched)[0]
+            rep.warn("exemptions", path,
+                     f'never tested: "{ex}" exists but was not among the files read. '
+                     f"That is a coverage gap in the walk, not a dead exemption — "
+                     f"widen collection before judging it, and do not delete")
+        else:
+            rep.warn("exemptions", path,
+                     f'covers nothing; "{phrase}" no longer appears there. The file '
+                     f"was read, so deleting is safe — or the content moved and a "
+                     f"fresh use now sits somewhere unexempted")
     for phrase, path in unbounded:
         rep.note("exemptions", path,
                  f'unbounded for "{phrase}"; one known use buys infinite uses. Add '
@@ -744,6 +893,7 @@ def main():
         root = Path(args.root)
         name = root.resolve().name
         run_repo(cfg, name, root, rep, only)
+        rep.absorb_tree(root)
         clear_file_cache()
         scanned.append(name)
     elif args.all or args.repo:
@@ -756,6 +906,7 @@ def main():
                     full_sweep = False   # a partial sweep cannot judge a dead exemption
                     continue
                 run_repo(cfg, name, root, rep, only)
+                rep.absorb_tree(root)
                 clear_file_cache()
                 scanned.append(name)
     elif not args.docx and not args.verify_facts:
