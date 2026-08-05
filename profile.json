@@ -1,6 +1,6 @@
 {
-  "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim. Exempting each phrase individually does not scale -- every future retirement will fail there again -- so the durable fix is an archive path exclusion in the checker, alongside SELF_EXCLUDE. The per-file exemptions below are the interim.",
-  "version": "1.2.1",
+  "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
+  "version": "1.2.2",
   "updated": "2026-08-05",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
@@ -104,7 +104,7 @@
         ],
         "note": "Source 'def test_' count is a floor: parametrized tests expand at runtime. The checker verifies the displayed floor is actually supported by source, and says when the next rung on the ladder has been earned. SUBSET: rnv-publishing-agent and rnv-brand are not counted, so the floor is conservative by construction. Adding a repo to this list requires recomputing floor_observed in the same change."
       },
-      "floor_observed": 4906,
+      "floor_observed": 4908,
       "ladder": [
         "5,000+",
         "10,000+",
@@ -381,29 +381,11 @@
     },
     {
       "phrase": "40-case",
-      "reason": "Eval suite is 60 cases (frozen 2026-08-05). Superseded twice: 40 -> 58 -> 60.",
-      "exempt": [
-        {
-          "path": "docs/eval-history/2026-06-29-baseline.md",
-          "max": 1,
-          "reason": "Preserved dated evidence. This file IS a 40-case run and its provenance header names the 58-case expansion it predates; both phrases must survive here or the archive stops being an archive. Counts assume the de-duplicated file (one header block).",
-          "added": "2026-08-05",
-          "verified": "2026-08-05"
-        }
-      ]
+      "reason": "Eval suite is 60 cases (frozen 2026-08-05). Superseded twice: 40 -> 58 -> 60. Archive copies under docs/eval-history/ are excluded wholesale by ARCHIVE_EXCLUDE in the checker; no exemption needed."
     },
     {
       "phrase": "58-case",
-      "reason": "Eval suite moved to 60 on 2026-08-05. Retired the same day the surfaces were corrected, so a stale copy is caught rather than assumed absent.",
-      "exempt": [
-        {
-          "path": "docs/eval-history/2026-06-29-baseline.md",
-          "max": 1,
-          "reason": "Preserved dated evidence. This file IS a 40-case run and its provenance header names the 58-case expansion it predates; both phrases must survive here or the archive stops being an archive. Counts assume the de-duplicated file (one header block).",
-          "added": "2026-08-05",
-          "verified": "2026-08-05"
-        }
-      ]
+      "reason": "Eval suite moved to 60 on 2026-08-05. Retired the same day the surfaces were corrected, so a stale copy is caught rather than assumed absent. Archive copies under docs/eval-history/ are excluded wholesale by ARCHIVE_EXCLUDE in the checker; no exemption needed."
     },
     {
       "phrase": "37 in-corpus",
