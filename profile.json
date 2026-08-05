@@ -1,6 +1,6 @@
 {
-  "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees.",
-  "version": "1.1.0",
+  "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim. Exempting each phrase individually does not scale -- every future retirement will fail there again -- so the durable fix is an archive path exclusion in the checker, alongside SELF_EXCLUDE. The per-file exemptions below are the interim.",
+  "version": "1.2.1",
   "updated": "2026-08-05",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
@@ -60,9 +60,10 @@
     ]
   },
   "facts": {
-    "_comment": "Values on more than one surface that have drifted before. 'sources' are files the checker reads; 'appears_in' is the wider map including surfaces it cannot reach.",
+    "_comment": "Values on more than one surface that have drifted before. 'sources' are files the checker reads; 'appears_in' is the wider map including surfaces it cannot reach. 'match' is the literal phrase that must appear on those sources -- a bare value is a useless needle (\"60\" matches a CSS font weight), so where a fact is printed inside a phrase, give the phrase. MOVE 'match' WITH 'value': a stale match fails loudly on the next run, which is correct but surprising if you forget the pairing.",
     "projects": {
       "value": "9",
+      "match": "<div class=\"stat-value\">9</div>",
       "sources": [
         "index.html"
       ],
@@ -79,6 +80,7 @@
     },
     "tests": {
       "value": "5,000+",
+      "match": "5,000+",
       "sources": [
         "index.html"
       ],
@@ -113,6 +115,7 @@
     },
     "eval_cases": {
       "value": "60",
+      "match": "60-case evaluation suite",
       "sources": [
         "resume/index.html"
       ],
@@ -316,7 +319,7 @@
         {
           "path": "NOTICE",
           "max": 1,
-          "reason": "NOTICE states AIII interoperates with open standards including MCP and IETF/WIMSE. Composing on standards is not claiming to be one.",
+          "reason": "NOTICE states AIII interoperates with open standards including MCP and IETF/WIMSE. Composing on standards is not claiming to be one. DO NOT DELETE on a 'covers nothing' warning: the phrase IS present in NOTICE (line 6, 'open standards'), verified 2026-08-05. A zero-use ledger entry here means the scanner is not reading the file -- NOTICE is extensionless -- not that the phrase is gone. Deleting it would remove a real exemption that fires the moment the scanner is fixed.",
           "added": "2026-07-28",
           "verified": "2026-08-05"
         }
@@ -378,11 +381,29 @@
     },
     {
       "phrase": "40-case",
-      "reason": "Eval suite is 60 cases (frozen 2026-08-05). Superseded twice: 40 -> 58 -> 60."
+      "reason": "Eval suite is 60 cases (frozen 2026-08-05). Superseded twice: 40 -> 58 -> 60.",
+      "exempt": [
+        {
+          "path": "docs/eval-history/2026-06-29-baseline.md",
+          "max": 1,
+          "reason": "Preserved dated evidence. This file IS a 40-case run and its provenance header names the 58-case expansion it predates; both phrases must survive here or the archive stops being an archive. Counts assume the de-duplicated file (one header block).",
+          "added": "2026-08-05",
+          "verified": "2026-08-05"
+        }
+      ]
     },
     {
       "phrase": "58-case",
-      "reason": "Eval suite moved to 60 on 2026-08-05. Retired the same day the surfaces were corrected, so a stale copy is caught rather than assumed absent."
+      "reason": "Eval suite moved to 60 on 2026-08-05. Retired the same day the surfaces were corrected, so a stale copy is caught rather than assumed absent.",
+      "exempt": [
+        {
+          "path": "docs/eval-history/2026-06-29-baseline.md",
+          "max": 1,
+          "reason": "Preserved dated evidence. This file IS a 40-case run and its provenance header names the 58-case expansion it predates; both phrases must survive here or the archive stops being an archive. Counts assume the de-duplicated file (one header block).",
+          "added": "2026-08-05",
+          "verified": "2026-08-05"
+        }
+      ]
     },
     {
       "phrase": "37 in-corpus",
