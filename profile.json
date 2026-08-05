@@ -1,7 +1,7 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees.",
-  "version": "1.0.0",
-  "updated": "2026-07-31",
+  "version": "1.1.0",
+  "updated": "2026-08-05",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
     "name": "Christian Smith",
@@ -100,7 +100,7 @@
           "rnv-color-mcp",
           "rnv-ask-the-corpus"
         ],
-        "note": "Source 'def test_' count is a floor: parametrized tests expand at runtime. The checker verifies the displayed floor is actually supported by source, and says when the next rung on the ladder has been earned."
+        "note": "Source 'def test_' count is a floor: parametrized tests expand at runtime. The checker verifies the displayed floor is actually supported by source, and says when the next rung on the ladder has been earned. SUBSET: rnv-publishing-agent and rnv-brand are not counted, so the floor is conservative by construction. Adding a repo to this list requires recomputing floor_observed in the same change."
       },
       "floor_observed": 4906,
       "ladder": [
@@ -112,21 +112,24 @@
       "_comment": "Public surfaces carry a floor that steps in 5k increments, not an exact count. The exact figure came from a CI run and cannot be re-derived without running every suite; the floor can be, from source. Move the display to the next rung only when the source floor clears it."
     },
     "eval_cases": {
-      "value": "58",
-      "sources": [],
-      "appears_in": [
-        "resumes"
+      "value": "60",
+      "sources": [
+        "resume/index.html"
       ],
-      "note": "Shape-only on public surfaces per the standing rule. Split is 37 in-corpus, 21 out-of-corpus.",
+      "appears_in": [
+        "resumes",
+        "rnvizion.github.io"
+      ],
+      "note": "Total only on public surfaces; the split is never published. A trap flipping out_of_corpus -> in_corpus on publication moves the split without moving the total, so the split fails the publication test and lives here as a machine-checked fact instead.",
       "derive": {
         "method": "exact",
         "repo": "rnv-ask-the-corpus",
         "file": "eval/cases.jsonl",
         "split": {
-          "in_corpus": 37,
-          "out_of_corpus": 21
+          "in_corpus": 38,
+          "out_of_corpus": 22
         },
-        "note": "Exactly derivable: one JSON object per line, each carrying a 'kind'."
+        "note": "Exactly derivable: one JSON object per line, each carrying a 'kind'. Frozen at 60 by decision 2026-08-05; update split in the same commit as any trap flip."
       }
     }
   },
@@ -149,7 +152,7 @@
       "deployment": "RNVizion/ask-the-corpus",
       "platform": "Hugging Face Space",
       "prefix_exempt": true,
-      "exempt_reason": "The org namespace already carries the brand; renaming yields the stutter rnvizion-rnv-ask-the-corpus.hf.space and breaks URLs printed on resumes in circulation.",
+      "exempt_reason": "The live URL is printed on resumes already in circulation, and Hugging Face Space IDs cannot redirect. Note the stutter argument (rnvizion-rnv-ask-the-corpus.hf.space) is NOT load-bearing: rnv-color-mcp deploys as RNVizion/rnv-color-mcp and carries the same stutter deliberately. Breaking a live URL is the reason; aesthetics are not.",
       "note": "The PRODUCT NAME did not change when the repo was renamed. Never 'RNV Ask the Corpus'."
     },
     {
@@ -310,9 +313,14 @@
       "phrase": "open standard",
       "reason": "AIII stood down its standards bid 2026-07-23; it is an Apache-2.0 reference implementation.",
       "exempt": [
-        "NOTICE"
-      ],
-      "exempt_reason": "NOTICE states AIII interoperates with open standards including MCP and IETF/WIMSE. Composing on standards is not claiming to be one."
+        {
+          "path": "NOTICE",
+          "max": 1,
+          "reason": "NOTICE states AIII interoperates with open standards including MCP and IETF/WIMSE. Composing on standards is not claiming to be one.",
+          "added": "2026-07-28",
+          "verified": "2026-08-05"
+        }
+      ]
     },
     {
       "phrase": "open proposal",
@@ -330,9 +338,14 @@
       "phrase": "MCP Publishing Agent",
       "reason": "Renamed to RNV Publishing Agent 2026-07-28.",
       "exempt": [
-        "eval/cases.jsonl"
-      ],
-      "exempt_reason": "The res-count case note names it. A note field, not matched against retrieval. This is the case the 'Honest and Wrong' essay is built on."
+        {
+          "path": "eval/cases.jsonl",
+          "max": 1,
+          "reason": "The res-count case note names it. A note field, not matched against retrieval. This is the case the 'Honest and Wrong' essay is built on; editing it destroys the evidence.",
+          "added": "2026-07-28",
+          "verified": "2026-08-05"
+        }
+      ]
     },
     {
       "phrase": "regulated cannabis",
@@ -354,13 +367,30 @@
       "phrase": "5,003",
       "reason": "Stale test aggregate.",
       "exempt": [
-        "scripts/generate_site_og.py"
-      ],
-      "exempt_reason": "The docstring cites the 5,003-vs-5,021 drift as the reason the script exists."
+        {
+          "path": "scripts/generate_site_og.py",
+          "max": 1,
+          "reason": "The docstring cites the 5,003-vs-5,021 drift as the reason the script exists.",
+          "added": "2026-07-28",
+          "verified": "2026-08-05"
+        }
+      ]
     },
     {
       "phrase": "40-case",
-      "reason": "Eval suite is 58 cases; public surfaces use shape-only phrasing anyway."
+      "reason": "Eval suite is 60 cases (frozen 2026-08-05). Superseded twice: 40 -> 58 -> 60."
+    },
+    {
+      "phrase": "58-case",
+      "reason": "Eval suite moved to 60 on 2026-08-05. Retired the same day the surfaces were corrected, so a stale copy is caught rather than assumed absent."
+    },
+    {
+      "phrase": "37 in-corpus",
+      "reason": "The split is never published; see facts.eval_cases. Catches a surface that updates the total but keeps the parenthetical."
+    },
+    {
+      "phrase": "Security & Networking",
+      "reason": "Skills category retired for 'Security & Identity' 2026-07-28, which carries OAuth 2.1, RFC 9728, and RFC 7800/7638."
     }
   ],
   "renamed_repos": {
@@ -383,7 +413,7 @@
       "check": [
         "Headline carries no retired phrase",
         "About matches current positioning and names RNV Publishing Agent",
-        "Projects: AIII, Ask the Corpus, RNV Color MCP, RNV Publishing Agent descriptions current",
+        "Projects: AIII, Ask the Corpus, rnv-color-mcp, RNV Publishing Agent descriptions current",
         "Experience: Hotbox says 'regulated startup'; Vitalyst runs Productivity Consultant to Help Desk to Content Developer",
         "Contact email and vanity URL match the manifest",
         "Current role matches role.title and role.employer"
