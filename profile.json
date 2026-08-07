@@ -1,7 +1,7 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
-  "version": "1.2.2",
-  "updated": "2026-08-05",
+  "version": "1.2.3",
+  "updated": "2026-08-07",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
     "name": "Christian Smith",
@@ -446,6 +446,18 @@
         "rnv-color-mcp description matches server.json",
         "Deliberately omits OAuth 2.1; the public endpoint has RNV_AUTH unset and a connection manifest must not imply otherwise"
       ]
+    },
+    {
+      "name": "OpenSSF Best Practices Baseline",
+      "url": "https://bestpractices.dev/projects/13437",
+      "_comment": "Here rather than in facts{} for two reasons. Nothing in the repos derives it -- the figure lives on bestpractices.dev -- so no check_facts guard is possible. And OpenSSF owns the denominator: a control added or reclassified moves the claim with nobody touching a repo, which is the same drift class as a source count auto-incrementing. Deliberately NOT paired with the other two per-project figures: 46 tests (AIII, frozen by decision #4) and 786 tests / ~76% coverage (toolkit, complete) change only on a commit, so they are safe published and safe unguarded. Revisit if either unfreezes.",
+      "check": [
+        "Control count still reads 20 of 21. The denominator is OpenSSF's, not ours, and can change without a repo commit",
+        "The unmet control is still the maintainer-review criterion, which a solo maintainer structurally cannot satisfy",
+        "Resume and site say 'an OpenSSF Best Practices Baseline submission at 20 of 21 controls' -- a submission at a count, never a passing badge. Keep that wording; it is the part that is precisely true",
+        "The one exception is still documented rather than hidden, which is the claim's actual load-bearing half"
+      ],
+      "cadence": "Check when a resume variant is next revised. That is when the claim gets re-read anyway, so attaching it to an existing event beats inventing a schedule nobody keeps."
     }
   ]
 }
