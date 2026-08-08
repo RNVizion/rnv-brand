@@ -396,7 +396,10 @@ def check_contact(cfg, root, rep, scope):
                          f'LinkedIn is "{m.group(0)}", manifest says "{ident["linkedin"]}"')
         for m in re.finditer(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}", body):
             a = m.group(0)
-            if a == ident["email"] or "example" in a or "noreply" in a or "users.noreply" in a:
+            role = {k.lower() for k in ident.get("role_emails", {})
+                    if not k.startswith("_")}
+            if (a == ident["email"] or a.lower() in role
+                    or "example" in a or "noreply" in a or "users.noreply" in a):
                 continue
             if "rnvizion" in a.lower() or "vizionary" in a.lower():
                 line = body[:m.start()].count("\n") + 1
