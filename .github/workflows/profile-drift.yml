@@ -9,7 +9,7 @@ name: Profile drift
 # clears it closes the issue itself. The issue list is the state: an open
 # "Profile drift" issue means something disagrees, no issue means nothing does.
 #
-# TWO EXPRESSION BUGS TO NOT REINTRODUCE
+# THREE EXPRESSION BUGS TO NOT REINTRODUCE
 # GitHub casts across types before comparing, so null and false both become 0.
 #   1. A SKIPPED step's output is '', not '0'. Testing `!= '0'` treats "this step
 #      didn't run" as failure, and the job fails on a clean push. Always test for
@@ -17,7 +17,17 @@ name: Profile drift
 #   2. `inputs.x` is null outside workflow_dispatch, and `null != false` is FALSE,
 #      so an opt-out phrased that way silently disables the step on every
 #      scheduled run. Phrase opt-outs against `true` instead.
+#   3. Rule 1 is correct for FAILING and wrong for CLOSING. `!= '1'` means "did not
+#      explicitly fail", which is true of a step that never ran -- so a push with
+#      clean surfaces closed the issue with a comment claiming the manifest agreed
+#      with source, on an event where that check is skipped. The condition is kept
+#      (a surface fix should still clear a surface issue) and the CLAIM is now
+#      scoped to what actually ran. An idiom that is right in one direction is not
+#      automatically right in its inverse.
 on:
+  # The schedule is load-bearing, not a convenience. Surface drift has a push
+  # trigger; time-based checks do not -- an expiring surface goes stale with no
+  # commit anywhere, so this run is the only thing that will ever notice.
   schedule:
     - cron: "0 13 * * 1"        # Mondays, 13:00 UTC
   push:
@@ -127,13 +137,23 @@ jobs:
                             --label profile-drift --body-file body.md
           fi
 
+      # See bug 3 above. The condition is deliberately permissive so that fixing a
+      # surface clears the issue on the push that fixes it; the closing comment is
+      # what must not overclaim. FACTS_RAN is true only when the step actually ran
+      # and passed -- a skipped step yields '' and so reports false, correctly.
       - name: Close the drift issue when clean
         if: steps.surfaces.outputs.exit == '0' && steps.facts.outputs.exit != '1'
         env:
           GH_TOKEN: ${{ github.token }}
+          FACTS_RAN: ${{ steps.facts.outputs.exit == '0' }}
         run: |
+          if [ "$FACTS_RAN" = "true" ]; then
+            scope="Every surface agrees with the manifest, and the manifest agrees with source."
+          else
+            scope="Every surface agrees with the manifest. The manifest-vs-source check did not run on this event, so nothing here speaks to it; the next scheduled run covers it."
+          fi
           for n in $(gh issue list --state open --label profile-drift --json number --jq '.[].number'); do
-            gh issue close "$n" --comment "Clean as of run [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}). Every surface agrees with the manifest."
+            gh issue close "$n" --comment "Clean as of run [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}). $scope"
             echo "closed issue #$n"
           done
 
