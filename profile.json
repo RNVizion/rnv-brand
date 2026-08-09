@@ -1,6 +1,6 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "updated": "2026-08-09",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
@@ -158,18 +158,19 @@
     }
   },
   "eval_thresholds": {
-    "_comment": "The three gates. Declared in rnv-ask-the-corpus/eval/thresholds.json and quoted on the resume; the checker verifies the two agree.",
+    "_comment": "The three gates. Declared in rnv-ask-the-corpus/eval/thresholds.json and quoted on the resume; the checker verifies the two agree. COVERAGE GAP, recorded 2026-08-09 rather than assumed away: resume/index.html prints all three percentages and repos['rnvizion.github.io'].checks does NOT include 'thresholds', so the site copy is declared here and verified nowhere. Values match today; a change to thresholds.json would go stale on that page silently. 'thresholds' is deliberately NOT added to that repo's checks -- the dispatch looks for eval/thresholds.json, which the site repo does not have, so it would fail spuriously. The real fix is a check that reads the printed percentages off the page; tooling chat.",
     "retrieval_accuracy": 85.0,
     "ooc_refusal_accuracy": 90.0,
     "false_refusal_rate": 10.0,
     "source_of_truth": "rnv-ask-the-corpus/eval/thresholds.json",
     "appears_in": [
+      "rnvizion.github.io",
       "rnv-ask-the-corpus",
       "resumes"
     ]
   },
   "expiring_surfaces": {
-    "_comment": "Surfaces that go stale on a calendar rather than on a change. This is NOT a facts entry: facts assert that a surface matches a derived value, and this asserts that a date is still comfortably ahead of today. There is nothing to derive it from -- the file IS the source -- so the check is a comparison against now. Note the consequence: this is the one check that fires while the surface is still correct. That is deliberate; by the time it is wrong it is too late, because nothing else will ever prompt a refresh.",
+    "_comment": "Surfaces that go stale on a calendar rather than on a change. This is NOT a facts entry: facts assert that a surface matches a derived value, and this asserts that a date is still comfortably ahead of today. There is nothing to derive it from -- the file IS the source -- so the check is a comparison against now. Note the consequence: this is the one check that fires while the surface is still correct. That is deliberate; by the time it is wrong it is too late, because nothing else will ever prompt a refresh. WIRING, as of 2026-08-09: nothing reads this block yet. refresh_profile.py has no temporal check -- every other check is string matching -- and no repo's 'checks' array names an expiring group. Until that lands this is a declaration, not a guard, which is the same shape as facts.eval_cases sitting with an empty 'sources' array and being verified against nothing. Recorded here so the gap is visible from inside the file rather than discovered when the date passes.",
     ".well-known/security.txt": {
       "repo": "rnvizion.github.io",
       "field": "Expires",
