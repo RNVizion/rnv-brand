@@ -1,13 +1,33 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
-  "version": "1.2.3",
-  "updated": "2026-08-07",
+  "version": "1.2.6",
+  "updated": "2026-08-09",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
     "name": "Christian Smith",
     "brand": "RNVizion",
     "brand_long": "Research N' Vizion",
     "email": "vizionaryfx@yahoo.com",
+    "role_emails": {
+      "_comment": "Domain role addresses on rnvizion.dev, receive-only through Cloudflare Email Routing and forwarded to identity.email. The contact check recognizes these so they do not read as drift. identity.email stays canonical for resumes and applications until a send path passes DMARC in a recipient's headers. CORRECTED 2026-08-09: an earlier note here said consumer send-as cannot align. It does -- Yahoo sets envelope-from to the domain address, so the identifier was aligned all along and only the sending IP was unauthorized; one SPF include closed it. What remains is that DKIM still signs d=yahoo.com, so alignment rests on SPF alone and does not survive forwarding: fine for p=none and p=quarantine, not for p=reject.",
+      "inquiries@rnvizion.dev": "public contact; site contact section and bio",
+      "security@rnvizion.dev": "vulnerability disclosure; SECURITY.md and /.well-known/security.txt",
+      "dmarc@rnvizion.dev": "DMARC aggregate reports; not published anywhere"
+    },
+    "email_change_coupling": {
+      "_comment": "Changing identity.email is NOT a repo-only edit. One occurrence is an ownership claim served to a third party and verified against an account held there, so it changes on both sides or it breaks. Recorded because check_contact sees the string and cannot see the constraint on editing it.",
+      "rnv-color-mcp/server.py": {
+        "route": "/.well-known/glama.json",
+        "schema": "https://glama.ai/mcp/schemas/connector.json",
+        "constraint": "The email must match the email on the Glama account. Update the Glama account first, confirm it took, then update the route. Changing the route alone invalidates the ownership claim the Glama badge rests on.",
+        "not_to_be_confused_with": {
+          "path": "rnv-color-mcp/glama.json",
+          "schema": "https://glama.ai/mcp/schemas/server.json",
+          "holds": "maintainers: [\"RNVizion\"], a GitHub username -- no email, no coupling",
+          "note": "Same filename, different artifact. Two review passes checked the root file, concluded no email was involved, and retracted a true warning. Verify the one that serves."
+        }
+      }
+    },
     "phone": "(301) 455-3779",
     "linkedin": "linkedin.com/in/rnvizion",
     "github": "github.com/RNVizion",
@@ -19,7 +39,8 @@
       "resumes",
       "linkedin",
       "huggingface",
-      "dev.to"
+      "dev.to",
+      "rnv-color-mcp"
     ]
   },
   "role": {
@@ -146,6 +167,17 @@
       "rnv-ask-the-corpus",
       "resumes"
     ]
+  },
+  "expiring_surfaces": {
+    "_comment": "Surfaces that go stale on a calendar rather than on a change. This is NOT a facts entry: facts assert that a surface matches a derived value, and this asserts that a date is still comfortably ahead of today. There is nothing to derive it from -- the file IS the source -- so the check is a comparison against now. Note the consequence: this is the one check that fires while the surface is still correct. That is deliberate; by the time it is wrong it is too late, because nothing else will ever prompt a refresh.",
+    ".well-known/security.txt": {
+      "repo": "rnvizion.github.io",
+      "field": "Expires",
+      "value": "2027-02-09T00:00:00.000Z",
+      "warn_days": 60,
+      "fail_days": 14,
+      "reason": "RFC 9116 makes Expires mandatory. An expired security.txt reads as an abandoned project, which is a worse signal than having no file at all. Weekly profile-drift gives roughly eight warnings before the fail window, which is enough notice to act without the warning becoming noise."
+    }
   },
   "products": [
     {
