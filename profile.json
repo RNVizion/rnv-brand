@@ -1,18 +1,13 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
-  "version": "1.2.4",
-  "updated": "2026-08-08",
+  "version": "1.2.3",
+  "updated": "2026-08-07",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
     "name": "Christian Smith",
     "brand": "RNVizion",
     "brand_long": "Research N' Vizion",
     "email": "vizionaryfx@yahoo.com",
-    "role_emails": {
-      "_comment": "Domain role addresses on rnvizion.dev, receive-only through Cloudflare Email Routing and forwarded to identity.email. The contact check recognizes these so they do not read as drift. identity.email stays canonical for resumes and applications until a send path passes DMARC alignment; consumer send-as signs as d=yahoo.com, which cannot align.",
-      "inquiries@rnvizion.dev": "public contact; site contact section and bio",
-      "security@rnvizion.dev": "vulnerability disclosure; SECURITY.md"
-    },
     "phone": "(301) 455-3779",
     "linkedin": "linkedin.com/in/rnvizion",
     "github": "github.com/RNVizion",
