@@ -8,10 +8,21 @@ BRAND_COLORS.md stays the human-readable deep-dive; this is the machine.
 Place at: engine/brand.py (empty engine/__init__.py beside it).
 
 Usage:
-    python engine/brand.py --css web > tokens.css   # website surface
-    python engine/brand.py --css app > tokens.css   # desktop surface
+    python engine/brand.py --css web > tokens.css     # website surface
+    python engine/brand.py --css app > tokens.css     # desktop surface
+    python engine/brand.py --css records > tokens.css # notes, releases, initiatives
     # or, from Python:
-    from engine.brand import RNV_BRAND, WEB, APP, STATUS, emit_css
+    from engine.brand import RNV_BRAND, WEB, APP, RECORDS, STATUS, emit_css
+
+Register discipline (BRAND_COLORS.md rev 8, 2026-08-10). PERMANENT holds the
+six values the brand commits to on any medium, print included. Everything else
+here is a ramp step, a tint, an alpha, or a platform convenience — real values
+that consumers need, but not brand claims. Adding to PERMANENT is a decision;
+adding a ramp step is not.
+
+Consumer note: rnv-color-mcp carries its own copy of this module for the
+resolver. Values agree; identifiers do not (BRAND_GOLD there, GOLD here).
+Any RNV_BRAND change has to land in both to reach the live resolver.
 """
 
 # ---------------------------------------------------------- canonical trio
@@ -19,11 +30,42 @@ GOLD = "#d2bc93"         # brand gold (primary) — never varies across surfaces
 DARK_GOLD = "#b19145"    # dark gold (light-mode accent)
 BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 
+# ------------------------------------------------- the rest of the register
+# Named because they are permanent, not because a palette happened to use
+# them. TRUE_BLACK and WHITE were already in APP and in every light theme as
+# bare literals; WEB_BLACK existed only as WEB["bg-0"].
+TRUE_BLACK = "#000000"   # app window ground; text on gold, on either surface
+WHITE = "#ffffff"        # light-surface cards and inputs; the ramp's far anchor
+WEB_BLACK = "#0a0a0f"    # rnvizion.dev ground; social and OG base
+
+# The six the brand commits to. Gold on dark, dark gold on light; dark gold is
+# additionally gold's shade on dark, where full gold is too loud.
+PERMANENT = {
+    "gold": GOLD,
+    "dark-gold": DARK_GOLD,
+    "charcoal": BRAND_BLACK,
+    "black": TRUE_BLACK,
+    "web-black": WEB_BLACK,
+    "white": WHITE,
+}
+
+# --------------------------------------------------------------- alpha helper
+# Defined here rather than beside the emitter because the RECORDS palette
+# derives a value from it. Alpha modulates; it never mints a color.
+def _rgba(hex_color: str, alpha: float) -> str:
+    h = hex_color.lstrip("#")
+    r, g, b = (int(h[i : i + 2], 16) for i in (0, 2, 4))
+    return f"rgba({r}, {g}, {b}, {alpha})"
+
+
+RULE_ALPHA = 0.18      # hairline gold rules at low alpha (Brand Book §3.4)
+GOLD_DIM_ALPHA = 0.52  # secondary gold, Records surface
+
 # -------------------------------------------------- desktop / app palette
 # The two-dark rule: apps run neutral dark (true-black window, charcoal
 # panels); the website runs the blue-tinted ramp. Intentional, not drift.
 APP = {
-    "window": "#000000",
+    "window": TRUE_BLACK,
     "panel": BRAND_BLACK,
     "card": "#2a2a2a",
     "border": "#333333",
@@ -31,12 +73,12 @@ APP = {
     "text-dim": "#aaaaaa",
     "accent": GOLD,
     "accent-light-mode": DARK_GOLD,
-    "text-on-gold": "#000000",
+    "text-on-gold": TRUE_BLACK,
 }
 
 # ---------------------------------------------- website palette (the ramp)
 WEB = {
-    "bg-0": "#0a0a0f",
+    "bg-0": WEB_BLACK,
     "bg-1": "#11111a",
     "bg-2": "#1a1a26",
     "border": "#25253a",
@@ -51,7 +93,33 @@ WEB = {
 
 WEB_RAMP = (WEB["bg-0"], WEB["bg-1"], WEB["bg-2"])  # never flatten to charcoal
 
+# ------------------------------------------------------- Records (warm ink)
+# Notes, patch notes, updates, newsletters, initiative pages — what RNVizion
+# issues and a reader consults later. Same ground and same gold as the site;
+# only the ink changes. Established by the AIII page, 2026-08-10.
+#
+# The cool ramp lifts blue (R = G, B raised); this one warms (R > G > B).
+# CONSTRAINT, carried with the value: ink-faint reads 3.77:1 on WEB_BLACK.
+# That clears large text and UI components; it does NOT clear the 4.5 floor
+# for normal text. Labels only, never body.
+RECORDS = {
+    "bg": WEB_BLACK,
+    "surface": "#13131c",
+    "surface-2": "#0f0f17",
+    "ink-bright": "#efece2",   # ledes and opening paragraphs
+    "ink": "#e7e3d8",          # body, headings, names
+    "ink-mute": "#9b978c",     # bylines, definitions, footer links
+    "ink-faint": "#6f6c64",    # kickers and small labels ONLY — see above
+    "accent": GOLD,
+    "gold-dim": _rgba(GOLD, GOLD_DIM_ALPHA),
+}
+
 # ---------------------------------------------------------- status (app)
+# NOT brand colors. Material's semantics, adopted deliberately because they
+# fit the platform; the brand neither owns them nor varies them, and issues no
+# ruling on what red means. Published here so the apps share one answer.
+# Two apps ship Bootstrap's set instead; that is a platform choice, not drift.
+# Dark-tuned: #ffc107 reads 1.63:1 on white. Re-check before any light use.
 STATUS = {
     "success": "#4caf50",
     "warning": "#ffc107",
@@ -59,8 +127,6 @@ STATUS = {
 }
 
 # ------------------------------------------------------- texture + type
-RULE_ALPHA = 0.18  # hairline gold rules at low alpha (Brand Book §3.4)
-
 TYPE = {
     "display": "Bricolage Grotesque",
     "mono": "JetBrains Mono",
@@ -72,31 +138,37 @@ TYPE = {
 # The documented MCP interface (BRAND_COLORS.md, "Resolver vocabulary"):
 # the color server imports RNV_BRAND; RNV names win over CSS names on
 # collision; css:gold forces the universal one. Add a color here, push,
-# and every consumer updates from the one edit.
+# and every consumer updates from the one edit — except the resolver, which
+# runs from rnv-color-mcp's own copy. Land RNV_BRAND changes in both.
+#
+# "white" and "black" shadow CSS names at identical values, so resolution is
+# unchanged either way; they are here because the register names them.
 RNV_BRAND = {
     "near-black": BRAND_BLACK,
+    "near black": BRAND_BLACK,
     "brand black": BRAND_BLACK,
     "rnv black": BRAND_BLACK,
+    "charcoal": BRAND_BLACK,
     "gold": GOLD,
     "brand gold": GOLD,
     "rnv gold": GOLD,
     "dark gold": DARK_GOLD,
     "gold dark": DARK_GOLD,
     "light-mode gold": DARK_GOLD,
+    "black": TRUE_BLACK,
+    "true black": TRUE_BLACK,
+    "white": WHITE,
+    "brand white": WHITE,
+    "web black": WEB_BLACK,
+    "web near-black": WEB_BLACK,
 }
 
 # ---------------------------------------------------------------- emitter
-def _rgba(hex_color: str, alpha: float) -> str:
-    h = hex_color.lstrip("#")
-    r, g, b = (int(h[i : i + 2], 16) for i in (0, 2, 4))
-    return f"rgba({r}, {g}, {b}, {alpha})"
-
-
 def tokens(surface: str = "web") -> dict[str, str]:
     """Flat token map for one surface; the emitter's source of truth."""
-    palettes = {"web": WEB, "app": APP}
+    palettes = {"web": WEB, "app": APP, "records": RECORDS}
     if surface not in palettes:
-        raise ValueError("surface must be 'web' or 'app'")
+        raise ValueError("surface must be 'web', 'app', or 'records'")
     return {
         "gold": GOLD,
         "gold-dark": DARK_GOLD,
@@ -124,4 +196,4 @@ if __name__ == "__main__":
         surface = sys.argv[i + 1] if len(sys.argv) > i + 1 else "web"
         sys.stdout.write(emit_css(surface))
     else:
-        sys.exit("usage: python engine/brand.py --css [web|app] > tokens.css")
+        sys.exit("usage: python engine/brand.py --css [web|app|records] > tokens.css")
