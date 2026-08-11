@@ -3,7 +3,13 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-10 (rev 8 — **first commit into `rnv-brand`.** Revs 1–7 existed as a
+Last locked: 2026-08-10 (rev 10 — the two-dark rule re-derived from measurement after the
+question was reopened: charcoal is a mid-tone in both ramps and a base in neither, so it
+cannot replace the web ground. Rev 9 strikes "one edit updates every consumer," a mechanism this
+file claimed and nothing ever implemented; records the mirror pattern that actually governs.
+Renames the `#0a0a0f` register row from "web near-black" to **web black**, since "near-black"
+already resolves to charcoal and one word cannot mean two darks. Rev 8 was the **first commit
+into `rnv-brand`.** Revs 1–7 existed as a
 document without a home while `engine/brand.py` and this repo's README both cited it by
 name; that citation now resolves. Adds the three-artifact ownership split and re-frames the
 ramp tables as dated census evidence rather than value listings, so this file points at the
@@ -86,12 +92,30 @@ surface that needs a lighter or darker gold derives it; it doesn't mint one.
 |---|---|---|---|
 | True black | `#000000` | 0, 0, 0 | App window ground; text on gold, on both light and dark surfaces |
 | Brand black (charcoal) | `#1a1a1a` | 26, 26, 26 | Raised surfaces in apps; the answer to "brand black" with no other context |
-| Web near-black | `#0a0a0f` | 10, 10, 15 | rnvizion.dev base; social assets and OG cards |
+| Web black | `#0a0a0f` | 10, 10, 15 | rnvizion.dev base; social assets and OG cards |
 
-**Three blacks, and each one is committed.** Charcoal is the brand's black when someone asks
-for a value; true black is the app ground; web near-black is blue-tinted on purpose and
-carries every outward-facing asset. Flattening any into another loses something real, which
-is what makes all three permanent rather than steps on a ramp.
+**Three blacks, and each one is committed.** Measured rather than asserted (2026-08-10):
+
+| Value | L* | Role |
+|---|---|---|
+| `#000000` | 0.00 | App ground; the neutral ramp's near anchor |
+| `#0a0a0f` | 2.86 | Web ground; the floor the site's ramp is built up from |
+| `#1a1a1a` | 9.26 | Charcoal; the answer to "brand black" with no context |
+
+**Charcoal cannot replace the web ground, because charcoal is not a base in either system.**
+It sits at L\* 9.26; the web ramp's *top* step `#1a1a26` sits at L\* 9.79. Flatten the site to
+charcoal and it starts where its ramp currently ends, with the two darker steps having nowhere
+to exist. The same is true of the apps, where charcoal is the middle step of
+`#000000` → `#1a1a1a` → `#2a2a2a`. **Charcoal is a mid-tone in both systems and a base in
+neither.**
+
+The distinction is also visibly real, not a protected invisibility: `#0a0a0f` against `#1a1a1a`
+is ΔE 6.81, roughly seven times the just-noticeable threshold. The blue lift alone carries
+ΔE 8.91 between `#1a1a26` and `#1a1a1a` at nearly identical lightness, which is the
+independent case for never flattening the tint to neutral.
+
+One practical cost on top of the structural one: every social asset and OG card built to date
+sits on `#0a0a0f`. Collapsing the darks re-renders all of them.
 
 ### White
 
@@ -308,9 +332,30 @@ brand gold, not CSS gold); use `css:gold` to force the universal one.
 | gold, brand gold, rnv gold | `#d2bc93` |
 | dark gold, gold dark, light-mode gold | `#b19145` |
 
-To teach the server a new brand color: add it to `RNV_BRAND` in `engine/brand.py`, push,
-done. **The register above is the test for what belongs there** — permanent colors only, not
-ramp steps, not tints, not platform semantics.
+**"near-black" resolves to charcoal `#1a1a1a`, not to the web ground.** The web ground is
+`web black`. Both readings were in circulation — this file called `#0a0a0f` "web near-black"
+until rev 9, and the Brand Book §0 still does. The resolver keeps the older reading because a
+live contract is expensive to repoint and a document is cheap to reword; §0 gets the reword.
+Repointing a name to a different value is the one change a resolver must never make quietly.
+
+To teach the server a new brand color: add it to `RNV_BRAND` in `engine/brand.py`, then land
+it in each consumer's mirror. **The register above is the test for what belongs there** —
+permanent colors only, not ramp steps, not tints, not platform semantics.
+
+### Consumers mirror; nothing propagates
+
+**Each repo carries its own copy of the values it needs, sourced from `rnv-brand` and
+corrected when drift is detected.** A program is never one network call away from knowing its
+own colors, and a resolver on the hot path never has to answer what happens when a fetch
+fails — every available answer there is bad: fail closed and it refuses everything, fall back
+and it needs the local copy anyway, guess and it has broken its own rule.
+
+Identifiers are local by design; the check compares values, never names.
+
+**Struck in rev 9: "one edit updates every consumer."** That line survived from rev 1 and was
+never true — nothing propagated, and the proof is that the alias `near black` lived in the MCP
+mirror and not in the source for a month with nobody the wiser. **A documented mechanism that
+was never built is worse than no mechanism, because it tells everyone to stop looking.**
 
 ---
 
