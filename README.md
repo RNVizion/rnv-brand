@@ -3,9 +3,12 @@
 The machine source for RNVizion brand tokens. Import it; never hardcode.
 
 `engine/brand.py` holds the values every RNV surface consumes: the two golds, the darks,
-the surface palettes, type roles, and the `RNV_BRAND` resolver vocabulary. Every RNV surface
-(site, apps, MCP servers, OG images) is meant to consume this file; one edit updates every
-consumer.
+the surface palettes, type roles, and the `RNV_BRAND` resolver vocabulary.
+
+**Consumers mirror; nothing propagates.** Each repo carries its own copy of the values it
+needs, sourced from here and corrected when drift is detected, so a program is never one
+network call away from knowing its own colors. Identifiers are local by design; the check
+compares values, never names.
 
 ## Usage
 
