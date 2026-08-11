@@ -20,9 +20,11 @@ here is a ramp step, a tint, an alpha, or a platform convenience — real values
 that consumers need, but not brand claims. Adding to PERMANENT is a decision;
 adding a ramp step is not.
 
-Consumer note: rnv-color-mcp carries its own copy of this module for the
-resolver. Values agree; identifiers do not (BRAND_GOLD there, GOLD here).
-Any RNV_BRAND change has to land in both to reach the live resolver.
+Consumers mirror, they do not import. Each repo carries its own copy of the
+values it needs, sourced from here and corrected when drift is detected, so a
+program is never one network call away from knowing its own colors. Identifiers
+are local by design (BRAND_GOLD in the MCP mirror, GOLD here); the drift check
+compares values, never names.
 """
 
 # ---------------------------------------------------------- canonical trio
@@ -137,9 +139,18 @@ TYPE = {
 # ---------------------------------------- resolver contract (rnv-color-mcp)
 # The documented MCP interface (BRAND_COLORS.md, "Resolver vocabulary"):
 # the color server imports RNV_BRAND; RNV names win over CSS names on
-# collision; css:gold forces the universal one. Add a color here, push,
-# and every consumer updates from the one edit — except the resolver, which
-# runs from rnv-color-mcp's own copy. Land RNV_BRAND changes in both.
+# collision; css:gold forces the universal one.
+#
+# NOTHING PROPAGATES. Consumers carry their own mirror of this vocabulary and
+# are corrected when drift is detected; a change here reaches them only when a
+# human lands it there. "One edit updates every consumer" was a claim, never a
+# mechanism, and the proof is that "near black" lived in the mirror and not
+# here for a month with nobody the wiser.
+#
+# VOCABULARY NOTE: "near-black" resolves to CHARCOAL, not to the web ground.
+# The web ground is "web black". Both readings of "near-black" were in use
+# across artifacts; this contract keeps the older one because a live resolver
+# is expensive to repoint and a document is cheap to reword.
 #
 # "white" and "black" shadow CSS names at identical values, so resolution is
 # unchanged either way; they are here because the register names them.
@@ -160,7 +171,6 @@ RNV_BRAND = {
     "white": WHITE,
     "brand white": WHITE,
     "web black": WEB_BLACK,
-    "web near-black": WEB_BLACK,
 }
 
 # ---------------------------------------------------------------- emitter
