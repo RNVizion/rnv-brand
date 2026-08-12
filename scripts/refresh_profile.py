@@ -83,7 +83,14 @@ MANIFEST = REPO_ROOT / "profile.json"
 OWNER = "RNVizion"
 
 SKIP_DIRS = {".git", "node_modules", "assets/fonts", "chroma", "__pycache__", ".venv", "dist"}
-TEXT_EXT = {".html", ".md", ".py", ".yml", ".yaml", ".json", ".xml", ".txt", ".sh", ".jsonl", ".toml"}
+# .vcf added 2026-08-12: card/rnvizion.vcf is a published surface carrying the
+# brand number, an email, and two profile URLs, and the walk was skipping it on
+# extension alone -- a public surface that passes every run by never being
+# opened. Probed before landing: exactly one .vcf exists across all fourteen
+# repos in the manifest, and it produces zero new findings. Any future addition
+# here gets the same treatment -- widening the walk without probing the newly
+# visible set is how a green run stops meaning anything.
+TEXT_EXT = {".html", ".md", ".py", ".yml", ".yaml", ".json", ".xml", ".txt", ".sh", ".jsonl", ".toml", ".vcf"}
 
 # The manifest names every retired phrase, and this file quotes several while
 # explaining itself. A checker that measures text must exclude its own text, or
@@ -830,13 +837,37 @@ def report_exemptions(cfg, rep):
                  f'"max" so occurrence two has to be deliberate')
 
 
+# profile.json v1.3.0 removed identity.phone: the personal cell does not live in
+# a public repository. "phone" therefore leaves this tuple. The consequence is
+# named rather than absorbed -- the resume phone number is now UNCHECKED and
+# unprintable from here, because the only value that could have been compared
+# against it is the one deliberately not published. Do not close that gap by
+# reading the number back into the manifest. If it needs closing, the value has
+# to reach the check without reaching the repository.
+MANUAL_IDENTITY_KEYS = ("name", "email", "linkedin", "github", "site")
+
+
 def print_manual(cfg):
     i, r = cfg["identity"], cfg["role"]
+    missing = [k for k in MANUAL_IDENTITY_KEYS if k not in i]
+    if missing:
+        # An absent key is a manifest defect, not a field to skip. A .get()
+        # here would print a blank line that a human reads as "checked, empty."
+        print(f"error: identity is missing {', '.join(missing)}; the manual "
+              f"checklist prints expected values and a blank one reads as "
+              f"verified", file=sys.stderr)
+        raise SystemExit(2)
     print("\nMANUAL SURFACES — not reachable from here")
     print("=" * 70)
     print("Expected values, so the comparison is quick:")
-    for k in ("name", "email", "phone", "linkedin", "github", "site"):
+    for k in MANUAL_IDENTITY_KEYS:
         print(f"   {k:<10} {i[k]}")
+    bp = i.get("brand_phone")
+    if bp:
+        print(f"   {'phone':<10} {bp['display']}  <- brand routing number only; "
+              f"the personal cell is not in this manifest")
+    else:
+        print(f"   {'phone':<10} (NOT IN MANIFEST — nothing to compare)")
     print(f"   {'role':<10} {r['title']}, {r['employer']}")
     print(f"   {'tagline':<10} {cfg['tagline']['canonical']}")
     print(f"   {'bio':<10} {cfg['bio']['canonical'][:70]}…")
