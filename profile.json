@@ -2,6 +2,7 @@
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
   "version": "1.3.0",
   "updated": "2026-08-12",
+  "_resumes_out_of_scope": "2026-08-12, v1.3.0. The .docx resume variants are PERSONAL documents, handed directly to people, and they carry the personal cell. They are deliberately not modelled here: no appears_in list names them, no fact claims to appear on them, and nothing in this manifest describes their contents. This is a scope decision, not an oversight -- do not re-add 'resumes' to an appears_in list. TWO DIFFERENT ARTIFACTS SHARE THE WORD: resume/index.html in rnvizion.github.io is the PUBLIC web resume, it carries no phone number, and it stays fully checked -- see facts.eval_cases.sources. Verify the one that serves. scripts/refresh_profile.py --docx still exists as a local, opt-in, recordless tool a human can point at their own files; it stores nothing and no workflow passes that flag.",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
     "name": "Christian Smith",
@@ -41,7 +42,6 @@
     "appears_in": [
       "rnvizion.github.io",
       "RNVizion",
-      "resumes",
       "linkedin",
       "huggingface",
       "dev.to",
@@ -57,7 +57,6 @@
     "appears_in": [
       "rnvizion.github.io",
       "RNVizion",
-      "resumes",
       "linkedin",
       "huggingface",
       "dev.to"
@@ -70,7 +69,6 @@
     "appears_in": [
       "rnvizion.github.io",
       "RNVizion",
-      "resumes",
       "linkedin"
     ]
   },
@@ -95,7 +93,6 @@
       ],
       "appears_in": [
         "rnvizion.github.io",
-        "resumes",
         "linkedin"
       ],
       "note": "Stat block and the count of project articles must agree.",
@@ -108,11 +105,11 @@
       "value": "5,000+",
       "match": "5,000+",
       "sources": [
-        "index.html"
+        "index.html",
+        "resume/index.html"
       ],
       "appears_in": [
         "rnvizion.github.io",
-        "resumes",
         "linkedin"
       ],
       "note": "og-image.png is generated from this; never typed twice.",
@@ -146,7 +143,6 @@
         "resume/index.html"
       ],
       "appears_in": [
-        "resumes",
         "rnvizion.github.io"
       ],
       "note": "Total only on public surfaces; the split is never published. A trap flipping out_of_corpus -> in_corpus on publication moves the split without moving the total, so the split fails the publication test and lives here as a machine-checked fact instead.",
@@ -170,8 +166,7 @@
     "source_of_truth": "rnv-ask-the-corpus/eval/thresholds.json",
     "appears_in": [
       "rnvizion.github.io",
-      "rnv-ask-the-corpus",
-      "resumes"
+      "rnv-ask-the-corpus"
     ]
   },
   "expiring_surfaces": {
@@ -193,7 +188,7 @@
       "deployment": "RNVizion/ask-the-corpus",
       "platform": "Hugging Face Space",
       "prefix_exempt": true,
-      "exempt_reason": "The live URL is printed on resumes already in circulation, and Hugging Face Space IDs cannot redirect. Note the stutter argument (rnvizion-rnv-ask-the-corpus.hf.space) is NOT load-bearing: rnv-color-mcp deploys as RNVizion/rnv-color-mcp and carries the same stutter deliberately. Breaking a live URL is the reason; aesthetics are not.",
+      "exempt_reason": "The live URL is printed on documents already in circulation, and Hugging Face Space IDs cannot redirect. Note the stutter argument (rnvizion-rnv-ask-the-corpus.hf.space) is NOT load-bearing: rnv-color-mcp deploys as RNVizion/rnv-color-mcp and carries the same stutter deliberately. Breaking a live URL is the reason; aesthetics are not.",
       "note": "The PRODUCT NAME did not change when the repo was renamed. Never 'RNV Ask the Corpus'."
     },
     {
@@ -439,6 +434,17 @@
     "ask-the-corpus": "rnv-ask-the-corpus",
     "publishing-agent": "rnv-publishing-agent"
   },
+  "phone_exemptions": [
+    {
+      "_comment": "Bounded exactly like the retirement exemptions, and deliberately WITHOUT a value field. Naming a number here to permit it would publish it, which is the failure this whole block exists to prevent. A path and a count are enough: occurrence two has to be a deliberate edit. Keyed on repo as well as path, because a bare relative path is ambiguous across fourteen repos and the retirement ledger already carries that ambiguity. NEVER write an example number into a reason string here -- the manifest audit reads its own prose and will trip on it, correctly.",
+      "repo": "rnv-text-transformer",
+      "path": "core/regex_patterns.py",
+      "max": 1,
+      "reason": "Reserved-fictional placeholder inside a regex example. The NANP sets a range aside for exactly this purpose and it is not a routable number. Measured as the only non-contact phone shape across all fourteen repos.",
+      "added": "2026-08-12",
+      "verified": "2026-08-12"
+    }
+  ],
   "protected": {
     "_comment": "Strings that look like the renamed repos but must NEVER be rewritten. Hugging Face Space IDs are deliberately exempt from the rnv- prefix.",
     "strings": [
@@ -492,10 +498,10 @@
       "check": [
         "Control count still reads 20 of 21. The denominator is OpenSSF's, not ours, and can change without a repo commit",
         "The unmet control is still the maintainer-review criterion, which a solo maintainer structurally cannot satisfy",
-        "Resume and site say 'an OpenSSF Best Practices Baseline submission at 20 of 21 controls' -- a submission at a count, never a passing badge. Keep that wording; it is the part that is precisely true",
+        "The site says 'an OpenSSF Best Practices Baseline submission at 20 of 21 controls' -- a submission at a count, never a passing badge. Keep that wording; it is the part that is precisely true",
         "The one exception is still documented rather than hidden, which is the claim's actual load-bearing half"
       ],
-      "cadence": "Check when a resume variant is next revised. That is when the claim gets re-read anyway, so attaching it to an existing event beats inventing a schedule nobody keeps."
+      "cadence": "Check when resume/index.html is next edited -- a repo commit the scheduled run already sees. Attaching it to an existing event beats inventing a schedule nobody keeps. Re-pointed 2026-08-12: the old cadence keyed on a personal resume revision, an event outside this system by decision."
     }
   ]
 }
