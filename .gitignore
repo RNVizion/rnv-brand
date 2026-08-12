@@ -1,12 +1,5 @@
 # rnv-brand — added 2026-08-12.
-# scripts/__pycache__/refresh_profile.cpython-312.pyc is committed on main. A
-# compiled copy of the checker in a public repo is not a leak, but it is a second
-# artifact with the same name as the one that serves, and the whole system rests
-# on reading the one that serves. This file stops new ones; it does not untrack
-# the existing one. Run once, in the same commit:
-#
-#   git rm -r --cached scripts/__pycache__
-#
+
 __pycache__/
 *.py[cod]
 .venv/
