@@ -50,12 +50,15 @@ WHAT IT REACHES
                 no local clones needed, which suits a phone-and-Codespace workflow
   --repo NAME   one repo, fetched the same way
   --root PATH   a local checkout
-  --docx DIR    resume .docx, read without dependencies by unzipping the XML
+  --docx DIR    a local directory of .docx, read without dependencies by
+                unzipping the XML. Opt-in and recordless: no workflow passes
+                this, nothing is fetched, nothing is stored
   --manual      the checklist for LinkedIn, Hugging Face, dev.to, MCP registry
 
 USAGE
   python scripts/refresh_profile.py --all
-  python scripts/refresh_profile.py --repo rnvizion.github.io --docx ~/resumes
+  python scripts/refresh_profile.py --repo rnvizion.github.io
+  python scripts/refresh_profile.py --docx ~/Documents/outgoing
   python scripts/refresh_profile.py --root ../rnvizion.github.io
   python scripts/refresh_profile.py --manual
 
@@ -393,6 +396,75 @@ def check_retired(cfg, root, rep, scope):
     rep.checks += len(phrases)
 
 
+# --------------------------------------------------------------------------
+# phone shapes — added 2026-08-12 with profile.json v1.3.0
+#
+# The four formats a contact surface actually prints. Narrow on purpose: looser
+# patterns start matching version strings, IDs and dates, and a guard that cries
+# wolf gets muted, which is worse than not having it. Measured across all
+# fourteen repos before landing — eight hits, seven of them real contact numbers
+# and one a reserved-fictional placeholder, which is the only exemption.
+# --------------------------------------------------------------------------
+PHONE_SHAPE = re.compile(
+    r"\(\d{3}\)\s?\d{3}-\d{4}"      # (202) 987-9948
+    r"|\+1\d{10}"                     # +12029879948
+    r"|\b\d{3}-\d{3}-\d{4}\b"        # 202-987-9948
+    r"|\b\d{3}\.\d{3}\.\d{4}\b"     # 202.987.9948
+)
+
+
+def permitted_phones(cfg):
+    """The only numbers allowed to appear anywhere. None if the manifest has none.
+
+    This is the whole design in one function. The guard is written INSIDE-OUT: it
+    never learns the personal cell, because a manifest that names a forbidden
+    value publishes it. It knows only what is PERMITTED, so anything else fails —
+    including a number it has never seen. That is the difference between a
+    tripwire on the key coming back and a blocklist of one string.
+    """
+    bp = cfg.get("identity", {}).get("brand_phone")
+    if not isinstance(bp, dict):
+        return None
+    vals = {v for k, v in bp.items() if not k.startswith("_") and isinstance(v, str)}
+    return vals or None
+
+
+def _json_strings(node, path=""):
+    if isinstance(node, dict):
+        for k, v in node.items():
+            yield from _json_strings(v, f"{path}.{k}" if path else k)
+    elif isinstance(node, list):
+        for n, v in enumerate(node):
+            yield from _json_strings(v, f"{path}[{n}]")
+    elif isinstance(node, str):
+        yield path, node
+
+
+def audit_manifest_phones(cfg):
+    """Manifest paths carrying a number that is not the brand routing number.
+
+    Separate from the surface walk because profile.json sits in SELF_EXCLUDE and
+    is invisible to it. Without this, the one file the whole system is named for
+    would be the one file the phone guard could not read.
+
+    NOTE WHAT IS NOT RETURNED: the offending value. This report is catted
+    verbatim into a public issue body, a public Actions log, and a 30-day
+    artifact. A guard that quoted what it found would republish the number it
+    exists to suppress, in three more places than the one it caught.
+    """
+    allowed = permitted_phones(cfg)
+    if allowed is None:
+        return ["identity.brand_phone is absent or empty, so there is no "
+                "permitted number and this guard has nothing to check against. "
+                "Restore it rather than removing the check."]
+    bad = sorted({p for p, s in _json_strings(cfg)
+                  if (m := PHONE_SHAPE.search(s)) and m.group(0) not in allowed})
+    return [f"{path} carries a phone-shaped value that is not the brand routing "
+            f"number. The value is withheld from this report on purpose. See "
+            f"identity._phone_removed before doing anything else."
+            for path in bad]
+
+
 def check_contact(cfg, root, rep, scope):
     ident = cfg["identity"]
     for rel, body in text_files(root):
@@ -411,7 +483,36 @@ def check_contact(cfg, root, rep, scope):
             if "rnvizion" in a.lower() or "vizionary" in a.lower():
                 line = body[:m.start()].count("\n") + 1
                 rep.warn(scope, f"{rel}:{line}", f'address "{a}" is not {ident["email"]}')
+    check_phones_on_surfaces(cfg, root, rep, scope)
     rep.checks += 1
+
+
+def check_phones_on_surfaces(cfg, root, rep, scope):
+    """Any phone-shaped string on a surface must be the brand routing number.
+
+    Deliberately folded into check_contact rather than registered as its own
+    CHECKS key. Every one of the fourteen repos names its check groups
+    explicitly, so run_repo's `list(CHECKS)` default never applies — a new
+    registry key would appear armed in the source and run on exactly zero
+    surfaces until fourteen manifest entries opted in. Coverage that depends on
+    remembering is the failure mode this file exists to catch.
+    """
+    allowed = permitted_phones(cfg) or set()
+    budget = {ex["path"]: ex.get("max", 0)
+              for ex in cfg.get("phone_exemptions", [])
+              if isinstance(ex, dict) and ex.get("repo") == scope}
+    for rel, body in text_files(root):
+        for m in PHONE_SHAPE.finditer(body):
+            if m.group(0) in allowed:
+                continue
+            if budget.get(rel, 0) > 0:
+                budget[rel] -= 1
+                continue
+            line = body[:m.start()].count("\n") + 1
+            rep.fail(scope, f"{rel}:{line}",
+                     "phone-shaped string that is not the brand routing number; "
+                     "the value is withheld from this report on purpose, because "
+                     "this text is pasted into a public issue")
 
 
 def check_renames(cfg, root, rep, scope):
@@ -457,7 +558,7 @@ def check_facts(cfg, root, rep, scope):
             continue
         # 'match' is the literal phrase the page must print; 'value' is the
         # semantic fact. A bare value is a useless needle — "60" matches a CSS
-        # font weight — which is how a stale resume once passed this check with
+        # font weight — which is how a stale resume PAGE once passed this check with
         # total confidence. Fall back to value when no match is given, so a
         # fact without one keeps working exactly as before.
         needle = spec.get("match") or spec["value"]
@@ -509,12 +610,14 @@ def check_products(cfg, root, rep, scope):
 
 
 def check_thresholds(cfg, root, rep, scope):
-    """The gates are declared once and quoted on the resume. Verify the file
-    still says what the manifest says.
+    """The gates are declared once and quoted on the web resume at
+    resume/index.html. Verify the file still says what the manifest says.
+    (Named precisely because two different artifacts share the word
+    "resume"; the personal .docx are out of scope entirely.)
 
     An absent key is a failure, not a skip. thresholds.json is read by the eval
     with data.get(key, default), so a renamed or typo'd gate silently falls back
-    to the default; the suite keeps passing and the resume keeps quoting a bar
+    to the default; the suite keeps passing and the page keeps quoting a bar
     that nothing enforces. A checker that stays quiet on absence reproduces that
     bug one layer up."""
     spec = cfg.get("eval_thresholds", {})
@@ -546,36 +649,54 @@ CHECKS = {
 }
 
 
-def check_docx(cfg, docx_dir, rep):
+def lint_documents(cfg, docx_dir, rep):
+    """A pre-send lint for local .docx. Opt-in, recordless, and NOT a check.
+
+    Named lint_ rather than check_ on purpose. Every check_* function in this
+    file is a CHECKS member that runs per repo, unattended, on a schedule. This
+    one runs only when a human types a path to their own local files, so calling
+    it a check would put it in a family it does not belong to and imply coverage
+    that no schedule provides.
+
+    Renamed 2026-08-12 from check_docx, and its scope label from "resumes" to
+    "documents". The manifest stopped modelling the personal resume variants that
+    day; the tool kept the vocabulary, which is the same thing one layer down.
+    Whatever you point this at is a document, and the lint has no opinion about
+    what kind.
+
+    WHAT IT DOES NOT DO, stated rather than absorbed: facts are not verified
+    here. Selection ran off `appears_in: "resumes"` and that claim is gone, so
+    the old code would now select nothing and quietly do less than its name
+    suggested -- the exact failure this file exists to catch. The fact loop was
+    deleted rather than left returning an empty list.
+
+    What survives is the half that matters most on paper: retired phrases and
+    retired product names. A pushed fix cannot recall a printed page, and this
+    is the only guard anywhere on that surface.
+    """
     files = sorted(Path(docx_dir).glob("*.docx"))
     if not files:
-        rep.warn("resumes", str(docx_dir), "no .docx found")
+        rep.warn("documents", str(docx_dir), "no .docx found")
         return
     ident = cfg["identity"]
-    fact_specs = [(n, s) for n, s in cfg["facts"].items()
-                  if not n.startswith("_") and "resumes" in s.get("appears_in", [])]
+    print(f"\n  {len(files)} document(s) read locally; nothing recorded. "
+          f"Retired phrases, retired product names, email and LinkedIn only — "
+          f"facts are not checked here, by decision.")
     for f in files:
         text = docx_text(f)
         if not text:
-            rep.warn("resumes", f.name, "could not read document text")
+            rep.warn("documents", f.name, "could not read document text")
             continue
         for entry in cfg["retired"]:
             if re.search(re.escape(entry["phrase"]), text, re.I):
-                rep.fail("resumes", f.name, f'retired "{entry["phrase"]}"')
+                rep.fail("documents", f.name, f'retired "{entry["phrase"]}"')
         for prod in cfg["products"]:
             old = prod.get("retired_display")
             if old and old in text:
-                rep.fail("resumes", f.name, f'retired product name "{old}"')
+                rep.fail("documents", f.name, f'retired product name "{old}"')
         for label, val in (("email", ident["email"]), ("LinkedIn", ident["linkedin"])):
             if val not in text:
-                rep.fail("resumes", f.name, f"{label} missing; expected {val}")
-        # Facts that claim to appear on the resumes get checked there. Absence is
-        # the finding; a stray match elsewhere in the document can mask it, which
-        # is the known limit of substring checking against prose.
-        for name, spec in fact_specs:
-            if spec["value"] not in text:
-                rep.fail("resumes", f.name,
-                         f"'{name}' should read {spec['value']}; not present")
+                rep.fail("documents", f.name, f"{label} missing; expected {val}")
         rep.checks += 1
 
 
@@ -838,12 +959,15 @@ def report_exemptions(cfg, rep):
 
 
 # profile.json v1.3.0 removed identity.phone: the personal cell does not live in
-# a public repository. "phone" therefore leaves this tuple. The consequence is
-# named rather than absorbed -- the resume phone number is now UNCHECKED and
-# unprintable from here, because the only value that could have been compared
-# against it is the one deliberately not published. Do not close that gap by
-# reading the number back into the manifest. If it needs closing, the value has
-# to reach the check without reaching the repository.
+# a public repository. "phone" therefore leaves this tuple.
+#
+# This is NOT an open coverage gap, and an earlier draft of this comment wrongly
+# called it one. The .docx resume variants are personal documents that carry the
+# cell, and by decision of 2026-08-12 they are out of scope for this system
+# entirely -- see _resumes_out_of_scope in the manifest. There is no surface left
+# whose phone number this could be compared against, so there is nothing to
+# check and nothing to reinstate. Do not "close" it by reading the number back
+# into the manifest.
 MANUAL_IDENTITY_KEYS = ("name", "email", "linkedin", "github", "site")
 
 
@@ -893,7 +1017,7 @@ def main():
     ap.add_argument("--all", action="store_true", help="every repo in the manifest")
     ap.add_argument("--repo", help="one repo, fetched remotely")
     ap.add_argument("--root", help="a local checkout")
-    ap.add_argument("--docx", help="directory of resume .docx")
+    ap.add_argument("--docx", help="a local directory of .docx to lint before sending")
     ap.add_argument("--only", help="comma-separated check groups")
     ap.add_argument("--quiet", action="store_true", help="skip the manual checklist")
     ap.add_argument("--manual", action="store_true", help="print only the checklist")
@@ -906,6 +1030,20 @@ def main():
         print(f"error: manifest not found at {mp}", file=sys.stderr)
         return 2
     cfg = json.loads(mp.read_text(encoding="utf-8"))
+
+    # Refuse to proceed on a manifest carrying a number that is not the brand
+    # one. Exit 1, not 2, on purpose: profile-drift.yml only understands 0 and
+    # 1, and a 2 falls through the open branch, the close branch AND the
+    # fail-the-job branch — a silent green run. 1 opens the drift issue, which
+    # is exactly the signal this deserves. (The pre-existing `return 2` for a
+    # missing manifest has that same silent-green problem and is not fixed here.)
+    phone_problems = audit_manifest_phones(cfg)
+    if phone_problems:
+        print("MANIFEST PHONE AUDIT FAILED — nothing else ran.", file=sys.stderr)
+        for problem in phone_problems:
+            print(f"  {problem}", file=sys.stderr)
+        return 1
+
     only = set(args.only.split(",")) if args.only else None
 
     if args.manual:
@@ -947,8 +1085,8 @@ def main():
         ap.error("give --all, --repo, --root, --docx, --verify-facts, or --manual")
 
     if args.docx:
-        check_docx(cfg, args.docx, rep)
-        scanned.append("resumes")
+        lint_documents(cfg, args.docx, rep)
+        scanned.append("documents")
 
     # Only a complete sweep can tell a dead exemption from an unvisited one.
     if full_sweep and (not only or "retired" in only):
