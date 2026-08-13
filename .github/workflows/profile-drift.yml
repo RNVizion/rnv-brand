@@ -5,11 +5,18 @@ name: Profile drift
 # inside the surface that's wrong; this is the thing that notices without anyone
 # remembering to look.
 #
-# It never edits. On drift it opens one issue and keeps it updated; when the drift
-# clears it closes the issue itself. The issue list is the state: an open
-# "Profile drift" issue means something disagrees, no issue means nothing does.
+# It never edits. The issue list is the state, and there are now TWO states,
+# because they are different questions with different answers:
 #
-# THREE EXPRESSION BUGS TO NOT REINTRODUCE
+#   profile-drift     something I read disagrees with the manifest.
+#   profile-coverage  I could not read part of the ecosystem, so I do not know.
+#
+# Collapsing those is the bug this file was rewritten to fix. An unfetchable repo
+# used to log a warning, exit 0, and close the drift issue while the report said
+# every surface agreed -- accurate about what it read, silent about what it never
+# opened, and silence read as agreement.
+#
+# FOUR EXPRESSION BUGS TO NOT REINTRODUCE
 # GitHub casts across types before comparing, so null and false both become 0.
 #   1. A SKIPPED step's output is '', not '0'. Testing `!= '0'` treats "this step
 #      didn't run" as failure, and the job fails on a clean push. Always test for
@@ -24,6 +31,21 @@ name: Profile drift
 #      (a surface fix should still clear a surface issue) and the CLAIM is now
 #      scoped to what actually ran. An idiom that is right in one direction is not
 #      automatically right in its inverse.
+#   4. NEW, and the reason for this revision: an exit code this file does not name
+#      falls through the open branch, the close branch AND the fail branch, and
+#      the run goes green having reported nothing. Every code is now named, and
+#      an UNKNOWN code fails the job on purpose. Adding a code to the checker
+#      without adding it here recreates the exact bug in one commit.
+#
+# EXIT CODES, and all four are handled below
+#   0  complete and clean. The only code that means what it says.
+#   1  something disagrees.        -> open/update profile-drift
+#   2  the checker could not run at all (manifest missing or unreadable).
+#      Touch no issues: a checker that did not run cannot judge either state.
+#   3  nothing disagreed, but the sweep was incomplete. -> open/update
+#      profile-coverage. Deliberately NOT reported as drift; "I found a problem"
+#      and "I could not look" need different responses from a human.
+
 on:
   # The schedule is load-bearing, not a convenience. Surface drift has a push
   # trigger; time-based checks do not -- an expiring surface goes stale with no
@@ -45,7 +67,7 @@ on:
 
 permissions:
   contents: read
-  issues: write                  # needed to open, update, and close the drift issue
+  issues: write                  # needed to open, update, and close both issues
 
 concurrency:
   group: profile-drift
@@ -98,6 +120,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 30
 
+      # ---------------------------------------------------------------- drift
       - name: Open or update the drift issue
         if: steps.surfaces.outputs.exit == '1' || steps.facts.outputs.exit == '1'
         env:
@@ -139,26 +162,117 @@ jobs:
 
       # See bug 3 above. The condition is deliberately permissive so that fixing a
       # surface clears the issue on the push that fixes it; the closing comment is
-      # what must not overclaim. FACTS_RAN is true only when the step actually ran
-      # and passed -- a skipped step yields '' and so reports false, correctly.
+      # what must not overclaim. Note that `== '0'` already excludes an incomplete
+      # sweep -- a run that could not read every repo exits 3 and closes nothing.
       - name: Close the drift issue when clean
         if: steps.surfaces.outputs.exit == '0' && steps.facts.outputs.exit != '1'
         env:
           GH_TOKEN: ${{ github.token }}
-          FACTS_RAN: ${{ steps.facts.outputs.exit == '0' }}
+          FACTS: ${{ steps.facts.outputs.exit }}
         run: |
-          if [ "$FACTS_RAN" = "true" ]; then
-            scope="Every surface agrees with the manifest, and the manifest agrees with source."
-          else
-            scope="Every surface agrees with the manifest. The manifest-vs-source check did not run on this event, so nothing here speaks to it; the next scheduled run covers it."
-          fi
+          case "$FACTS" in
+            0) scope="Every surface agrees with the manifest, and the manifest agrees with source." ;;
+            3) scope="Every surface agrees with the manifest. The manifest-vs-source check ran but could not read everything it needed, so nothing here speaks to it; see the coverage issue." ;;
+            *) scope="Every surface agrees with the manifest. The manifest-vs-source check did not run on this event, so nothing here speaks to it; the next scheduled run covers it." ;;
+          esac
           for n in $(gh issue list --state open --label profile-drift --json number --jq '.[].number'); do
             gh issue close "$n" --comment "Clean as of run [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}). $scope"
             echo "closed issue #$n"
           done
 
+      # ------------------------------------------------------------- coverage
+      - name: Open or update the coverage issue
+        if: steps.surfaces.outputs.exit == '3' || steps.facts.outputs.exit == '3'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "**The checker could not read part of the ecosystem.** Nothing below is a drift finding — this is the run telling you what it does not know."
+            echo
+            echo "Run: [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) · $(date -u '+%Y-%m-%d %H:%M UTC')"
+            echo
+            echo "Each unread surface set is marked \`MISS\` with a reason:"
+            echo
+            echo "- **gone** — 404 on every branch. Renamed, made private, or deleted, and \`profile.json\` is now wrong about what exists. This will not clear on its own; fix the manifest."
+            echo "- **unreachable** — the fetch failed for some other reason and a retry also failed. Usually transient. If it is still here next Monday, it is not."
+            echo
+            echo '### Surfaces'
+            echo '```'
+            cat report.txt
+            echo '```'
+            if [ -s facts.txt ]; then
+              echo '### Manifest vs source'
+              echo '```'
+              cat facts.txt
+              echo '```'
+            fi
+            echo
+            echo "---"
+            echo "_Closes only after a run where every pass completed and read everything. A push does not close this: the manifest-vs-source pass is skipped on push, so a push cannot prove coverage._"
+          } > coverage.md
+
+          existing=$(gh issue list --state open --label profile-coverage \
+                       --json number --jq '.[0].number' 2>/dev/null || echo "")
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --body-file coverage.md
+            echo "updated issue #$existing"
+          else
+            gh label create profile-coverage --color b45309 \
+              --description "the checker could not read part of the ecosystem" 2>/dev/null || true
+            gh issue create --title "Profile coverage incomplete" \
+                            --label profile-coverage --body-file coverage.md
+          fi
+
+      # STRICTER THAN THE DRIFT CLOSE, ON PURPOSE. Both passes must have run and
+      # both must have returned 0. A push skips the facts pass, so `facts` is ''
+      # and this does not fire -- which is correct: a push cannot prove coverage
+      # for a pass that did not execute. The cost is that a coverage issue can
+      # stay open until Monday after it is fixed. That is a false failure, and a
+      # false failure is cheap. A false all-clear here would close the one issue
+      # whose entire message is "I could not look."
+      - name: Close the coverage issue when the sweep is complete
+        if: steps.surfaces.outputs.exit == '0' && steps.facts.outputs.exit == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --state open --label profile-coverage --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Complete sweep as of run [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}). Every repo was fetched and every declared check ran."
+            echo "closed issue #$n"
+          done
+
+      # ----------------------------------------------------------- job result
       - name: Fail the run on drift
         if: steps.surfaces.outputs.exit == '1' || steps.facts.outputs.exit == '1'
         run: |
-          echo "Profile drift detected; see the open issue." >&2
+          echo "Profile drift detected; see the open profile-drift issue." >&2
+          exit 1
+
+      - name: Fail the run on incomplete coverage
+        if: steps.surfaces.outputs.exit == '3' || steps.facts.outputs.exit == '3'
+        run: |
+          echo "The sweep was incomplete; see the open profile-coverage issue." >&2
+          echo "A run that could not read the ecosystem does not get to look green." >&2
+          exit 1
+
+      - name: Fail the run when the checker could not start
+        if: steps.surfaces.outputs.exit == '2' || steps.facts.outputs.exit == '2'
+        run: |
+          echo "The checker exited 2: it could not run at all." >&2
+          echo "Usually a missing or unreadable profile.json. No issue was opened or" >&2
+          echo "closed, because a checker that did not run cannot judge either state." >&2
+          exit 1
+
+      # The backstop for bug 4. If the checker ever returns a code this file does
+      # not name, this catches it instead of the run going green in silence. Add
+      # a code to the checker and you will be told here, once, loudly.
+      - name: Fail on an exit code this workflow does not understand
+        if: >-
+          (steps.surfaces.outputs.exit != '0' && steps.surfaces.outputs.exit != '1' &&
+           steps.surfaces.outputs.exit != '2' && steps.surfaces.outputs.exit != '3') ||
+          (steps.facts.outputs.exit != '' && steps.facts.outputs.exit != '0' &&
+           steps.facts.outputs.exit != '1' && steps.facts.outputs.exit != '2' &&
+           steps.facts.outputs.exit != '3')
+        run: |
+          echo "Unhandled exit code. surfaces=${{ steps.surfaces.outputs.exit }} facts=${{ steps.facts.outputs.exit }}" >&2
+          echo "No issue was opened or closed. Add the code to this workflow before trusting another run." >&2
           exit 1
