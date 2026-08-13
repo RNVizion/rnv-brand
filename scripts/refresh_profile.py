@@ -76,6 +76,8 @@ import re
 import sys
 import tarfile
 import tempfile
+import time
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -208,25 +210,61 @@ def clear_file_cache() -> None:
     _FILE_CACHE.clear()
 
 
-def fetch_repo(name: str, dest: Path) -> Path | None:
-    """Download a repo tarball and unpack it. No clone, no auth, no local state."""
-    for branch in ("main", "master"):
-        url = f"https://codeload.github.com/{OWNER}/{name}/tar.gz/refs/heads/{branch}"
-        try:
-            with urllib.request.urlopen(url, timeout=60) as r:
-                if r.status != 200:
-                    continue
-                data = r.read()
-        except Exception:
-            continue
-        out = dest / name
-        out.mkdir(parents=True, exist_ok=True)
-        with tarfile.open(fileobj=io.BytesIO(data)) as tf:
-            members = [m for m in tf.getmembers() if not m.name.startswith("/") and ".." not in m.name]
-            tf.extractall(out, members=members)
-        inner = next((c for c in out.iterdir() if c.is_dir()), None)
-        return inner or out
-    return None
+RETRY_DELAY = 2.0   # seconds, once, and only for failures a retry could fix
+
+# Appended to every MISS so the reason code is self-explaining in a public
+# issue body, where the reader has no access to this source.
+MISS_HINT = ('"gone" means 404 on every branch: renamed, private or deleted, '
+             'and the manifest is wrong about what exists')
+
+
+def fetch_repo(name: str, dest: Path) -> tuple[Path | None, str]:
+    """Download a repo tarball and unpack it. No clone, no auth, no local state.
+
+    Returns (root, reason). reason is "" on success, "gone" when GitHub answered
+    404 on every branch, and "unreachable" for anything else.
+
+    THE TWO ARE DIFFERENT FINDINGS AND MUST NOT COLLAPSE. A 404 on every branch
+    is a fact about the ecosystem: the repo was renamed, made private, or
+    deleted, and the manifest is now wrong about what exists. It is stable, it
+    will 404 again next Monday, and retrying it only burns twenty seconds.
+    Anything else -- timeout, DNS, a 5xx, a reset -- is a statement about this
+    run's network and nothing about the ecosystem, which is why it gets one
+    retry and why its report reads differently.
+
+    Both stop the sweep from being complete. Only one of them is drift.
+    """
+    for attempt in (1, 2):
+        saw_transient = False
+        for branch in ("main", "master"):
+            url = f"https://codeload.github.com/{OWNER}/{name}/tar.gz/refs/heads/{branch}"
+            try:
+                with urllib.request.urlopen(url, timeout=60) as r:
+                    if r.status != 200:
+                        saw_transient = True
+                        continue
+                    data = r.read()
+            except urllib.error.HTTPError as e:
+                # 404 is the answer, not a failure to get one. Anything else is.
+                if e.code != 404:
+                    saw_transient = True
+                continue
+            except Exception:
+                saw_transient = True
+                continue
+            out = dest / name
+            out.mkdir(parents=True, exist_ok=True)
+            with tarfile.open(fileobj=io.BytesIO(data)) as tf:
+                members = [m for m in tf.getmembers()
+                           if not m.name.startswith("/") and ".." not in m.name]
+                tf.extractall(out, members=members)
+            inner = next((c for c in out.iterdir() if c.is_dir()), None)
+            return (inner or out), ""
+        if not saw_transient:
+            return None, "gone"
+        if attempt == 1:
+            time.sleep(RETRY_DELAY)
+    return None, "unreachable"
 
 
 def docx_text(path: Path) -> str:
@@ -275,6 +313,18 @@ class Report:
     def note(self, scope, surface, msg):
         self.findings.append(("NOTE", scope, surface, msg))
 
+    def miss(self, scope, surface, msg):
+        """A surface that could not be read.
+
+        Deliberately NOT a warning. A warning is something you read and judge; a
+        MISS is the run telling you it does not know. Collapsing the two is how
+        an unfetchable repo used to exit 0 and close the drift issue while
+        claiming every surface agreed -- the report was accurate about what it
+        read and silent about what it never opened, and silence read as
+        agreement. Its own bucket, its own exit code, its own issue.
+        """
+        self.findings.append(("MISS", scope, surface, msg))
+
     @property
     def failures(self):
         return [f for f in self.findings if f[0] == "FAIL"]
@@ -282,6 +332,10 @@ class Report:
     @property
     def warnings(self):
         return [f for f in self.findings if f[0] == "WARN"]
+
+    @property
+    def misses(self):
+        return [f for f in self.findings if f[0] == "MISS"]
 
 
 # --------------------------------------------------------------------------
@@ -753,9 +807,11 @@ def verify_facts(cfg, rep, workdir: Path):
     spec = facts.get("eval_cases", {})
     d = spec.get("derive", {})
     if d.get("method") == "exact" and d.get("repo"):
-        root = fetch_repo(d["repo"], workdir)
+        root, why = fetch_repo(d["repo"], workdir)
         if root is None:
-            rep.warn("verify", d["repo"], "could not fetch; eval cases unverified")
+            rep.miss("verify", d["repo"],
+                     f"could not fetch ({why}); eval cases unverified. "
+                     f"{MISS_HINT}")
         else:
             f = root / d["file"]
             if not f.exists():
@@ -788,11 +844,12 @@ def verify_facts(cfg, rep, workdir: Path):
         if str(n_products) != declared:
             rep.fail("verify", "profile.json",
                      f"manifest says {declared} projects; products[] lists {n_products}")
-        site = fetch_repo("rnvizion.github.io", workdir)
+        site, why = fetch_repo("rnvizion.github.io", workdir)
         if site is None:
-            rep.warn("verify", "rnvizion.github.io",
-                     "could not fetch; project count checked against products[] only, "
-                     "which is self-consistency and not verification")
+            rep.miss("verify", "rnvizion.github.io",
+                     f"could not fetch ({why}); project count checked against "
+                     f"products[] only, which is self-consistency and not "
+                     f"verification. {MISS_HINT}")
         else:
             idx = site / "index.html"
             if not idx.exists():
@@ -814,9 +871,9 @@ def verify_facts(cfg, rep, workdir: Path):
     if d.get("method") in ("floor", "floor_display"):
         floor, param_files, missing = 0, 0, []
         for name in d.get("repos", []):
-            root = fetch_repo(name, workdir)
+            root, why = fetch_repo(name, workdir)
             if root is None:
-                missing.append(name)
+                missing.append(f"{name} ({why})")
                 continue
             floor += _count_test_functions(root)
             param_files += _count_parametrized_files(root)
@@ -825,7 +882,7 @@ def verify_facts(cfg, rep, workdir: Path):
             # Partial evidence cannot support any of the assertions below: a short
             # floor makes a correct display look inflated, and losing whichever
             # repos hold the parametrized files makes it look impossible.
-            rep.warn("verify", "tests",
+            rep.miss("verify", "tests",
                      f"could not fetch {', '.join(missing)}; the floor is incomplete at "
                      f"{floor:,}, so the display assertions are skipped rather than run "
                      f"against partial evidence")
@@ -1072,9 +1129,11 @@ def main():
         names = [args.repo] if args.repo else [k for k in cfg["repos"] if not k.startswith("_")]
         with tempfile.TemporaryDirectory() as tmp:
             for name in names:
-                root = fetch_repo(name, Path(tmp))
+                root, why = fetch_repo(name, Path(tmp))
                 if root is None:
-                    rep.warn(name, "-", "could not fetch (private, empty, or renamed)")
+                    rep.miss(name, "-",
+                             f"could not fetch ({why}); every check declared for "
+                             f"this repo was skipped, not passed. {MISS_HINT}")
                     full_sweep = False   # a partial sweep cannot judge a dead exemption
                     continue
                 run_repo(cfg, name, root, rep, only)
@@ -1108,12 +1167,33 @@ def main():
 
     print("\n" + "-" * 70)
     print(f"  scanned: {', '.join(scanned) or 'nothing'}")
-    notes = len(rep.findings) - len(rep.failures) - len(rep.warnings)
-    print(f"  {len(rep.failures)} failure(s), {len(rep.warnings)} warning(s), {notes} note(s)")
+    notes = (len(rep.findings) - len(rep.failures)
+             - len(rep.warnings) - len(rep.misses))
+    print(f"  {len(rep.failures)} failure(s), {len(rep.warnings)} warning(s), "
+          f"{len(rep.misses)} unread, {notes} note(s)")
+    if rep.misses:
+        # The line that had to exist. Everything above describes what was read;
+        # without this, a report with no failures reads as an all-clear for an
+        # ecosystem it only partly opened.
+        print(f"  INCOMPLETE SWEEP — {len(rep.misses)} surface set(s) could not be "
+              f"read. Nothing above speaks to them, and a clean result here is "
+              f"not a clean result for the ecosystem.")
 
     if not args.quiet:
         print_manual(cfg)
-    return 1 if rep.failures else 0
+
+    # 1 = something disagrees. 3 = nothing disagreed but the sweep was
+    # incomplete. 0 = complete and clean, which is now the only thing that
+    # means what it says.
+    #
+    # Drift outranks coverage when both are true: exit 1 opens the drift issue
+    # and leaves any coverage issue untouched, which is correct, because a run
+    # that found drift AND could not read a repo has resolved neither.
+    if rep.failures:
+        return 1
+    if rep.misses:
+        return 3
+    return 0
 
 
 if __name__ == "__main__":
