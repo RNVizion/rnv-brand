@@ -18,9 +18,15 @@ name: Profile drift
 #
 # FOUR EXPRESSION BUGS TO NOT REINTRODUCE
 # GitHub casts across types before comparing, so null and false both become 0.
-#   1. A SKIPPED step's output is '', not '0'. Testing `!= '0'` treats "this step
-#      didn't run" as failure, and the job fails on a clean push. Always test for
-#      explicit failure: `== '1'`.
+#   1. CORRECTED 2026-08-13, after this file shipped with the bug. The old text
+#      here read "a SKIPPED step's output is '', not '0'". That is true when the
+#      value is INTERPOLATED into a shell and false inside an `if:` expression,
+#      where it is NULL. GitHub casts null to 0 and the string '0' to 0, so
+#      `steps.x.outputs.exit == '0'` is TRUE for a step that never ran. The
+#      coverage-close step shipped with exactly that condition and executed on a
+#      clean push -- harmless only because no coverage issue was open to close.
+#      Testing `!= '0'` is still wrong for the original reason. Both directions
+#      are traps; see rule 5.
 #   2. `inputs.x` is null outside workflow_dispatch, and `null != false` is FALSE,
 #      so an opt-out phrased that way silently disables the step on every
 #      scheduled run. Phrase opt-outs against `true` instead.
@@ -31,7 +37,16 @@ name: Profile drift
 #      (a surface fix should still clear a surface issue) and the CLAIM is now
 #      scoped to what actually ran. An idiom that is right in one direction is not
 #      automatically right in its inverse.
-#   4. NEW, and the reason for this revision: an exit code this file does not name
+#   5. THE GENERAL RULE, and the only one that makes the rest unnecessary:
+#      NEVER COMPARE `outputs.*` WITHOUT FIRST CHECKING `outcome`. A step's
+#      outputs are null until it runs, and every null comparison goes through
+#      numeric coercion where '', '0', false and null are all the same value.
+#      `outcome` is always one of success / failure / cancelled / skipped -- a
+#      non-empty string, compared against a non-empty string, with no coercion
+#      path in or out. Guard first, then read the output. Every condition below
+#      does this, and none of them depend on remembering how null casts.
+#
+#   4. An exit code this file does not name
 #      falls through the open branch, the close branch AND the fail branch, and
 #      the run goes green having reported nothing. Every code is now named, and
 #      an UNKNOWN code fails the job on purpose. Adding a code to the checker
@@ -122,7 +137,9 @@ jobs:
 
       # ---------------------------------------------------------------- drift
       - name: Open or update the drift issue
-        if: steps.surfaces.outputs.exit == '1' || steps.facts.outputs.exit == '1'
+        if: >-
+          (steps.surfaces.outcome == 'success' && steps.surfaces.outputs.exit == '1') ||
+          (steps.facts.outcome == 'success' && steps.facts.outputs.exit == '1')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -164,14 +181,21 @@ jobs:
       # surface clears the issue on the push that fixes it; the closing comment is
       # what must not overclaim. Note that `== '0'` already excludes an incomplete
       # sweep -- a run that could not read every repo exits 3 and closes nothing.
+      # Permissive on the facts half BY DESIGN: fixing a surface should clear a
+      # surface issue on the push that fixes it, and the closing comment is what
+      # carries the scope. Written as an explicit outcome test rather than
+      # `!= '1'`, which only worked because null happened to cast the right way.
       - name: Close the drift issue when clean
-        if: steps.surfaces.outputs.exit == '0' && steps.facts.outputs.exit != '1'
+        if: >-
+          steps.surfaces.outcome == 'success' && steps.surfaces.outputs.exit == '0' &&
+          (steps.facts.outcome != 'success' || steps.facts.outputs.exit != '1')
         env:
           GH_TOKEN: ${{ github.token }}
           FACTS: ${{ steps.facts.outputs.exit }}
         run: |
           case "$FACTS" in
             0) scope="Every surface agrees with the manifest, and the manifest agrees with source." ;;
+            2) scope="Every surface agrees with the manifest. The manifest-vs-source check could not start at all, so nothing here speaks to it." ;;
             3) scope="Every surface agrees with the manifest. The manifest-vs-source check ran but could not read everything it needed, so nothing here speaks to it; see the coverage issue." ;;
             *) scope="Every surface agrees with the manifest. The manifest-vs-source check did not run on this event, so nothing here speaks to it; the next scheduled run covers it." ;;
           esac
@@ -182,7 +206,9 @@ jobs:
 
       # ------------------------------------------------------------- coverage
       - name: Open or update the coverage issue
-        if: steps.surfaces.outputs.exit == '3' || steps.facts.outputs.exit == '3'
+        if: >-
+          (steps.surfaces.outcome == 'success' && steps.surfaces.outputs.exit == '3') ||
+          (steps.facts.outcome == 'success' && steps.facts.outputs.exit == '3')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -231,7 +257,9 @@ jobs:
       # false failure is cheap. A false all-clear here would close the one issue
       # whose entire message is "I could not look."
       - name: Close the coverage issue when the sweep is complete
-        if: steps.surfaces.outputs.exit == '0' && steps.facts.outputs.exit == '0'
+        if: >-
+          steps.surfaces.outcome == 'success' && steps.surfaces.outputs.exit == '0' &&
+          steps.facts.outcome == 'success' && steps.facts.outputs.exit == '0'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -242,20 +270,26 @@ jobs:
 
       # ----------------------------------------------------------- job result
       - name: Fail the run on drift
-        if: steps.surfaces.outputs.exit == '1' || steps.facts.outputs.exit == '1'
+        if: >-
+          (steps.surfaces.outcome == 'success' && steps.surfaces.outputs.exit == '1') ||
+          (steps.facts.outcome == 'success' && steps.facts.outputs.exit == '1')
         run: |
           echo "Profile drift detected; see the open profile-drift issue." >&2
           exit 1
 
       - name: Fail the run on incomplete coverage
-        if: steps.surfaces.outputs.exit == '3' || steps.facts.outputs.exit == '3'
+        if: >-
+          (steps.surfaces.outcome == 'success' && steps.surfaces.outputs.exit == '3') ||
+          (steps.facts.outcome == 'success' && steps.facts.outputs.exit == '3')
         run: |
           echo "The sweep was incomplete; see the open profile-coverage issue." >&2
           echo "A run that could not read the ecosystem does not get to look green." >&2
           exit 1
 
       - name: Fail the run when the checker could not start
-        if: steps.surfaces.outputs.exit == '2' || steps.facts.outputs.exit == '2'
+        if: >-
+          (steps.surfaces.outcome == 'success' && steps.surfaces.outputs.exit == '2') ||
+          (steps.facts.outcome == 'success' && steps.facts.outputs.exit == '2')
         run: |
           echo "The checker exited 2: it could not run at all." >&2
           echo "Usually a missing or unreadable profile.json. No issue was opened or" >&2
@@ -267,11 +301,12 @@ jobs:
       # a code to the checker and you will be told here, once, loudly.
       - name: Fail on an exit code this workflow does not understand
         if: >-
-          (steps.surfaces.outputs.exit != '0' && steps.surfaces.outputs.exit != '1' &&
+          (steps.surfaces.outcome == 'success' &&
+           steps.surfaces.outputs.exit != '0' && steps.surfaces.outputs.exit != '1' &&
            steps.surfaces.outputs.exit != '2' && steps.surfaces.outputs.exit != '3') ||
-          (steps.facts.outputs.exit != '' && steps.facts.outputs.exit != '0' &&
-           steps.facts.outputs.exit != '1' && steps.facts.outputs.exit != '2' &&
-           steps.facts.outputs.exit != '3')
+          (steps.facts.outcome == 'success' &&
+           steps.facts.outputs.exit != '0' && steps.facts.outputs.exit != '1' &&
+           steps.facts.outputs.exit != '2' && steps.facts.outputs.exit != '3')
         run: |
           echo "Unhandled exit code. surfaces=${{ steps.surfaces.outputs.exit }} facts=${{ steps.facts.outputs.exit }}" >&2
           echo "No issue was opened or closed. Add the code to this workflow before trusting another run." >&2
