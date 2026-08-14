@@ -51,7 +51,7 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 # ------------------------------------------------- the rest of the register
 # Named because they are permanent, not because a palette happened to use
 # them. TRUE_BLACK and WHITE were already in APP and in every light theme as
-# bare literals; WEB_BLACK existed only as WEB["bg"] (named bg-0 until 2026-08-14).
+# bare literals; WEB_BLACK existed only as WEB["bg"] (named bg-0 until 2026-08-13).
 TRUE_BLACK = "#000000"   # app window ground; text on gold, on either surface
 WHITE = "#ffffff"        # light-surface cards and inputs; the ramp's far anchor
 WEB_BLACK = "#0a0a0f"    # rnvizion.dev ground; social and OG base
@@ -98,7 +98,7 @@ APP = {
 WEB = {
     # ONE-INDEXED, WITH NO bg-1, because that is what the eleven published
     # pages on rnvizion.dev already call these three colours. Decided
-    # 2026-08-14: the source moved to the surface, not the surface to the
+    # 2026-08-13: the source moved to the surface, not the surface to the
     # source. The gap in the sequence is the honest cost of describing a live
     # thing accurately instead of tidily.
     "bg": WEB_BLACK,
@@ -124,20 +124,20 @@ WEB = {
     # boundary at 10.68:1 on bg and 3.35:1 at the breathe animation's dim end,
     # which is what frees the FILL to be whatever the brand wants, including
     # values that could never carry it alone. Drop the ring and every value below
-    # fails. Measured 2026-08-14; re-measure if the ring or the ground moves.
+    # fails. Measured 2026-08-13; re-measure if the ring or the ground moves.
     #
     # signal-live is 2.56:1 on bg and 2.43:1 on bg-2. DELIBERATELY under the
     # floor, and defensible for two reasons that are now independent: the pill
-    # carries the word, and since the ring was split onto its own element it no
-    # longer animates -- it holds 10.68:1 at EVERY frame rather than 3.35:1 at
-    # the trough. The 0.5 dip is therefore an aesthetic choice held in common
+    # carries the word, and since 2026-08-14 the ring sits on its own element
+    # and no longer animates -- it holds 10.68:1 at EVERY frame rather than
+    # 3.35:1 at the trough. The 0.5 dip is an aesthetic choice held in common
     # across two surfaces, not a contrast floor. Colour is the third signal.
     #
-    # Chosen at hue 333 over an earlier 351 wine, on the check that mattered:
-    # a hue move toward magenta could have narrowed the gap to STATUS.error and
-    # instead widened it -- CIEDE2000 18.22 against #dc3545 where the wine was
-    # 17.40, and 25.92 against status error-text. The error red was always this
-    # value's nearest neighbour in the system.
+    # Value changed 2026-08-14 from an earlier wine at hue 351, on the check
+    # that mattered rather than on taste: a move toward magenta could have
+    # narrowed the gap to STATUS.error and instead widened it -- CIEDE2000 18.22
+    # against the error red where the wine was 17.40, and 25.92 against
+    # error-text. The error red was always this value's nearest neighbour.
     #
     # signal-offline and signal-down happen to equal text-faint and accent-warm.
     # THE MATCH IS INCIDENTAL AND THE SEAM IS DELIBERATE: text-faint moves for
@@ -148,7 +148,7 @@ WEB = {
     # Until both surfaces land the change they carry a hex this file no longer
     # defines, and an audit finding that is the work being unfinished, not a bug.
     # signal-live means "RNVizion is on", NOT "a video stream is broadcasting".
-    # Widened deliberately 2026-08-14: it carries the availability dot on
+    # Widened deliberately 2026-08-13: it carries the availability dot on
     # rnvizion.dev ("open to roles") as well as the broadcast dot on rnv-live.
     # Two different mediums, one recognisable mark -- the adjacent WORD carries
     # the specific meaning on each, the colour carries the presence. That is the
@@ -161,7 +161,7 @@ WEB = {
     "signal-down": "#ffd166",      # service degraded or unavailable
 }
 
-# RESOLVED 2026-08-14. This ramp was named bg-0 / bg-1 / bg-2 while eleven
+# RESOLVED 2026-08-13. This ramp was named bg-0 / bg-1 / bg-2 while eleven
 # published pages called the same three colours --bg / --bg-2 / --bg-3. Values
 # identical, nothing rendered wrong -- the collision was that "bg-2" meant
 # #11111a to the site and #1a1a26 here, so anyone reading this file and editing
@@ -205,7 +205,7 @@ RECORDS = {
 }
 
 # ---------------------------------------------------------- status (app)
-# RULED 2026-08-14. The brand now issues one answer for app status semantics,
+# RULED 2026-08-13. The brand now issues one answer for app status semantics,
 # and the answer is BOOTSTRAP'S SET. The previous comment here said the brand
 # "neither owns them nor varies them, and issues no ruling on what red means" --
 # that sentence is retired, because unifying IS the ruling, and leaving the
