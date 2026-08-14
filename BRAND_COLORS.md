@@ -250,16 +250,70 @@ platform, not the brand; the brand neither owns them nor varies them.
 | Value | Origin | Where |
 |---|---|---|
 | `#0078d4`, `rgba(0,120,215,200)` | Windows accent and selection | Checkboxes, progress fill, selection overlay |
-| `#f44336`, `#4caf50`, `#ffc107` | Material | App status semantics |
-| `#dc3545`, `#28a745` | Bootstrap | Status semantics in picker, icon builder, transformer |
 | `#ff6b6b` | Inline error text variant | Palette manager |
-| `#4ade80` | Tailwind | Site status indicator |
 | `#ff0000`, `#00ff00`, `#0000ff` | RGB primaries | Color math in the picker, mixer, palette manager |
 
-**Two consequences worth stating.** Status colors are outside the brand, so there is no brand
-ruling on what red or green means and no light status trio to decide; the surface follows its
-platform. And the divergence between the Material and Bootstrap sets across apps is not brand
-drift, because neither set was ever the brand's.
+**This table lost two rows on 2026-08-13 and the reason matters.** Status semantics and the
+site's status indicator are no longer outside the brand. See the two sections below.
+
+---
+
+## App status — ruled 2026-08-13, no longer borrowed
+
+The brand now issues one answer, and the answer is **Bootstrap's set**: `#28a745` success,
+`#ffc107` warning, `#dc3545` error. Canonical in `engine/brand.py` as `STATUS`.
+
+Bootstrap rather than Material because three applications already shipped Bootstrap's values in
+source — the picker, the icon builder, the transformer. Choosing the set reality already holds
+moved one dict in one file and no pixel anywhere; choosing Material would have made three apps
+wrong on the day it landed. Warning was never in dispute; both systems use `#ffc107`.
+
+**What this retires.** The previous claim that "there is no brand ruling on what red or green
+means" is gone, and so is "the divergence between the Material and Bootstrap sets is not brand
+drift." It is drift now, by decision. `#f44336` and `#4caf50` are the values to remove.
+
+**Known non-conformance, recorded rather than assumed clean.** `rnv-color-picker` carries **both**
+sets live: Bootstrap in its `PALETTE` dict and Material in `STATUS_SUCCESS_BG` / `STATUS_ERROR_BG`,
+the latter consumed by `ui/settings_panel.py` and `utils/cache.py`. That app was internally
+inconsistent before this ruling and nothing compared the two. `rnv-icon-builder` writes `#FFC107`
+in uppercase — the same value, but a case-sensitive comparison reads it as drift.
+
+**One measured regression, and the lift that answers it.** `#dc3545` reads 3.84:1 on the app panel
+and 3.17:1 on a card — it clears the 3:1 non-text floor for fills, borders and badges but sits
+**below the 4.5:1 text floor**, where Material's `#f44336` read 4.73:1 and passed.
+
+`STATUS` therefore carries a fourth value, **`error-text` `#e56b77`**, for dark-theme text only.
+Derived by rule rather than picked: hold hue and saturation, raise lightness, take the first step
+clearing 4.5:1 on the worst dark ground. The walk is published in `engine/brand.py` beside the
+value, in the same spirit as the two tint censuses above — a derived value is publishable without
+being permanent, and the source emits it so nobody re-derives it by hand.
+
+It reads **4.58:1 on a card**, 5.55 on panel, 6.70 on window, and **3.13:1 on white**, which fails.
+That is why `error` stays `#dc3545` for light mode: one colour, two grounds, the same shape as
+`GOLD` and `DARK_GOLD`. Cross-checked through `rnv-color-mcp` rather than trusted to arithmetic.
+
+**It does not conform to the Records order and was not forced to.** Making R > G > B swung it to
+`#e56d3c`, burnt orange — a different colour wearing the right lightness. The tint rules govern
+the neutral ramps; a borrowed platform value that never conformed should not sprout a derived
+variant that does.
+
+---
+
+## The site signal indicator — ruled 2026-08-13, no longer borrowed
+
+`#4ade80` was Tailwind's green, printed on the site with no entry in any source. It is retired.
+In its place, `engine/brand.py` carries a three-value **signal** set, distinct from `STATUS`:
+`#8B2C3B` live, `#5a5a72` offline, `#ffd166` down.
+
+**Signals are not status.** Status is the result of a user's action inside an app and moves when a
+UI framework moves. A signal is the state of something the brand runs and moves when the brand
+decides something. `signal-live` means *RNVizion is on*, not *a video stream is broadcasting* — it
+carries the availability dot on the site as well as the broadcast dot on `rnv-live`.
+
+**The ring is load-bearing.** Every signal dot is drawn with a 1px gold ring, identical in all
+states, so the ring signals nothing and is simply the component's chrome. It carries the WCAG
+1.4.11 boundary at 10.15:1, and 3.35:1 at the breathe animation's dim end. That is what frees the
+fill to be a deep wine at 2.37:1. Remove the ring and every value in the set fails.
 
 **One legibility note, app-level and not a brand matter:** `#ffc107` reads 1.63:1 on white and
 is carried unchanged by all five apps. Amber on white is a known trap; worth a look in
