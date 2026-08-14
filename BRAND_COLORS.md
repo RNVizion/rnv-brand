@@ -3,7 +3,13 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-14 (rev 12 — the signal dot's ring was decoupled from its fill on both
+Last locked: 2026-08-14 (rev 13 — **third revision on this date; the sequence is in the rev
+number, not the stamp.** Lands `signal-live` at `#a5034e` and moves the fill's ratio to 2.43:1;
+retires "wine" as a descriptor for the current value. Repairs a blind pass that ran over rev 12
+and hit only the sentences that are *about* hex case: three mentions of `#FFC107` lowercased into
+meaninglessness, the `#8B2C3B`/`#8b2c3b` illustration replaced with two different colours, and the
+one line that actually stated a value left carrying a retired one. **A find-and-replace cannot
+tell a mention from a use.** Rev 12 — the signal dot's ring was decoupled from its fill on both
 surfaces, so the ring no longer dims and the dim-end contrast figure in the signal section is
 retired rather than corrected. Records the split as landed, and records that `breathe`'s 0.5 dip
 now stands on parity rather than on the accessibility floor that originally set it. Rev 11 —
@@ -13,7 +19,7 @@ a document that no longer existed. A dated header is the only thing that surface
 clobber, and it cannot do that job while it is itself behind. Rev 11 closes the signal ruling:
 `rnvizion.dev` landed the change, so both surfaces are clean and `#4ade80` is gone from the
 ecosystem rather than merely retired at the source. Normalises `#8b2c3b` to lowercase, the case
-hazard this file already names about `#ffc107`. Retires the typography block (R3) — it was not
+hazard this file already names about `#FFC107`. Retires the typography block (R3) — it was not
 merely redundant with Brand Book §3.2, it stated three facts that §3.2 had already retired.
 Rev 10 — the two-dark rule re-derived from measurement after the
 question was reopened: charcoal is a mid-tone in both ramps and a base in neither, so it
@@ -287,7 +293,7 @@ drift." It is drift now, by decision. `#f44336` and `#4caf50` are the values to 
 **Known non-conformance, recorded rather than assumed clean.** `rnv-color-picker` carries **both**
 sets live: Bootstrap in its `PALETTE` dict and Material in `STATUS_SUCCESS_BG` / `STATUS_ERROR_BG`,
 the latter consumed by `ui/settings_panel.py` and `utils/cache.py`. That app was internally
-inconsistent before this ruling and nothing compared the two. `rnv-icon-builder` writes `#ffc107`
+inconsistent before this ruling and nothing compared the two. `rnv-icon-builder` writes `#FFC107`
 in uppercase — the same value, but a case-sensitive comparison reads it as drift.
 
 **One measured regression, and the lift that answers it.** `#dc3545` reads 3.84:1 on the app panel
@@ -315,7 +321,20 @@ variant that does.
 
 `#4ade80` was Tailwind's green, printed on the site with no entry in any source. It is retired.
 In its place, `engine/brand.py` carries a three-value **signal** set, distinct from `STATUS`:
-`#8b2c3b` live, `#5a5a72` offline, `#ffd166` down.
+`#a5034e` live, `#5a5a72` offline, `#ffd166` down.
+
+**`signal-live` changed on 2026-08-14, from `#8b2c3b` to `#a5034e`.** Hue moved 350.5° to 332.2°
+and saturation 52% to 96%. **It was decided on the check that mattered rather than on taste:** a
+move toward magenta could have narrowed the gap to the error red, which was always this value's
+nearest neighbour in the system, and instead widened it — CIEDE2000 18.22 against `#dc3545`
+where the retired value was 17.40. Against the dark-theme error text it reads 25.92. Contrast on
+`bg-2` moves 2.37:1 to 2.43:1, immaterial either way, because the ring carries the boundary and
+the fill was never asked to.
+
+**"Wine" describes the retired value and should not be carried forward.** At 96% saturation the
+current value is not the muted red that word implies, and `engine/brand.py` already uses "wine"
+for what it replaced. This file now says `signal-live` or gives the hex. A descriptor that
+survives the thing it described starts naming the wrong colour to everyone who reads it.
 
 **Signals are not status.** Status is the result of a user's action inside an app and moves when a
 UI framework moves. A signal is the state of something the brand runs and moves when the brand
@@ -326,7 +345,7 @@ carries the availability dot on the site as well as the broadcast dot on `rnv-li
 with a 1px gold ring, identical in all states, so the ring signals nothing and is simply the
 component's chrome. It carries the WCAG 1.4.11 boundary — 10.15:1 on the site's pill ground
 (`bg-2`), 10.68:1 on `rnv-live`'s (`bg`) — **at every frame**, because the fill breathes and the
-ring does not. That is what frees the fill to be a deep wine at 2.37:1. Remove the ring and
+ring does not. That is what frees the fill to sit at 2.43:1. Remove the ring and
 every value in the set fails.
 
 **A dim-end figure used to live in this paragraph and is retired.** While the ring animated with
@@ -359,10 +378,27 @@ be defended with the old one.** Change it on one surface and it must change on b
 Sizes are **not** matched and were not made to match: 8px on the site, 0.45rem on `rnv-live`.
 The two pills differ in type size and padding, so equal pixels would not read as equal marks.
 
-**Case is part of the value here, not formatting.** `#8b2c3b` is lowercase in this file and
-must be lowercase at the source: a case-sensitive comparison reads `#a5034e` and `#8b2c3b` as
-two colors, which is precisely the failure recorded one section above about `rnv-icon-builder`
-and `#ffc107`. Naming a hazard and then committing it is how a house style stops being one.
+**Case is part of the value here, not formatting.** Hex is lowercase in this file and must be
+lowercase at the source: a case-sensitive comparison reads `#8B2C3B` and `#8b2c3b` as two
+colors, which is precisely the failure recorded one section above about `rnv-icon-builder` and
+`#FFC107`. Naming a hazard and then committing it is how a house style stops being one.
+
+**That pair is kept in its original case on purpose, and it was destroyed once already.** A
+blind pass ran over this file after rev 12 and replaced `#8B2C3B` here with `#a5034e`, leaving
+a sentence claiming a case-sensitive comparison reads two *different colours* as different —
+which they are, so the example proved nothing. The same pass lowercased `#FFC107` in the three
+places that name it *as the uppercase instance*, and left line 318, the only place that
+actually stated a value, carrying a retired one.
+
+**The rule that failure earns: a mechanical pass must skip the sentences that are about the
+value being replaced.** A worked example, a "do not write it this way," a before-and-after —
+each is a *mention*, and a find-and-replace cannot tell a mention from a use, because in the
+text they are the same string. If a file explains a rule about a value's form, that file
+cannot be swept for that value; search it, read the hits, edit by hand. In this document
+`#ffc107` is lowercase wherever it is used and uppercase wherever a sentence names the
+uppercase instance as the fault. **No count of either is published here on purpose** — an
+occurrence count changes on every edit, and a figure that moves without a decision is the
+kind this file does not carry.
 
 **One legibility note, app-level and not a brand matter:** `#ffc107` reads 1.63:1 on white and
 is carried unchanged by all five apps. Amber on white is a known trap; worth a look in
