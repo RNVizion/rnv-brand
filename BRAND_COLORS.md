@@ -3,7 +3,15 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-10 (rev 10 — the two-dark rule re-derived from measurement after the
+Last locked: 2026-08-14 (rev 11 — **rev 10's header was stale against its own body:** it read
+2026-08-10 while carrying two sections ruled 2026-08-13, so this file's version field described
+a document that no longer existed. A dated header is the only thing that surfaces a stale-base
+clobber, and it cannot do that job while it is itself behind. Rev 11 closes the signal ruling:
+`rnvizion.dev` landed the change, so both surfaces are clean and `#4ade80` is gone from the
+ecosystem rather than merely retired at the source. Normalises `#8b2c3b` to lowercase, the case
+hazard this file already names about `#FFC107`. Retires the typography block (R3) — it was not
+merely redundant with Brand Book §3.2, it stated three facts that §3.2 had already retired.
+Rev 10 — the two-dark rule re-derived from measurement after the
 question was reopened: charcoal is a mid-tone in both ramps and a base in neither, so it
 cannot replace the web ground. Rev 9 strikes "one edit updates every consumer," a mechanism this
 file claimed and nothing ever implemented; records the mirror pattern that actually governs.
@@ -303,7 +311,7 @@ variant that does.
 
 `#4ade80` was Tailwind's green, printed on the site with no entry in any source. It is retired.
 In its place, `engine/brand.py` carries a three-value **signal** set, distinct from `STATUS`:
-`#8B2C3B` live, `#5a5a72` offline, `#ffd166` down.
+`#8b2c3b` live, `#5a5a72` offline, `#ffd166` down.
 
 **Signals are not status.** Status is the result of a user's action inside an app and moves when a
 UI framework moves. A signal is the state of something the brand runs and moves when the brand
@@ -314,6 +322,19 @@ carries the availability dot on the site as well as the broadcast dot on `rnv-li
 states, so the ring signals nothing and is simply the component's chrome. It carries the WCAG
 1.4.11 boundary at 10.15:1, and 3.35:1 at the breathe animation's dim end. That is what frees the
 fill to be a deep wine at 2.37:1. Remove the ring and every value in the set fails.
+
+**Both surfaces have landed, 2026-08-14.** `rnv-live` took the set in the ruling change;
+`rnvizion.dev` followed on 2026-08-14, replacing the hero dot's fill and dropping its outer
+glow, since a ring plus a glow is two treatments doing one job and the ring is the one carrying
+contrast. `#4ade80` now appears in no RNVizion source. **The reading of a sighting changes with
+this:** while the change was outstanding, finding the hex meant unfinished work; finding it now
+means a surface has regressed or a new one was built from a stale base. `engine/brand.py`
+carries a comment stating the former — it expires with this line.
+
+**Case is part of the value here, not formatting.** `#8b2c3b` is lowercase in this file and
+must be lowercase at the source: a case-sensitive comparison reads `#8B2C3B` and `#8b2c3b` as
+two colors, which is precisely the failure recorded one section above about `rnv-icon-builder`
+and `#FFC107`. Naming a hazard and then committing it is how a house style stops being one.
 
 **One legibility note, app-level and not a brand matter:** `#ffc107` reads 1.63:1 on white and
 is carried unchanged by all five apps. Amber on white is a known trap; worth a look in
@@ -413,14 +434,19 @@ was never built is worse than no mechanism, because it tells everyone to stop lo
 
 ---
 
-## Typography (reference)
+## Typography — not here
 
-- Display: Bricolage Grotesque
-- Serif (emphasis / italics): Instrument Serif
-- Mono (wordmark, labels, footer): JetBrains Mono
-- Body: Inter / system stack
+**Brand Book §3.2 owns type. This file owns color.** The reference list that stood here is
+retired rather than corrected, and the distinction matters: it was not a stale copy of a
+current fact, it was three retired ones. It gave the wordmark to JetBrains Mono, which
+decision #15 took away and gave to Montserrat Black; it wrote body as "Inter / system stack,"
+one phrase describing two different things, which F2 split; and it had no row for the mark
+face at all.
 
-Social and OG-card typography is tracked separately.
+**A convenience copy is a second canonical entry wearing a disclaimer.** "(reference)" did not
+stop this list from being read and followed, and two canonical entries that disagree are
+invisible to review — each reads coherently alone. The ownership table at the top of this file
+exists to prevent exactly this, and this block was the standing exception to it.
 
 ---
 
