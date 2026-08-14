@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""BRAND_COLORS.md rev 10 -> rev 11.
+"""BRAND_COLORS.md rev 11 -> rev 12.
 
-Built against rnv-brand/BRAND_COLORS.md @ main, fetched 2026-08-14 (rev 10,
-445 lines, 22994 bytes). Fails loudly if the base has moved. Run from repo root.
+Built against rnv-brand/BRAND_COLORS.md @ main, fetched 2026-08-14 (rev 11,
+470 lines, 25351 bytes). Fails loudly if the base has moved. Run from repo root.
+Run it AFTER the two dot splits are pushed, not before -- rev 12 states them as
+landed, and a doc that claims a landing ahead of the push is the security.txt
+Policy: failure again.
 
-Four edits:
-  1. rev header  -- rev 10's header said 2026-08-10 while carrying two sections
-                    ruled 2026-08-13; the version field was lying about its own body.
-  2. signal hex  -- #8B2C3B -> #8b2c3b, the only uppercase hex in engine/brand.py's
-                    38 and one of two in this file. The doc names this exact hazard
-                    two sections earlier, about #FFC107.
-  3. signal note -- record that both surfaces have landed, so the "unfinished work"
-                    reading of a #4ade80 sighting expires.
-  4. typography  -- R3. The block stated three facts retired by Brand Book decision
-                    #15 and F2. Replaced by a pointer, not a corrected restatement.
+Two edits:
+  1. The ring clause. Rev 11 said the ring carries 1.4.11 "at 10.15:1, and
+     3.35:1 at the breathe animation's dim end." The ring no longer animates,
+     so there is no dim end for it. Leaving the number would leave a floor
+     documented that nothing enforces and nothing needs.
+  2. A landing paragraph for the split, and the reason the number in the
+     keyframe survived its own justification.
 """
 import pathlib
 
@@ -21,65 +21,45 @@ P = pathlib.Path("BRAND_COLORS.md")
 s = P.read_text(encoding="utf-8")
 
 EDITS = [
-    # ---------------------------------------------------------------- 1. header
+    # ------------------------------------------------------- 1. the ring clause
     (
-        "Last locked: 2026-08-10 (rev 10 \u2014 the two-dark rule re-derived from measurement after the",
-        "Last locked: 2026-08-14 (rev 11 \u2014 **rev 10's header was stale against its own body:** it read\n"
-        "2026-08-10 while carrying two sections ruled 2026-08-13, so this file's version field described\n"
-        "a document that no longer existed. A dated header is the only thing that surfaces a stale-base\n"
-        "clobber, and it cannot do that job while it is itself behind. Rev 11 closes the signal ruling:\n"
-        "`rnvizion.dev` landed the change, so both surfaces are clean and `#4ade80` is gone from the\n"
-        "ecosystem rather than merely retired at the source. Normalises `#8b2c3b` to lowercase, the case\n"
-        "hazard this file already names about `#FFC107`. Retires the typography block (R3) \u2014 it was not\n"
-        "merely redundant with Brand Book \u00a73.2, it stated three facts that \u00a73.2 had already retired.\n"
-        "Rev 10 \u2014 the two-dark rule re-derived from measurement after the",
+        "**The ring is load-bearing.** Every signal dot is drawn with a 1px gold ring, identical in all\n"
+        "states, so the ring signals nothing and is simply the component's chrome. It carries the WCAG\n"
+        "1.4.11 boundary at 10.15:1, and 3.35:1 at the breathe animation's dim end. That is what frees the\n"
+        "fill to be a deep wine at 2.37:1. Remove the ring and every value in the set fails.",
+        "**The ring is load-bearing, and since 2026-08-14 it is also still.** Every signal dot is drawn\n"
+        "with a 1px gold ring, identical in all states, so the ring signals nothing and is simply the\n"
+        "component's chrome. It carries the WCAG 1.4.11 boundary \u2014 10.15:1 on the site's pill ground\n"
+        "(`bg-2`), 10.68:1 on `rnv-live`'s (`bg`) \u2014 **at every frame**, because the fill breathes and the\n"
+        "ring does not. That is what frees the fill to be a deep wine at 2.37:1. Remove the ring and\n"
+        "every value in the set fails.\n"
+        "\n"
+        "**A dim-end figure used to live in this paragraph and is retired.** While the ring animated with\n"
+        "the fill, the boundary was only as good as the animation's worst frame \u2014 3.35:1 at a 0.5 dip,\n"
+        "2.57:1 at 0.4 \u2014 so the keyframe carried a floor. Splitting the fill onto a pseudo-element\n"
+        "removed the coupling and the floor with it. **The number is gone rather than corrected**, which\n"
+        "is the point: a constraint that stops applying should not be left standing as a figure someone\n"
+        "later re-derives a rule from.",
     ),
-    # ------------------------------------------------------------- 2. hex case
+    # --------------------------------------------------------- 2. landing record
     (
-        "`#8B2C3B` live, `#5a5a72` offline, `#ffd166` down.",
-        "`#8b2c3b` live, `#5a5a72` offline, `#ffd166` down.",
-    ),
-    # ---------------------------------------------------------- 3. landing note
-    (
-        "**One legibility note, app-level and not a brand matter:** `#ffc107` reads 1.63:1 on white and",
-        "**Both surfaces have landed, 2026-08-14.** `rnv-live` took the set in the ruling change;\n"
-        "`rnvizion.dev` followed on 2026-08-14, replacing the hero dot's fill and dropping its outer\n"
-        "glow, since a ring plus a glow is two treatments doing one job and the ring is the one carrying\n"
-        "contrast. `#4ade80` now appears in no RNVizion source. **The reading of a sighting changes with\n"
-        "this:** while the change was outstanding, finding the hex meant unfinished work; finding it now\n"
-        "means a surface has regressed or a new one was built from a stale base. `engine/brand.py`\n"
-        "carries a comment stating the former \u2014 it expires with this line.\n"
+        "**Case is part of the value here, not formatting.**",
+        "**The two dots were split on 2026-08-14, in one pass across both surfaces.** The ring moved to\n"
+        "the element and the fill to its `::after`, so only the fill animates. It was done on both at\n"
+        "once deliberately: *one recognisable mark across two mediums* is the stated justification for a\n"
+        "fill sitting under the contrast floor, and a structural change to one dot and not the other\n"
+        "would have quietly retired that justification while leaving the sentence in place.\n"
         "\n"
-        "**Case is part of the value here, not formatting.** `#8b2c3b` is lowercase in this file and\n"
-        "must be lowercase at the source: a case-sensitive comparison reads `#8B2C3B` and `#8b2c3b` as\n"
-        "two colors, which is precisely the failure recorded one section above about `rnv-icon-builder`\n"
-        "and `#FFC107`. Naming a hazard and then committing it is how a house style stops being one.\n"
+        "**The 0.5 dip survived the argument that produced it, and that is worth naming.** It was chosen\n"
+        "as a floor \u2014 the shallowest dip the animated ring could take and still clear 3:1. The split\n"
+        "retired the floor, and the value stayed, so it is now held for parity between the two surfaces\n"
+        "and for nothing else. **A number that outlives its reason needs a new one recorded or it will\n"
+        "be defended with the old one.** Change it on one surface and it must change on both.\n"
         "\n"
-        "**One legibility note, app-level and not a brand matter:** `#ffc107` reads 1.63:1 on white and",
-    ),
-    # ------------------------------------------------------------ 4. typography
-    (
-        "## Typography (reference)\n"
+        "Sizes are **not** matched and were not made to match: 8px on the site, 0.45rem on `rnv-live`.\n"
+        "The two pills differ in type size and padding, so equal pixels would not read as equal marks.\n"
         "\n"
-        "- Display: Bricolage Grotesque\n"
-        "- Serif (emphasis / italics): Instrument Serif\n"
-        "- Mono (wordmark, labels, footer): JetBrains Mono\n"
-        "- Body: Inter / system stack\n"
-        "\n"
-        "Social and OG-card typography is tracked separately.",
-        "## Typography \u2014 not here\n"
-        "\n"
-        "**Brand Book \u00a73.2 owns type. This file owns color.** The reference list that stood here is\n"
-        "retired rather than corrected, and the distinction matters: it was not a stale copy of a\n"
-        "current fact, it was three retired ones. It gave the wordmark to JetBrains Mono, which\n"
-        "decision #15 took away and gave to Montserrat Black; it wrote body as \"Inter / system stack,\"\n"
-        "one phrase describing two different things, which F2 split; and it had no row for the mark\n"
-        "face at all.\n"
-        "\n"
-        "**A convenience copy is a second canonical entry wearing a disclaimer.** \"(reference)\" did not\n"
-        "stop this list from being read and followed, and two canonical entries that disagree are\n"
-        "invisible to review \u2014 each reads coherently alone. The ownership table at the top of this file\n"
-        "exists to prevent exactly this, and this block was the standing exception to it.",
+        "**Case is part of the value here, not formatting.**",
     ),
 ]
 
@@ -88,13 +68,21 @@ for i, (old, new) in enumerate(EDITS, 1):
     assert n == 1, f"edit {i}: expected 1 match, found {n}. Base has moved:\n{old[:100]}"
     s = s.replace(old, new)
 
-# post-conditions
-# The uppercase form survives exactly once, on purpose: the case note quotes it as
-# the wrong half of the comparison it is warning about. Anything else is a real one.
-assert s.count("#8B2C3B") == 1, f"uppercase signal hex appears {s.count('#8B2C3B')}x, expected 1"
-assert "reads `#8B2C3B` and `#8b2c3b` as" in s, "the one survivor is not the illustration"
-assert "Mono (wordmark, labels, footer)" not in s, "the retired type claim survives"
-assert "rev 11" in s, "header not bumped"
+# header bump
+OLD_H = "Last locked: 2026-08-14 (rev 11 \u2014 **rev 10's header was stale against its own body:** it read"
+NEW_H = (
+    "Last locked: 2026-08-14 (rev 12 \u2014 the signal dot's ring was decoupled from its fill on both\n"
+    "surfaces, so the ring no longer dims and the dim-end contrast figure in the signal section is\n"
+    "retired rather than corrected. Records the split as landed, and records that `breathe`'s 0.5 dip\n"
+    "now stands on parity rather than on the accessibility floor that originally set it. Rev 11 \u2014\n"
+    "**rev 10's header was stale against its own body:** it read"
+)
+n = s.count(OLD_H)
+assert n == 1, f"header: expected 1 match, found {n}"
+s = s.replace(OLD_H, NEW_H)
+
+assert "3.35:1 at the breathe animation's dim end" not in s, "retired dim-end figure survives"
+assert "rev 12" in s, "header not bumped"
 
 P.write_text(s, encoding="utf-8")
-print("BRAND_COLORS.md -> rev 11")
+print("BRAND_COLORS.md -> rev 12")
