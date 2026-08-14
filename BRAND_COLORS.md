@@ -3,7 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-14 (rev 13 — **third revision on this date; the sequence is in the rev
+Last locked: 2026-08-14 (rev 14 — the hero dot's fill grew to 10px and the ring thinned to
+0.75px on **both surfaces in one pass**, dropping the boundary from 10.15:1 to 6.09:1 on the
+site and 10.68:1 to 6.27:1 on `rnv-live`. Aligning rather than diverging was the call: ring
+sameness is the stated justification for a sub-floor fill, and a tracked mismatch becomes
+intentional by age. Carried as a `[confirm/fill]`, since the value is unverified below 3x. Also
+records a defect: the hero dot had been an ellipse at every viewport width, squeezed by flex,
+through three passes of work on this same component — every one of which was about colour.
+Rev 13 — **third revision on this date; the sequence is in the rev
 number, not the stamp.** Lands `signal-live` at `#a5034e` and moves the fill's ratio to 2.43:1;
 retires "wine" as a descriptor for the current value. Repairs a blind pass that ran over rev 12
 and hit only the sentences that are *about* hex case: three mentions of `#FFC107` lowercased into
@@ -342,11 +349,34 @@ decides something. `signal-live` means *RNVizion is on*, not *a video stream is 
 carries the availability dot on the site as well as the broadcast dot on `rnv-live`.
 
 **The ring is load-bearing, and since 2026-08-14 it is also still.** Every signal dot is drawn
-with a 1px gold ring, identical in all states, so the ring signals nothing and is simply the
-component's chrome. It carries the WCAG 1.4.11 boundary — 10.15:1 on the site's pill ground
-(`bg-2`), 10.68:1 on `rnv-live`'s (`bg`) — **at every frame**, because the fill breathes and the
-ring does not. That is what frees the fill to sit at 2.43:1. Remove the ring and
-every value in the set fails.
+with a **0.75px** gold ring, identical in all states and on both surfaces, so the ring signals
+nothing and is simply the component's chrome. It carries the WCAG 1.4.11 boundary **at every
+frame**, because the fill breathes and the ring does not. That is what frees the fill to sit
+at 2.43:1. Remove the ring and every value in the set fails.
+
+**The ring thinned from 1px to 0.75px on 2026-08-14, on both surfaces in one pass.**
+
+| Surface | Ground | Composited at 0.75 coverage | Boundary |
+|---|---|---|---|
+| `rnvizion.dev` hero | `bg-2` | `#a19174` | **6.09:1** |
+| `rnv-live` | `bg` | `#a08f72` | **6.27:1** |
+
+Sub-pixel spread antialiases rather than vanishing, and partial coverage costs contrast in
+proportion. Both clear the 3:1 UI floor by roughly 2x, down from 3.4x. **0.5px was rejected**
+at ~3.35:1 — a bare pass with no margin, on the one element carrying the boundary for a fill
+that cannot.
+
+**Both surfaces moved together, deliberately, and the reasoning is worth keeping.** Holding
+`rnv-live` at 1px was considered and rejected. It would have confined an unverified value to
+one surface, but at the cost of a divergence in the one property whose sameness is the stated
+justification for a sub-floor fill. **A tracked mismatch becomes intentional by age**, and one
+revert later is cheaper than a difference nobody remembers the reason for. The risk is
+symmetric either way; the revert is the same one-character change on each.
+
+**[confirm/fill] 0.75px is unverified below 3x, now on both surfaces.** Observed only on a 3x
+phone, where it renders 2.25 device pixels; a 1x display gets 0.75 and leans entirely on
+antialiasing. **If it reads absent rather than merely finer, revert both to 1px in one pass**
+— the fills at 2.43:1 and 2.56:1 cannot replace it. Resolve at the next desktop sighting.
 
 **A dim-end figure used to live in this paragraph and is retired.** While the ring animated with
 the fill, the boundary was only as good as the animation's worst frame — 3.35:1 at a 0.5 dip,
@@ -375,7 +405,20 @@ retired the floor, and the value stayed, so it is now held for parity between th
 and for nothing else. **A number that outlives its reason needs a new one recorded or it will
 be defended with the old one.** Change it on one surface and it must change on both.
 
-Sizes are **not** matched and were not made to match: 8px on the site, 0.45rem on `rnv-live`.
+Sizes are **not** matched and were not made to match: 10px on the site (8px until 2026-08-14,
+grown by eye), 0.45rem on `rnv-live`. The two pills differ in type size and padding, so equal
+pixels would not read as equal marks. **Ring weight is matched and size is not**, which is not
+a contradiction: the ring is the element carrying the accessibility boundary and the thing
+the parity claim rests on, while the fill's diameter is tuned per surface by eye.
+
+**Both dots also gained `flex-shrink: 0` on 2026-08-14, and the reason is a defect worth
+recording.** The site's hero dot had been rendering as an **ellipse at every viewport width** —
+measured at 5.6px wide by 10.4px tall against a specified 10 by 10. Its flex parent was
+squeezing it on the main axis while `align-items: center` held its height, and the 1px ring
+traced the distortion, which is why each size increase made the outline look heavier rather
+than better. It survived three passes of deliberate work on this component because every pass
+was about colour. **A component can be audited repeatedly on the axis someone is thinking
+about and stay broken on the one nobody is.**
 The two pills differ in type size and padding, so equal pixels would not read as equal marks.
 
 **Case is part of the value here, not formatting.** Hex is lowercase in this file and must be
