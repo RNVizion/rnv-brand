@@ -3,7 +3,11 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-14 (rev 11 — **rev 10's header was stale against its own body:** it read
+Last locked: 2026-08-14 (rev 12 — the signal dot's ring was decoupled from its fill on both
+surfaces, so the ring no longer dims and the dim-end contrast figure in the signal section is
+retired rather than corrected. Records the split as landed, and records that `breathe`'s 0.5 dip
+now stands on parity rather than on the accessibility floor that originally set it. Rev 11 —
+**rev 10's header was stale against its own body:** it read
 2026-08-10 while carrying two sections ruled 2026-08-13, so this file's version field described
 a document that no longer existed. A dated header is the only thing that surfaces a stale-base
 clobber, and it cannot do that job while it is itself behind. Rev 11 closes the signal ruling:
@@ -318,10 +322,19 @@ UI framework moves. A signal is the state of something the brand runs and moves 
 decides something. `signal-live` means *RNVizion is on*, not *a video stream is broadcasting* — it
 carries the availability dot on the site as well as the broadcast dot on `rnv-live`.
 
-**The ring is load-bearing.** Every signal dot is drawn with a 1px gold ring, identical in all
-states, so the ring signals nothing and is simply the component's chrome. It carries the WCAG
-1.4.11 boundary at 10.15:1, and 3.35:1 at the breathe animation's dim end. That is what frees the
-fill to be a deep wine at 2.37:1. Remove the ring and every value in the set fails.
+**The ring is load-bearing, and since 2026-08-14 it is also still.** Every signal dot is drawn
+with a 1px gold ring, identical in all states, so the ring signals nothing and is simply the
+component's chrome. It carries the WCAG 1.4.11 boundary — 10.15:1 on the site's pill ground
+(`bg-2`), 10.68:1 on `rnv-live`'s (`bg`) — **at every frame**, because the fill breathes and the
+ring does not. That is what frees the fill to be a deep wine at 2.37:1. Remove the ring and
+every value in the set fails.
+
+**A dim-end figure used to live in this paragraph and is retired.** While the ring animated with
+the fill, the boundary was only as good as the animation's worst frame — 3.35:1 at a 0.5 dip,
+2.57:1 at 0.4 — so the keyframe carried a floor. Splitting the fill onto a pseudo-element
+removed the coupling and the floor with it. **The number is gone rather than corrected**, which
+is the point: a constraint that stops applying should not be left standing as a figure someone
+later re-derives a rule from.
 
 **Both surfaces have landed, 2026-08-14.** `rnv-live` took the set in the ruling change;
 `rnvizion.dev` followed on 2026-08-14, replacing the hero dot's fill and dropping its outer
@@ -330,6 +343,21 @@ contrast. `#4ade80` now appears in no RNVizion source. **The reading of a sighti
 this:** while the change was outstanding, finding the hex meant unfinished work; finding it now
 means a surface has regressed or a new one was built from a stale base. `engine/brand.py`
 carries a comment stating the former — it expires with this line.
+
+**The two dots were split on 2026-08-14, in one pass across both surfaces.** The ring moved to
+the element and the fill to its `::after`, so only the fill animates. It was done on both at
+once deliberately: *one recognisable mark across two mediums* is the stated justification for a
+fill sitting under the contrast floor, and a structural change to one dot and not the other
+would have quietly retired that justification while leaving the sentence in place.
+
+**The 0.5 dip survived the argument that produced it, and that is worth naming.** It was chosen
+as a floor — the shallowest dip the animated ring could take and still clear 3:1. The split
+retired the floor, and the value stayed, so it is now held for parity between the two surfaces
+and for nothing else. **A number that outlives its reason needs a new one recorded or it will
+be defended with the old one.** Change it on one surface and it must change on both.
+
+Sizes are **not** matched and were not made to match: 8px on the site, 0.45rem on `rnv-live`.
+The two pills differ in type size and padding, so equal pixels would not read as equal marks.
 
 **Case is part of the value here, not formatting.** `#8b2c3b` is lowercase in this file and
 must be lowercase at the source: a case-sensitive comparison reads `#8B2C3B` and `#8b2c3b` as
