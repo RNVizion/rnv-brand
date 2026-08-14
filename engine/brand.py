@@ -35,7 +35,7 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 # ------------------------------------------------- the rest of the register
 # Named because they are permanent, not because a palette happened to use
 # them. TRUE_BLACK and WHITE were already in APP and in every light theme as
-# bare literals; WEB_BLACK existed only as WEB["bg-0"].
+# bare literals; WEB_BLACK existed only as WEB["bg"] (named bg-0 until 2026-08-13).
 TRUE_BLACK = "#000000"   # app window ground; text on gold, on either surface
 WHITE = "#ffffff"        # light-surface cards and inputs; the ramp's far anchor
 WEB_BLACK = "#0a0a0f"    # rnvizion.dev ground; social and OG base
@@ -80,9 +80,14 @@ APP = {
 
 # ---------------------------------------------- website palette (the ramp)
 WEB = {
-    "bg-0": WEB_BLACK,
-    "bg-1": "#11111a",
-    "bg-2": "#1a1a26",
+    # ONE-INDEXED, WITH NO bg-1, because that is what the eleven published
+    # pages on rnvizion.dev already call these three colours. Decided
+    # 2026-08-13: the source moved to the surface, not the surface to the
+    # source. The gap in the sequence is the honest cost of describing a live
+    # thing accurately instead of tidily.
+    "bg": WEB_BLACK,
+    "bg-2": "#11111a",
+    "bg-3": "#1a1a26",
     "border": "#25253a",
     "border-soft": "#1e1e2e",
     "text": "#e8e8f0",
@@ -91,9 +96,67 @@ WEB = {
     "accent": GOLD,
     "accent-violet": "#b794ff",  # secondary, sparing
     "accent-warm": "#ffd166",    # secondary, sparing
+    # ---- signals ---------------------------------------------------------
+    # Brand signals: the state of a THING the brand runs. Not STATUS below,
+    # which is the result of a user's action in an app. Different job, different
+    # lifecycle, different owner -- STATUS moves when a UI framework moves, these
+    # move when the brand decides something.
+    #
+    # THE RING IS NOT IN HERE, AND THAT IS THE DESIGN. Every signal dot is drawn
+    # with a 1px `gold` ring, identical in all states, so the ring signals
+    # nothing -- it is the component's chrome. It carries the WCAG 1.4.11
+    # boundary at 10.68:1 on bg and 3.35:1 at the breathe animation's dim end,
+    # which is what frees the FILL to be whatever the brand wants, including
+    # values that could never carry it alone. Drop the ring and every value below
+    # fails. Measured 2026-08-13; re-measure if the ring or the ground moves.
+    #
+    # signal-live is 2.37:1 on bg. That is DELIBERATELY under the floor and is
+    # only defensible because the ring holds the boundary and the pill carries
+    # the word. Colour is the third signal here, not the only one.
+    #
+    # signal-offline and signal-down happen to equal text-faint and accent-warm.
+    # THE MATCH IS INCIDENTAL AND THE SEAM IS DELIBERATE: text-faint moves for
+    # legibility reasons and accent-warm for decorative ones, and neither should
+    # drag a signal with it. Do not "de-duplicate" these.
+    #
+    # Retires #4ade80, the green these replace on rnvizion.dev and rnv-live.
+    # Until both surfaces land the change they carry a hex this file no longer
+    # defines, and an audit finding that is the work being unfinished, not a bug.
+    # signal-live means "RNVizion is on", NOT "a video stream is broadcasting".
+    # Widened deliberately 2026-08-13: it carries the availability dot on
+    # rnvizion.dev ("open to roles") as well as the broadcast dot on rnv-live.
+    # Two different mediums, one recognisable mark -- the adjacent WORD carries
+    # the specific meaning on each, the colour carries the presence. That is the
+    # same argument that lets the fill sit under the contrast floor: colour is
+    # never the only signal here. Keeping the name "live" because it is the
+    # brand's own word for this (rnv-live, "RNVizion · live"), not because it is
+    # the narrower reading.
+    "signal-live": "#8B2C3B",      # on air / open / present
+    "signal-offline": "#5a5a72",   # receding by design; the absent state
+    "signal-down": "#ffd166",      # service degraded or unavailable
 }
 
-WEB_RAMP = (WEB["bg-0"], WEB["bg-1"], WEB["bg-2"])  # never flatten to charcoal
+# RESOLVED 2026-08-13. This ramp was named bg-0 / bg-1 / bg-2 while eleven
+# published pages called the same three colours --bg / --bg-2 / --bg-3. Values
+# identical, nothing rendered wrong -- the collision was that "bg-2" meant
+# #11111a to the site and #1a1a26 here, so anyone reading this file and editing
+# a page picked the wrong step.
+#
+# HOW IT SURVIVED, which is the part worth keeping: a checker comparing the SET
+# of hexes finds nothing, because every value was canonical. The needle has to
+# be the name-to-value BINDING. That is "60" matching a CSS font weight, one
+# layer up, and it means a colour guard written against values alone would have
+# been armed and blind.
+#
+# THE RENAME IS NOT FREE AND THE COST IS REAL: emit_css() derives CSS custom
+# property names straight from these keys, so rnv-live's generated tokens.css
+# renames with them. Its index.astro references --rnv-bg-0 and --rnv-bg-1 by
+# name; landing this file without landing that one leaves three var() calls
+# resolving to nothing, a page that deploys with no background, and no guard
+# anywhere in the path -- rnv-live's own check only asserts hexes stay in
+# tokens.css, never that a var() resolves. THE TWO CHANGES SHIP TOGETHER.
+
+WEB_RAMP = (WEB["bg"], WEB["bg-2"], WEB["bg-3"])  # never flatten to charcoal
 
 # ------------------------------------------------------- Records (warm ink)
 # Notes, patch notes, updates, newsletters, initiative pages — what RNVizion
@@ -117,15 +180,64 @@ RECORDS = {
 }
 
 # ---------------------------------------------------------- status (app)
-# NOT brand colors. Material's semantics, adopted deliberately because they
-# fit the platform; the brand neither owns them nor varies them, and issues no
-# ruling on what red means. Published here so the apps share one answer.
-# Two apps ship Bootstrap's set instead; that is a platform choice, not drift.
-# Dark-tuned: #ffc107 reads 1.63:1 on white. Re-check before any light use.
+# RULED 2026-08-13. The brand now issues one answer for app status semantics,
+# and the answer is BOOTSTRAP'S SET. The previous comment here said the brand
+# "neither owns them nor varies them, and issues no ruling on what red means" --
+# that sentence is retired, because unifying IS the ruling, and leaving the
+# disclaimer beside a decision would have invited the next reader to undo it.
+#
+# WHY BOOTSTRAP AND NOT MATERIAL: three applications already shipped Bootstrap's
+# values in source -- rnv-color-picker (utils/config.py), rnv-icon-builder
+# (ui/colors.py), rnv-text-transformer (utils/dialog_styles.py). Choosing the
+# set that reality already holds moves one dict in one file and no pixel
+# anywhere. Choosing Material would have made three apps wrong on the day it
+# landed, each fix in someone else's repository. Warning was never in dispute:
+# both systems use #ffc107.
+#
+# THE COUNT WAS WRONG HERE UNTIL TODAY. This comment said "two apps"; the table
+# in BRAND_COLORS.md in this same repository said picker, icon builder and
+# transformer, and it was right. Two documents in one repo disagreed and the
+# wrong one was the one people read first. Nothing checks prose against prose.
+#
+# MEASURED CONSTRAINTS, carried with the values rather than assumed:
+#   #ffc107  1.63:1 on white  -- dark-tuned. Re-check before any light use.
+#   #dc3545  3.84:1 on APP panel, 3.17:1 on APP card. Clears the 3:1 non-text
+#            floor for fills, borders and badges; BELOW the 4.5:1 text floor.
+#            Material's #f44336 read 4.73:1 on panel and did pass as text, so
+#            this ruling is a REGRESSION for that one use. Do not set #dc3545
+#            as body text on panel or card -- use it as a fill behind #ffffff,
+#            or lighten it for a text variant and record the lift here.
+#   #28a745  4.58:1 on APP card -- passes as text, with little margin.
 STATUS = {
-    "success": "#4caf50",
+    "success": "#28a745",
     "warning": "#ffc107",
-    "error": "#f44336",
+    "error": "#dc3545",
+    # DERIVED, and the steps are published because a consumer that has to guess
+    # will guess differently. Same discipline as the two tint censuses in
+    # BRAND_COLORS.md: a derived value is publishable without being permanent,
+    # and the source emits it so nobody re-derives it by hand.
+    #
+    #   rule    hold hue and saturation, raise lightness only
+    #   target  4.5:1 on the WORST dark ground the value lands on, APP card
+    #   walk    L 0.50 #d92637 2.93 · 0.55 #dd3b4b 3.28 · 0.58 #df4857 3.56
+    #           L 0.60 #e1515f 3.79 · 0.62 #e25a67 4.03 · 0.65 #e56b77 4.58 <-
+    #   taken   the first step that clears, not the first that looks right
+    #
+    # MEASURED, cross-checked against rnv-color-mcp rather than trusted:
+    #   4.58:1 on APP card, 5.55 panel, 6.70 window -- AA normal text passes.
+    #   3.13:1 on white -- AA normal text FAILS, which is why `error` above
+    #   stays as-is for light mode. This is a dark-theme value, not a
+    #   replacement. Same shape as GOLD / DARK_GOLD: one colour, two grounds.
+    #   CIEDE2000 26.55 from signal-live, "clearly different" -- the error text
+    #   and the live wine cannot be confused, which was the open question when
+    #   red was chosen for the live signal.
+    #
+    # NOT made Records-conformant. Forcing R > G > B swung it to #e56d3c, burnt
+    # orange, CIEDE2000 far off the base -- a different colour wearing the right
+    # lightness. The tint rules govern the neutral ramps; #dc3545 is a borrowed
+    # platform value that never conformed to either register, and a derived
+    # variant that conforms while its base does not makes the pair incoherent.
+    "error-text": "#e56b77",
 }
 
 # ------------------------------------------------------- texture + type
