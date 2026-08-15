@@ -119,23 +119,44 @@ WEB = {
     # move when the brand decides something.
     #
     # THE RING IS NOT IN HERE, AND THAT IS THE DESIGN. Every signal dot is drawn
-    # with a 1px `gold` ring, identical in all states, so the ring signals
-    # nothing -- it is the component's chrome. It carries the WCAG 1.4.11
-    # boundary at 10.68:1 on bg and 3.35:1 at the breathe animation's dim end,
-    # which is what frees the FILL to be whatever the brand wants, including
-    # values that could never carry it alone. Drop the ring and every value below
-    # fails. Measured 2026-08-13; re-measure if the ring or the ground moves.
+    # with a `gold` ring, identical in all states, so the ring signals nothing --
+    # it is the component's chrome. It carries the WCAG 1.4.11 boundary, which is
+    # what frees the FILL to be whatever the brand wants, including values that
+    # could never carry it alone. Drop the ring and every value below fails.
+    #
+    # THE RING IS 0.75px ON BOTH SURFACES as of 2026-08-14, down from 1px. Sub-
+    # pixel, so a 1x display antialiases it and the effective colour is roughly
+    # 75% gold over the ground: 6.12:1 on the site's bg-2, 6.33:1 on rnv-live's
+    # bg. Both still about 2x the 3:1 floor, down from 3.4x. On 2x and 3x screens
+    # it renders nearer the solid value. **0.75px is unverified below 3x** and is
+    # carried as an open confirm in BRAND_COLORS.md rev 14; if it reads absent
+    # rather than finer, both surfaces revert in one pass.
+    #
+    # No dim-end figure here any more -- see below, the ring stopped animating.
+    # Measured 2026-08-14. RE-MEASURE IF THE RING OR THE GROUND MOVES: that
+    # sentence was written on the 13th and the ring moved on the 14th, which is
+    # the only reason this block is correct rather than quietly wrong.
     #
     # signal-live is 2.56:1 on bg and 2.43:1 on bg-2. DELIBERATELY under the
     # floor, and defensible for two reasons that are now independent: the pill
-    # carries the word, and since 2026-08-14 the ring sits on its own element
-    # and no longer animates -- it holds 10.68:1 at EVERY frame rather than
-    # 3.35:1 at the trough. The 0.5 dip is an aesthetic choice held in common
-    # across two surfaces, not a contrast floor. Colour is the third signal.
+    # carries the word, and since 2026-08-14 the ring sits on its own element and
+    # no longer animates, so it holds its full value at EVERY frame -- see the
+    # figures above. The 0.5 dip is an aesthetic choice held in common across two
+    # surfaces, not a contrast floor. Colour is the third signal.
     #
-    # Value changed 2026-08-14 from an earlier wine at hue 351, on the check
+    # WHY THE SPLIT MATTERED, kept because the argument outlives the numbers:
+    # when ring and fill shared one element, the ring dimmed with the animation
+    # and fell to 3.35:1 at the trough against 10.68:1 at rest. The fix was
+    # structural, not numeric -- decouple the thing carrying the boundary from
+    # the thing that moves, rather than tuning the keyframe until the boundary
+    # survives it. Those two figures describe the retired 1px design and are
+    # history, not current measurements.
+    #
+    # Value changed 2026-08-14 from an earlier wine at hue 350.5, on the check
     # that mattered rather than on taste: a move toward magenta could have
-    # narrowed the gap to STATUS.error and instead widened it -- CIEDE2000 18.22
+    # narrowed the gap to STATUS.error and instead widened it. Hue measured
+    # 350.5 -> 332.2; published as 333 in one handoff and corrected to 332.
+    # CIEDE2000 18.22
     # against the error red where the wine was 17.40, and 25.92 against
     # error-text. The error red was always this value's nearest neighbour.
     #
@@ -145,8 +166,10 @@ WEB = {
     # drag a signal with it. Do not "de-duplicate" these.
     #
     # Retires #4ade80, the green these replace on rnvizion.dev and rnv-live.
-    # Until both surfaces land the change they carry a hex this file no longer
-    # defines, and an audit finding that is the work being unfinished, not a bug.
+    # Both surfaces landed on 2026-08-14 and no repo holds an instance. THE
+    # MEANING OF A SIGHTING HAS THEREFORE INVERTED: until the 14th it meant the
+    # work was unfinished; from now on it means a regression or a stale base.
+    # An expired note that still reads as current is worse than no note.
     # signal-live means "RNVizion is on", NOT "a video stream is broadcasting".
     # Widened deliberately 2026-08-13: it carries the availability dot on
     # rnvizion.dev ("open to roles") as well as the broadcast dot on rnv-live.
@@ -253,7 +276,7 @@ STATUS = {
     #   3.13:1 on white -- AA normal text FAILS, which is why `error` above
     #   stays as-is for light mode. This is a dark-theme value, not a
     #   replacement. Same shape as GOLD / DARK_GOLD: one colour, two grounds.
-    #   CIEDE2000 26.55 from signal-live, "clearly different" -- the error text
+    #   CIEDE2000 25.92 from signal-live, "clearly different" -- the error text
     #   and the live wine cannot be confused, which was the open question when
     #   red was chosen for the live signal.
     #
