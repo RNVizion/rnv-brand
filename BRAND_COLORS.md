@@ -3,9 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-14 (rev 14 — the hero dot's fill grew to 10px and the ring thinned to
-0.75px on **both surfaces in one pass**, dropping the boundary from 10.15:1 to 6.09:1 on the
-site and 10.68:1 to 6.27:1 on `rnv-live`. Aligning rather than diverging was the call: ring
+Last locked: 2026-08-15 (rev 15 — **hex notation is lowercase**, recorded below under names and
+values; applied across the five desktop apps on 2026-08-15 and already true in `brand.py`.
+**The ring's boundary figures drop to one decimal** and carry their display condition: the
+two-decimal forms claimed a precision the estimate does not have, and the two files that held
+them disagreed — this doc said 6.09/6.27, `brand.py` said 6.12/6.33, on the same blend. rev 14 —
+the hero dot's fill grew to 10px and the ring thinned to
+0.75px on **both surfaces in one pass**, dropping the boundary from ~10.2:1 to **~6.1:1** on the
+site and ~10.7:1 to **~6.3:1** on `rnv-live`, both at 1x. Aligning rather than diverging was the call: ring
 sameness is the stated justification for a sub-floor fill, and a tracked mismatch becomes
 intentional by age. Carried as a `[confirm/fill]`, since the value is unverified below 3x. Also
 records a defect: the hero dot had been an ellipse at every viewport width, squeezed by flex,
@@ -356,10 +361,17 @@ at 2.43:1. Remove the ring and every value in the set fails.
 
 **The ring thinned from 1px to 0.75px on 2026-08-14, on both surfaces in one pass.**
 
-| Surface | Ground | Composited at 0.75 coverage | Boundary |
+| Surface | Ground | Composited at 0.75 coverage | Boundary (1x estimate) |
 |---|---|---|---|
-| `rnvizion.dev` hero | `bg-2` | `#a19174` | **6.09:1** |
-| `rnv-live` | `bg` | `#a08f72` | **6.27:1** |
+| `rnvizion.dev` hero | `bg-2` | `#a19174` | **~6.1:1** |
+| `rnv-live` | `bg` | `#a08f72` | **~6.3:1** |
+
+**One decimal, and the condition travels with it.** Two independent measurements of this same
+ring disagreed in the second decimal — 6.09 against 6.12, 6.27 against 6.33 — purely on whether
+the blend was rounded to a hex before measuring. That difference is smaller than the model's own
+uncertainty: a sub-pixel ring's rendered coverage depends on the rasterizer, the device pixel
+ratio, and subpixel positioning, and **the figure is unverified below a 3x display.** Digits
+beyond the evidence invite a later reader to treat noise as signal.
 
 Sub-pixel spread antialiases rather than vanishing, and partial coverage costs contrast in
 proportion. Both clear the 3:1 UI floor by roughly 2x, down from 3.4x. **0.5px was rejected**
@@ -499,6 +511,38 @@ matching strings across repositories.
 
 One constraint on the source: **a role name may not be a widget name.** A role has to survive
 a change of toolkit and be nameable on a hangtag.
+
+### Notation is lowercase — ruled 2026-08-15
+
+**A hex value is written lowercase in source: `#d2bc93`, never `#D2BC93`.** Names are local and
+values are canonical; notation is the third axis, and unlike names it does not get to vary by
+consumer. `brand.py` standardised on 2026-08-14 and the five desktop apps followed on
+2026-08-15 — 357 values across five files, one colour source file per repo.
+
+**This was adopting a convention, not repairing a defect.** The five apps agreed with each other
+throughout; nothing rendered incorrectly at any point, and CSS and Qt both treat hex as
+case-insensitive. The only inconsistency was against a source that had moved the day before.
+That framing is kept because it governs how urgent this ever was, and how urgent the next one is.
+
+**Three things learned doing it, each of which would have cost a day on its own:**
+
+- **A value with no case cannot be normalised.** All-numeric hex (`#123456`) has no case to fold;
+  326 such values sit in those five files. A folding pass matches them and reports no change,
+  which reads like a broken pass rather than a correct skip. Exclude them from any count.
+- **Case and shorthand are different axes.** `#fff` and `#ffffff` name the same colour, and
+  expanding shorthand changes string length where folding case does not. **One axis per pass**,
+  or a failure in either is indistinguishable from a failure in the other.
+- **Prove a mechanical change is what it claims.** Every file was asserted with
+  `before.lower() == after.lower()` before writing, so no *value* could move under cover of a
+  notation pass. A notation change that silently altered a colour would be invisible in review
+  precisely because reviewers stop reading hex closely once they know the diff is cosmetic.
+
+**Now that source and consumers agree, a colour check should compare case-sensitively.** While
+they disagreed, folding was the only workable comparison — a case-sensitive guard would have
+produced hundreds of findings on its first run and been switched off. Against zero findings the
+reasoning inverts: an exact comparison *enforces* the convention, where a folding one passes on
+either notation and stops catching a regression. **Nothing caught the day the apps and
+`brand.py` disagreed**, which is the argument for arming it.
 
 ---
 
