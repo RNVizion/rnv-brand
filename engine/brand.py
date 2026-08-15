@@ -40,24 +40,26 @@ compares values, never names.
 # folding case across this file would trip on its own documentation. Same reason
 # profile.json's exemption reasons never name the value they permit.
 #
-# THE ECOSYSTEM IS NOT UNIFORM AND THIS DOES NOT MAKE IT SO. Censused across all
-# fourteen repos on 2026-08-14, source only, restricted to values this file
-# defines: FIVE apps carry capitalised hex -- the colour mixer, icon builder,
-# colour picker, palette manager and text transformer -- totalling 246
-# instances. Most are the APP palette (window, panel, card, text, white), not
-# the status pair; that was an earlier, narrower finding and this comment said
-# "two apps" until the census was actually run.
+# SOURCE AND CONSUMERS NOW AGREE, as of 2026-08-15. The five desktop apps were
+# normalised the day after this file was, so for the first time notation is
+# common across the ecosystem rather than a convention one file kept alone.
 #
-# CASE FOLDING IS THEREFORE A PRECONDITION FOR A COLOUR GUARD, NOT A REFINEMENT.
-# A case-sensitive comparison reports 246 findings on day one, every one of them
-# false, and a guard that false-fails at that volume is switched off inside a
-# week -- which leaves no guard at all.
+# THAT INVERTS THE COMPARATOR CHOICE. While they disagreed, a colour guard had
+# to fold case or it would have reported hundreds of findings on its first run
+# and been switched off. Against zero findings the reasoning reverses: an exact
+# comparison ENFORCES the convention, where a folding one passes on either
+# notation and stops catching a regression.
 #
-# Note the direction, because it is not what it looks like: the five apps agree
-# with each other. THIS FILE is the outlier, having standardised to lowercase on
-# 2026-08-14. That does not change the choice -- the source should be uniform
-# and lowercase is the better default -- but this is one source adopting a
-# convention the apps never had, not five apps drifting from one.
+# TWO CAVEATS, both of which decide scope before comparator. Roughly fifty
+# capitalised values survive OUTSIDE the five colour files -- arbitrary test
+# fixtures, plus six instances of a value this file does define, all in test
+# files. So a guard scoped to the colour sources can compare exactly and start
+# clean; one folded into a whole-repo walk cannot. And the apps are slated to
+# move their colour definitions into a single colors.py per repo, so the
+# file-to-repo map a guard would enumerate today is temporary.
+#
+# NOTHING CAUGHT THE DAY THE TWO SIDES DISAGREED. Not a checker failure -- no
+# checker was ever pointed at notation. Same shape as type before R2.
 GOLD = "#d2bc93"         # brand gold (primary) — never varies across surfaces
 DARK_GOLD = "#b19145"    # dark gold (light-mode accent)
 BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
@@ -140,11 +142,22 @@ WEB = {
     #
     # THE RING IS 0.75px ON BOTH SURFACES as of 2026-08-14, down from 1px. Sub-
     # pixel, so a 1x display antialiases it and the effective colour is roughly
-    # 75% gold over the ground: 6.12:1 on the site's bg-2, 6.33:1 on rnv-live's
-    # bg. Both still about 2x the 3:1 floor, down from 3.4x. On 2x and 3x screens
-    # it renders nearer the solid value. **0.75px is unverified below 3x** and is
-    # carried as an open confirm in BRAND_COLORS.md rev 14; if it reads absent
-    # rather than finer, both surfaces revert in one pass.
+    # 75% gold over the ground: ~6.1:1 on the site's bg-2, ~6.3:1 on rnv-live's
+    # bg, both at 1x. Both still about 2x the 3:1 floor, down from 3.4x. On 2x
+    # and 3x screens it renders nearer the solid value.
+    #
+    # ONE DECIMAL IS DELIBERATE. Two projects measured this ring independently
+    # and got 6.09/6.27 and 6.12/6.33 -- the same sRGB compositing model,
+    # differing only on whether the blend was rounded to a hex before measuring.
+    # That gap is smaller than the model's own uncertainty, because rendered
+    # coverage depends on the rasterizer, the device pixel ratio and subpixel
+    # positioning. Two files held the figure to two decimals and disagreed in the
+    # second one; neither was wrong by its own method, which is why the digit was
+    # dropped rather than arbitrated.
+    #
+    # **0.75px is unverified below 3x** and is carried as an open confirm in
+    # BRAND_COLORS.md rev 15; if it reads absent rather than finer, both surfaces
+    # revert in one pass.
     #
     # No dim-end figure here any more -- see below, the ring stopped animating.
     # Measured 2026-08-14. RE-MEASURE IF THE RING OR THE GROUND MOVES: that
