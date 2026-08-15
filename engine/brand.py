@@ -40,10 +40,24 @@ compares values, never names.
 # folding case across this file would trip on its own documentation. Same reason
 # profile.json's exemption reasons never name the value they permit.
 #
-# THE ECOSYSTEM IS NOT UNIFORM AND THIS DOES NOT MAKE IT SO. Two apps -- the
-# icon builder and the colour picker -- write their status values capitalised.
-# Any guard comparing a surface against this file must fold case, or it reports
-# drift that is not there.
+# THE ECOSYSTEM IS NOT UNIFORM AND THIS DOES NOT MAKE IT SO. Censused across all
+# fourteen repos on 2026-08-14, source only, restricted to values this file
+# defines: FIVE apps carry capitalised hex -- the colour mixer, icon builder,
+# colour picker, palette manager and text transformer -- totalling 246
+# instances. Most are the APP palette (window, panel, card, text, white), not
+# the status pair; that was an earlier, narrower finding and this comment said
+# "two apps" until the census was actually run.
+#
+# CASE FOLDING IS THEREFORE A PRECONDITION FOR A COLOUR GUARD, NOT A REFINEMENT.
+# A case-sensitive comparison reports 246 findings on day one, every one of them
+# false, and a guard that false-fails at that volume is switched off inside a
+# week -- which leaves no guard at all.
+#
+# Note the direction, because it is not what it looks like: the five apps agree
+# with each other. THIS FILE is the outlier, having standardised to lowercase on
+# 2026-08-14. That does not change the choice -- the source should be uniform
+# and lowercase is the better default -- but this is one source adopting a
+# convention the apps never had, not five apps drifting from one.
 GOLD = "#d2bc93"         # brand gold (primary) — never varies across surfaces
 DARK_GOLD = "#b19145"    # dark gold (light-mode accent)
 BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
