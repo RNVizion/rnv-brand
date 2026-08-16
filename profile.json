@@ -449,6 +449,7 @@
     "_comment": "Machine-readable half of BRAND_TYPE.md, for verify_type. The REASONING lives in the register and is not repeated here -- this block holds only what a checker can compare. Change a value here and change BRAND_TYPE.md in the same commit, or the two documents in this repo disagree and the source is what a reader trusts.",
     "mark_family": "Montserrat",
     "mark_string": "RNVizion",
+    "mark_weight": 900,
     "body_family": "Inter",
     "mark_selectors": {
       "_comment": "THE MARK IS A ROLE AND TEXT ALONE CANNOT IDENTIFY IT. The brand name also appears as an author byline on eight blog files, in page titles, and in the footer's long form; those are mentions of the name, not renderings of the mark, and the register's Labels row permits them in mono. A class list is required alongside the exact-text test because a check cannot infer the role from the contents -- the contents are the brand name either way. Same argument as F13's single-member allowlist: an inferred scope is a hole.",
