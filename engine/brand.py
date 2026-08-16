@@ -337,6 +337,21 @@ STATUS = {
 # lost the mark. Adding a role is additive: no existing token name or value
 # moves, so no consumer breaks.
 #
+# THE SERIF ROLE IS NAMED `serif`, NOT `serif-italic`, AND THAT IS A CORRECTION.
+# The old key emitted --rnv-font-serif-italic while forty-four references across
+# twelve site files said --font-serif, so one value carried two names and no
+# check compares a name-to-value binding. The source moved, not the site: same
+# call as the ground ramp, and for the same reason once the evidence was read.
+#
+# THE EVIDENCE REVERSED THE ARGUMENT I HAD FOR KEEPING `serif-italic`. That name
+# was defended on the grounds that the face is only ever drawn italic, so the
+# name carried a ruling `serif` would lose. It is drawn BOTH ways: twenty-four
+# rules set it with font-style italic, and eight draw the blog drop cap
+# `article p:first-of-type::first-letter` in roman with no italic anywhere in
+# the rule or its parents. `serif-italic` misdescribed a third of its own uses.
+# `ital: (0, 1)` records both axes, which is also why the font link's `ital@0;1`
+# is correct rather than an over-request.
+#
 # TWO CONFLICTS WITH THE REGISTER, encoded as measured rather than as ruled, and
 # routed rather than silently resolved. BRAND_TYPE.md's mono row says 400/500/600;
 # the canonical font link requests 400;500;600;700 and site rules that use
@@ -349,7 +364,7 @@ TYPE = {
     "mark":         {"family": "Montserrat",          "weights": (900,)},
     "display":      {"family": "Bricolage Grotesque", "weights": (300, 800),
                      "variable": True, "opsz": (12, 96)},
-    "serif-italic": {"family": "Instrument Serif",    "weights": (400,), "italic": True},
+    "serif":        {"family": "Instrument Serif",    "weights": (400,), "ital": (0, 1)},
     "mono":         {"family": "JetBrains Mono",      "weights": (400, 500, 600, 700)},
     "body":         {"family": "Inter",               "weights": (400, 500, 600)},
 }
