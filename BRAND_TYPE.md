@@ -3,7 +3,13 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-08-15 (rev 4 — **three implementation facts the ruling did not carry, and one
+Last locked: 2026-08-16 (rev 5 — **R2 is built, and it found this register's own worst case live on
+a deployed surface.** `rnv-live` rendered the brand mark in JetBrains Mono at 700 with `0.02em` —
+four revisions after decision #15 retired the wordmark from mono, on the one surface nothing had
+ever read. Fixed to Montserrat 900 at `0.09em`, the nav value, because it is a nav mark by role.
+**That fix was three files, not one**, and the coupling is recorded below. `verify_type` now guards
+the mark across every HTML and `.astro` in the ecosystem, **with its coverage boundary stated: it
+checks the face, not the weight or the tracking**, which are declared on the same rule. rev 4 — **three implementation facts the ruling did not carry, and one
 figure this project published wrong.** The tracking helper is duplicated across all three
 generators, so **a change to raster tracking is a three-file change**; per-glyph drawing discards
 kerning, which widens the mark by a fraction of a pixel; and the measured width change is +13.0%
@@ -348,6 +354,21 @@ that is not the mark. Montserrat had **zero occurrences** on the site when decis
 for a monospace face; the card's `-.015em` was the same error at display size. Both looked like
 values to preserve and both were wrong.
 
+**A THIRD, ADDED 2026-08-16: the face is loaded by a mechanism the change forgets.** `rnv-live`
+loads faces through `@fontsource` npm imports rather than a font link, so pointing `.wordmark` at
+`--rnv-font-mark` took **three files** — the import in `index.astro`, the dependency in
+`package.json`, and the entry in `package-lock.json`. Two were pushed and the build failed on
+`npm ci`, which refuses when the manifest and the lockfile disagree.
+
+**That refusal is the behaviour to want.** `npm ci` would not resolve from the manifest and quietly
+produce a dependency tree nobody had recorded; it failed at build time rather than deploying a page
+whose mark fell through to `system-ui`. Same posture this register asks of its own guards. The
+coupling was missed not because it was subtle but because it was **dull next to the interesting
+one** — the import was the insight, the lockfile was bookkeeping, and the bookkeeping broke the
+build.
+
+**A font change on `rnv-live` is a three-file change.** Written here rather than rediscovered.
+
 ---
 
 ## Open
@@ -373,6 +394,26 @@ values to preserve and both were wrong.
   figure it *did* dismiss is 0.99px, which is not sub-pixel either. **A conclusion can survive its
   own reasoning being wrong, and this one did not — the generators shipped untracked.** Three
   generator edits are with the Brand Architect chat.
+- **~~No font fact exists in `profile.json`.~~ CLOSED 2026-08-16 as R2.** `verify_type` runs
+  unconditionally in the facts pass and **discovers surfaces rather than reading a list**, so any repo
+  that grows an HTML or `.astro` file is checked from that moment. It asserts four things: the mark
+  is drawn in the mark face; a page drawing that face also requests it; the shared font link does not
+  drift on one page of the set; and no page redefines `--font-body` away from Inter. Seven arming
+  tests, the exemptions among them.
+  - **IT NEEDED TWO DISCRIMINATORS, AND THAT IS THE DESIGN LESSON. The mark is a role, not a
+    string.** Text alone flags the blog byline, which renders the brand name as an author credit in
+    mono on eight files and which the Labels row above explicitly permits. Class alone flags
+    `aiii/`, where `.wordmark` is the AIII initiative mark in mono by decision — same class, two
+    roles, one surface each. A check cannot infer "this is the wordmark" from contents, because the
+    contents are the brand name either way.
+  - **COVERAGE BOUNDARY, stated so nobody assumes more.** The guard checks the **face**. Weight and
+    tracking are declared on the same rule and are **not** asserted. `rnv-live` carried a wrong face
+    *and* wrong tracking, and only the face is why it failed — Montserrat 900 at `0.02em` would have
+    passed. Weight is a small increment, always 900 with no variation. Tracking is not: the expected
+    value depends on **role** rather than size, and a guard cannot infer role, so it needs an
+    expected value recorded here per mark selector before any code.
+  - **The three raster generators are outside it entirely** — Python drawing with PIL, no markup to
+    parse. Their 1.8px is held true by the three-file coupling and nothing else.
 - **[confirm/fill] A formal mark spec** — clearspace, minimum sizes, ratios. Deferred until the
   first external use demands it. Decision #15 settles the *face*, not the spec.
 
