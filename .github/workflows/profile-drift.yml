@@ -94,12 +94,87 @@ jobs:
     timeout-minutes: 20          # --all fetches every repo as a tarball
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history, so the version guard below can read profile.json as it
+          # stood before this push. Default depth is 1, which makes the previous
+          # commit unreachable and would turn that guard into a silent no-op --
+          # the exact failure class it exists to catch, one layer up.
+          fetch-depth: 0
+
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       # Stdlib only, by design: no dependency can rot underneath the checker.
+      # THE CHEAPEST GUARD IN THE SYSTEM, and it closes a class that has already
+      # bitten once. A complete drop-in built from a stale base once overwrote
+      # profile.json and erased role_emails entirely: the JSON stayed valid, the
+      # checker ran clean, and two domain addresses simply stopped being
+      # recognised. Nothing failed. It was caught because a human noticed the
+      # version had gone backwards -- 1.2.3 where 1.2.4 had been twenty minutes
+      # earlier. That is not a control, it is luck with good timing.
+      #
+      # The checker cannot catch this: it reads tarballs and has no git history,
+      # so "what did this file say before?" is a question only the workflow can
+      # ask. Hence a workflow step rather than a check.
+      #
+      # IT RUNS BEFORE THE SWEEP ON PURPOSE. A clobbered manifest sweeps clean --
+      # it is valid JSON describing fewer facts -- so letting the passes run
+      # first would produce a green report about a damaged source. If this step
+      # fails the job stops here, `surfaces` is skipped rather than successful,
+      # and every issue-lifecycle condition below is guarded on `outcome` and
+      # correctly does nothing.
+      - name: Refuse a manifest version regression
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          if ! git cat-file -e "$BEFORE:profile.json" 2>/dev/null; then
+            echo "profile.json did not exist at $BEFORE; nothing to compare."
+            exit 0
+          fi
+          git show "$BEFORE:profile.json" > /tmp/before.json
+          python3 - <<'PYEOF'
+          import json, sys
+
+          def parse(path):
+              with open(path) as fh:
+                  raw = json.load(fh).get("version", "")
+              parts = raw.split(".")
+              if len(parts) != 3 or not all(p.isdigit() for p in parts):
+                  return raw, None
+              return raw, tuple(int(p) for p in parts)
+
+          before_raw, before = parse("/tmp/before.json")
+          after_raw, after = parse("profile.json")
+
+          # An unparseable version is a failure, not a skip. Falling back to
+          # "cannot compare, therefore fine" is how a guard reads armed and
+          # enforces nothing.
+          if before is None or after is None:
+              print(f"error: version not in N.N.N form (before={before_raw!r} "
+                    f"after={after_raw!r}); the regression guard cannot run and "
+                    f"is not passing by default", file=sys.stderr)
+              sys.exit(1)
+
+          if after < before:
+              print(f"error: profile.json version went BACKWARDS, "
+                    f"{before_raw} -> {after_raw}.", file=sys.stderr)
+              print("A drop-in built from a stale base overwrites the newer file "
+                    "and the result is valid JSON that sweeps clean. Re-fetch "
+                    "profile.json from main, re-apply the change on top of it, "
+                    "and push again. Do not bump the version to clear this.",
+                    file=sys.stderr)
+              sys.exit(1)
+
+          if after == before:
+              print(f"version unchanged at {after_raw}.")
+          else:
+              print(f"version {before_raw} -> {after_raw}.")
+          PYEOF
+
       - name: Check every surface
         id: surfaces
         run: |
