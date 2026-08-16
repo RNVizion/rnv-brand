@@ -890,6 +890,38 @@ def emitted_token_values(engine):
     return out
 
 
+# CSS weight keywords, so a failure can name what it actually saw. `bold` is 700
+# and reads as a plausible mark weight to anyone not holding the register; saying
+# "bold, which is 700" is more useful than "not 900".
+WEIGHT_KEYWORDS = {"normal": 400, "bold": 700, "lighter": 100, "bolder": 900}
+
+
+def _declared_weight(decls):
+    """The numeric weight a rule declares, or None if it declares none.
+
+    None is a FINDING, not a skip. A mark with no declared weight inherits, so
+    its weight depends on whatever the page happens to set around it -- which is
+    the same class of failure as a token that resolves to nothing, arriving one
+    property over.
+    """
+    raw = (decls or {}).get("font-weight")
+    if raw is None:
+        return None, None
+    v = raw.strip().lower()
+    if v.isdigit():
+        return int(v), raw
+    return WEIGHT_KEYWORDS.get(v), raw
+
+
+def _rule_for(cls, blocks):
+    """The declaration block that carries this element's font-family."""
+    for name in cls.split():
+        for sel, decls in blocks.items():
+            if sel.split()[-1].lstrip(".") == name and "font-family" in decls:
+                return decls
+    return None
+
+
 def _resolve_family(cls, blocks, tokens):
     """The font-family declared for a class, with one level of var() resolution."""
     for name in cls.split():
@@ -969,6 +1001,7 @@ def verify_type(cfg, rep, workdir: Path):
         return
 
     mark_family = reg["mark_family"]
+    mark_weight = reg.get("mark_weight")
     mark_string = reg["mark_string"]
     selectors = set(reg["mark_selectors"]["selectors"])
     body_family = reg["body_family"]
@@ -1015,6 +1048,16 @@ def verify_type(cfg, rep, workdir: Path):
                              f"<{tag} class=\"{cls}\"> renders the mark in "
                              f"{fam.split(',')[0].strip()} rather than "
                              f"{mark_family}")
+                elif (weight := _declared_weight(_rule_for(cls, blocks)))[0] != mark_weight \
+                        and mark_weight is not None:
+                    found, raw = weight
+                    detail = (f"declares no font-weight, so it inherits whatever "
+                              f"the page sets" if raw is None else
+                              f"is {raw}" + (f", which is {found}" if found and str(found) != raw.strip() else ""))
+                    rep.fail("type", where,
+                             f"<{tag} class=\"{cls}\"> renders the mark in the "
+                             f"right face at the wrong weight: it {detail}, and "
+                             f"the register rules {mark_weight}")
                 elif not _requests_family(body, mark_family):
                     rep.fail("type", where,
                              f"draws {mark_family} and never requests it, so the "
