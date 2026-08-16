@@ -73,6 +73,7 @@ import fnmatch
 import io
 import json
 import re
+import subprocess
 import sys
 import tarfile
 import tempfile
@@ -95,7 +96,13 @@ SKIP_DIRS = {".git", "node_modules", "assets/fonts", "chroma", "__pycache__", ".
 # repos in the manifest, and it produces zero new findings. Any future addition
 # here gets the same treatment -- widening the walk without probing the newly
 # visible set is how a green run stops meaning anything.
-TEXT_EXT = {".html", ".md", ".py", ".yml", ".yaml", ".json", ".xml", ".txt", ".sh", ".jsonl", ".toml", ".vcf"}
+# .astro added 2026-08-15 for the same reason .vcf was: rnv-live's only page is
+# an .astro file, the repo carries retired/contact/renames, and all three passed
+# on a repo whose actual surface the walk never opened. Probed before landing --
+# exactly one .astro exists across the fourteen repos and it produces zero new
+# findings from the existing checks. It is also the file the var() guard below
+# needs to read.
+TEXT_EXT = {".html", ".md", ".py", ".yml", ".yaml", ".json", ".xml", ".txt", ".sh", ".jsonl", ".toml", ".vcf", ".astro"}
 
 # The manifest names every retired phrase, and this file quotes several while
 # explaining itself. A checker that measures text must exclude its own text, or
@@ -782,6 +789,96 @@ def _count_parametrized_files(root: Path) -> int:
     return n
 
 
+def verify_tokens(cfg, rep, workdir: Path):
+    """Every `var(--rnv-*)` on a surface must resolve against what emit_css emits.
+
+    THE GAP THIS CLOSES. `engine/brand.py`'s emit_css derives CSS custom property
+    names straight from the WEB dict keys, and rnv-live's deploy.yml pipes that
+    into src/styles/tokens.css. Rename a key here and a custom property renames
+    in another repository's stylesheet. Its index.astro references those
+    properties by name, so a rename landed without its consumer leaves var()
+    calls resolving to nothing, a page deploying with no background, and -- until
+    today -- no check anywhere reporting it. rnv-live's own guard asserts that
+    hex literals live in tokens.css; it never asserts that a var() resolves.
+
+    That is not hypothetical. The ground ramp rename on 2026-08-14 and the serif
+    role rename on the 15th were both this exact shape, and both were caught by
+    running this comparison BY HAND. This is that comparison, automated.
+
+    NOT A `CHECKS` MEMBER, DELIBERATELY. Every one of the fourteen repos names
+    its check groups explicitly, so a new registry key runs on zero surfaces
+    while reading armed in the source. This is also not repo-shaped: it compares
+    one source file against every consumer of it, which is verify_facts' shape,
+    not run_repo's. It therefore runs unconditionally in the facts pass -- the
+    same dispatch decided for expiring_surfaces and for the same reason.
+
+    CONSUMERS ARE DISCOVERED, NOT LISTED. A hardcoded consumer list is a
+    construct that goes stale silently the first time a new surface adopts
+    emit_css. Instead every fetched repo is scanned for `var(--rnv-*)`, so a new
+    consumer arms itself. The cost is that this pass fetches repos again; the
+    benefit is that there is no list to forget.
+    """
+    engine = REPO_ROOT / "engine" / "brand.py"
+    if not engine.exists():
+        # An early return with no finding is a check that reads armed and
+        # verifies nothing. Say so instead.
+        rep.fail("tokens", "engine/brand.py",
+                 "not found; the emitted token set could not be built, so no "
+                 "var() reference was verified")
+        return
+
+    emitted = set()
+    for surface in ("web", "app", "records"):
+        try:
+            out = subprocess.run(
+                [sys.executable, str(engine), "--css", surface],
+                capture_output=True, text=True, timeout=30)
+        except Exception as exc:
+            rep.fail("tokens", "engine/brand.py",
+                     f"--css {surface} could not be run ({type(exc).__name__}); "
+                     f"no var() reference was verified against it")
+            return
+        if out.returncode != 0:
+            rep.fail("tokens", "engine/brand.py",
+                     f"--css {surface} exited {out.returncode}; "
+                     f"no var() reference was verified against it")
+            return
+        emitted |= set(re.findall(r"--rnv-[a-z0-9-]+", out.stdout))
+
+    if not emitted:
+        rep.fail("tokens", "engine/brand.py",
+                 "emitted no --rnv-* properties at all; a comparison against an "
+                 "empty set would pass every surface and verify nothing")
+        return
+
+    checked = 0
+    for name in [r for r in cfg["repos"] if not r.startswith("_")]:
+        root, why = fetch_repo(name, workdir)
+        if root is None:
+            rep.miss("tokens", name,
+                     f"could not fetch ({why}); var() references in this repo "
+                     f"were not verified. {MISS_HINT}")
+            continue
+        for relpath, body in text_files(root):
+            used = set(re.findall(r"var\((--rnv-[a-z0-9-]+)", body))
+            if not used:
+                continue
+            checked += 1
+            for token in sorted(used - emitted):
+                rep.fail("tokens", f"{name}/{relpath}",
+                         f"references {token}, which engine/brand.py does not "
+                         f"emit. A renamed or removed key leaves this resolving "
+                         f"to nothing and the surface renders without it")
+    if checked == 0:
+        # Zero consuming files is indistinguishable from a broken scan, and the
+        # difference matters: one means nothing consumes the tokens, the other
+        # means the guard verified nothing while reporting clean.
+        rep.note("tokens", "-",
+                 f"{len(emitted)} properties emitted and no file in the "
+                 f"ecosystem references one; nothing was compared")
+    rep.checks += 1
+
+
 def verify_facts(cfg, rep, workdir: Path):
     """Check the manifest against reality, not just surfaces against the manifest.
 
@@ -1116,6 +1213,8 @@ def main():
         print("=" * 70)
         with tempfile.TemporaryDirectory() as tmp:
             verify_facts(cfg, rep, Path(tmp))
+            # Unconditional, not a CHECKS member. See verify_tokens' docstring.
+            verify_tokens(cfg, rep, Path(tmp))
         scanned.append("manifest")
 
     if args.root:
