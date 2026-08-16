@@ -3,7 +3,15 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-08-15 (rev 1 — created because type had outgrown its section. Brand Book §3.2
+Last locked: 2026-08-15 (rev 2 — **R1 is closed at the source and this register's mono row was
+wrong.** `engine/brand.py`'s `TYPE` was reshaped from `role -> family` to `role -> {family,
+weights}` and gained the `mark` role, so `--rnv-font-mark` is emittable for the first time and the
+five roles below are five roles at the source. **The reshape was forced by this file:** a map of
+role to family string cannot express "Montserrat *Black*" or F8's weight-axis standard, so both
+rulings were unenforceable no matter how carefully they were written here. Rev 1's mono row said
+400/500/600 while the shipped link requested four weights and the site draws 600 and 700 — ruled
+below rather than routed, because this register is maintained by the project that runs the repo.
+rev 1 — created because type had outgrown its section. Brand Book §3.2
 and §3.3 had reached 11,368 characters against §3.1's 1,274, which is a register wearing a
 section number rather than a summary. Four of the last five Brand Book decisions were type
 decisions, and a parallel register had already formed on its own: the F-series prefixed its
@@ -61,13 +69,48 @@ recorded where they appear because they describe the degraded state, not the int
 |---|---|---|---|
 | **Mark** | **Montserrat** | **900 (Black)** | The RNVizion mark at every size and in every medium; initiative lockup letterforms; IG aphorism cards and carousels |
 | Display | Bricolage Grotesque | variable, 300–800 | Site headings, blog titles, OG share titles, the name block on résumé cards |
-| Emphasis | Instrument Serif | italic | Pull lines, deks, the italicised signature phrases, the card back |
-| Labels, kickers, long form | JetBrains Mono | 400 / 500 / 600 | The tracked long form beneath a mark, uppercase tracked kickers, footers, captions |
+| Emphasis | Instrument Serif | italic **and roman** | Pull lines, deks, the italicised signature phrases, the card back — **and the blog drop cap, which is roman** |
+| Labels, kickers, long form | JetBrains Mono | 400 / 500 / 600 / 700 | The tracked long form beneath a mark, uppercase tracked kickers, footers, captions |
 | Body | Inter | 400 / 500 / 600 | Running text |
 
 **The JetBrains Mono row no longer claims wordmarks and no longer claims the nav.** It was
 narrowed on 2026-08-11 when decision #15 gave the mark to Montserrat Black, then narrowed again
 the same day when the nav ruling turned out to be global rather than size-scoped.
+
+**The Emphasis row said italic and the face is drawn both ways.** Measured across the site
+2026-08-15: twenty-four rules set `--font-serif` with `font-style: italic`; **eight draw
+`article p:first-of-type::first-letter` — the blog drop cap — in roman**, with no italic in the
+rule or either parent. The row understated the face's job by half of one axis, and the font link's
+`ital@0;1` is therefore **correct** rather than an over-request. `TYPE` carries `ital: (0, 1)`.
+
+**That evidence reversed a naming argument this project had already made in writing.** The source
+key was `serif-italic`, the site's forty-four references say `--font-serif`, and the case for
+moving the site was that `serif-italic` carried a ruling the shorter name would lose — the face is
+only ever italic. **It is not**, and the longer name misdescribed a third of its own uses. The
+source moved instead: one key here, one reference in `rnv-live`, and twelve site files untouched.
+
+**The rule that survives the reversal, stated so the next collision does not turn on memory:**
+prefer the name that carries more of the ruling — *and check that the ruling is true* before
+deciding which name that is. Where the names carry the same, prefer the published surface. Both
+collisions this week resolved the same direction once the artifact was read, and the ground ramp
+got there faster only because nobody had a theory to defend.
+
+**The mono row gained 700 on 2026-08-15, and rev 1 was wrong to omit it.** Traced from the
+thirty-seven selectors that set `--font-mono`: weights **500, 600 and 700** are reachable from a
+mono selector — 700 draws `code`, `.wordmark` and the close control; 600 draws list items; 500
+draws buttons, kickers and two heading levels. The register claimed 400/500/600 while the shipped
+font link requested `400;500;600;700`, so **the row understated by a weight that ships, and the
+two have disagreed since the link was written.**
+
+**400 stays in the request, marked unconfirmed rather than dropped. [confirm/fill]** No selector
+reachable from `--font-mono` declares it, so it is either inherited from the body default or
+requested and never drawn. F8 forbids requesting what is not drawn — but the failure modes are not
+symmetric. An extra request costs bytes; a missing one **synthesises** the weight, which F8 forbids
+outright and which fails silently. Confirm before removing.
+
+**F8 was unenforceable in both directions until today.** The ruling says *request the weights
+actually drawn and nothing synthesised*, and nothing could check it, because the source held
+families and no weights at all. That is why `TYPE` was reshaped rather than merely extended.
 
 **The body row was one phrase describing two things.** "Inter / system stack" read as a single
 answer while nine pages ran Inter and the two highest-traffic pages — homepage and blog index —
@@ -238,11 +281,15 @@ values to preserve and both were wrong.
 
 ## Open
 
-- **`engine/brand.py` cannot name the face that carries the mark.** `TYPE` holds four roles;
+- **~~`engine/brand.py` cannot name the face that carries the mark.~~ CLOSED 2026-08-15.** `TYPE`
+  now holds five roles as `{family, weights}`; `mark` is Montserrat at `(900,)` and
+  `--rnv-font-mark` emits. Verified additive against live `main`: **no token name removed, no value
+  changed, one token added**, and every `var(--rnv-*)` in `rnv-live` still resolves. The original
+  finding kept, because its shape is the lesson — `TYPE` held four roles;
   Montserrat appears **zero times** in the file. Sharper, because it is checkable: `tokens()` builds
   font tokens by comprehension over `TYPE`, so the emitter can produce exactly as many font tokens
   as `TYPE` has roles — four. **`--rnv-font-mark` is not missing from a list; it is unemittable.**
-  The site declares five tokens on every nav page. Handed to Brand Infrastructure as R1.
+  The site declared five tokens on every nav page against an emitter that could produce four.
 - **No font fact exists in `profile.json`.** Nothing watches type; the nav could disagree with this
   register indefinitely and nothing would say so. Not a checker failure — no checker was pointed
   here. Handed as R2.
