@@ -73,6 +73,14 @@ on:
       - "profile.json"           # change a fact, find out immediately what disagrees
       - "scripts/refresh_profile.py"
       - ".github/workflows/profile-drift.yml"
+      # Widened 2026-08-16 for the coupling signal. These three were invisible to
+      # the push trigger, so a change to the brand engine or either register
+      # waited until Monday for any signal at all -- including verify_tokens,
+      # which exists precisely to catch a key rename in engine/brand.py before it
+      # deploys a page with no background.
+      - "engine/brand.py"
+      - "BRAND_COLORS.md"
+      - "BRAND_TYPE.md"
   workflow_dispatch:
     inputs:
       skip_facts:
@@ -175,6 +183,26 @@ jobs:
               print(f"version {before_raw} -> {after_raw}.")
           PYEOF
 
+      # One diff, two consumers below. `github.event.before` rather than HEAD~1
+      # so a multi-commit push compares against what main actually held.
+      - name: What this push changed
+        id: changed
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        run: |
+          set -euo pipefail
+          files=$(git diff --name-only "${{ github.event.before }}" HEAD || true)
+          echo "$files"
+          {
+            echo "files<<EOF"
+            echo "$files"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          if echo "$files" | grep -qx "engine/brand.py"; then
+            echo "engine=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "engine=0" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Check every surface
         id: surfaces
         run: |
@@ -190,7 +218,15 @@ jobs:
       # confidence. Skipped on push so a one-line edit doesn't wait on fetches.
       - name: Verify facts against source
         id: facts
-        if: github.event_name != 'push' && inputs.skip_facts != true
+        # Normally skipped on push, so a one-line manifest edit does not wait on
+        # fourteen fetches. ENGINE CHANGES ARE THE EXCEPTION and it is not a
+        # convenience: emit_css derives CSS property names from this file's keys,
+        # so a rename here renames a custom property in rnv-live's stylesheet.
+        # verify_tokens is the only thing that catches it and waiting until
+        # Monday means a page can deploy with no background in between.
+        if: >-
+          (github.event_name != 'push' || steps.changed.outputs.engine == '1')
+          && inputs.skip_facts != true
         run: |
           set +e
           python scripts/refresh_profile.py --verify-facts --quiet > facts.txt 2>&1
@@ -342,6 +378,61 @@ jobs:
             gh issue close "$n" --comment "Complete sweep as of run [\`${{ github.run_id }}\`](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}). Every repo was fetched and every declared check ran."
             echo "closed issue #$n"
           done
+
+      # A PROMPT, NEVER A GUARD, and the difference is the whole design. Every
+      # other step here answers "does this disagree?" -- this one answers "did
+      # you just make something stale?", which is a different question asked at a
+      # different moment. It cannot verify the manual work happened and must
+      # never claim to: a construct that looks like enforcement and is not is the
+      # failure this repo has caught four times, most recently in a docstring
+      # written the same afternoon.
+      #
+      # IT CANNOT FAIL THE JOB. `continue-on-error` plus an unconditional exit 0,
+      # because a prompt that can go red is a gate, and a gate that cannot verify
+      # its own subject is the thing being avoided. The honest cost is that it
+      # can be ignored -- notices and a run summary are visible, not blocking,
+      # and nothing here pretends otherwise.
+      - name: What this change may have made stale
+        if: steps.changed.outputs.files != ''
+        continue-on-error: true
+        env:
+          CHANGED: ${{ steps.changed.outputs.files }}
+        run: |
+          python3 - <<'PYEOF' || true
+          import json, os
+
+          changed = [f.strip() for f in os.environ.get("CHANGED", "").splitlines() if f.strip()]
+          try:
+              with open("profile.json") as fh:
+                  couplings = json.load(fh).get("coupled_manual_work", {})
+          except Exception as exc:
+              print(f"::notice::coupling map unreadable ({type(exc).__name__}); "
+                    f"no follow-up was listed. This prompt failing is not a "
+                    f"finding about any surface.")
+              raise SystemExit(0)
+
+          hits = [(path, couplings[path]) for path in changed
+                  if path in couplings and not path.startswith("_")]
+          if not hits:
+              raise SystemExit(0)
+
+          lines = ["## Manual work this push may have made stale", "",
+                   "_A prompt, not a check. Nothing here was verified and nothing "
+                   "here failed the run._", ""]
+          for path, items in hits:
+              lines.append(f"**`{path}` changed:**")
+              lines += [f"- {i}" for i in items]
+              lines.append("")
+              for i in items:
+                  print(f"::notice file={path}::{i}")
+
+          summary = os.environ.get("GITHUB_STEP_SUMMARY")
+          if summary:
+              with open(summary, "a") as fh:
+                  fh.write("\n".join(lines) + "\n")
+          print("\n".join(lines))
+          PYEOF
+          exit 0
 
       # ----------------------------------------------------------- job result
       - name: Fail the run on drift
