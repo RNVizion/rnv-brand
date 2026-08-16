@@ -445,6 +445,20 @@
       "verified": "2026-08-12"
     }
   ],
+  "type_register": {
+    "_comment": "Machine-readable half of BRAND_TYPE.md, for verify_type. The REASONING lives in the register and is not repeated here -- this block holds only what a checker can compare. Change a value here and change BRAND_TYPE.md in the same commit, or the two documents in this repo disagree and the source is what a reader trusts.",
+    "mark_family": "Montserrat",
+    "mark_string": "RNVizion",
+    "body_family": "Inter",
+    "mark_selectors": {
+      "_comment": "THE MARK IS A ROLE AND TEXT ALONE CANNOT IDENTIFY IT. The brand name also appears as an author byline on eight blog files, in page titles, and in the footer's long form; those are mentions of the name, not renderings of the mark, and the register's Labels row permits them in mono. A class list is required alongside the exact-text test because a check cannot infer the role from the contents -- the contents are the brand name either way. Same argument as F13's single-member allowlist: an inferred scope is a hole.",
+      "selectors": ["logo", "mark", "wordmark"]
+    },
+    "no_canonical_link": {
+      "_comment": "Pages the register exempts from the shared font-link string, so the link-drift check does not report a decision as drift. THE RULE IS: a page requests every face it draws and no face it doesn't; the chrome pages share one string only because they happen to draw all five. /card/ requests only the three faces and four weights it draws. aiii/ had Montserrat trimmed on 2026-08-15 because it draws no mark -- it has no site nav, and its own AIII wordmark is mono. It still DECLARES --font-mark per decision #18, so the five-token vocabulary is identical on every page; declaring a token costs nothing and keeps a guard reading one shape everywhere. Each entry here is a decision recorded in BRAND_TYPE.md, not a value tolerated.",
+      "paths": ["card/index.html", "card/print/index.html", "aiii/index.html"]
+    }
+  },
   "protected": {
     "_comment": "Strings that look like the renamed repos but must NEVER be rewritten. Hugging Face Space IDs are deliberately exempt from the rnv- prefix.",
     "strings": [
