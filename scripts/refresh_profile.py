@@ -913,6 +913,25 @@ def _declared_weight(decls):
     return WEIGHT_KEYWORDS.get(v), raw
 
 
+def _em(value):
+    """A tracking value as a number, or None if it is not an em length.
+
+    PARSED, NOT COMPARED AS TEXT. The card writes `.06em` and the nav writes
+    `0.09em`; the leading zero is formatting and a string compare would report
+    drift where none exists -- the whitespace problem one level down, in the
+    value rather than the declaration.
+    """
+    if value is None:
+        return None
+    v = value.strip().lower()
+    if not v.endswith("em"):
+        return None
+    try:
+        return round(float(v[:-2]), 6)
+    except ValueError:
+        return None
+
+
 def _rule_for(cls, blocks):
     """The declaration block that carries this element's font-family."""
     for name in cls.split():
@@ -953,6 +972,37 @@ def _requests_family(text, family):
             return True
     return f in re.sub(r"(?s)<style.*?</style>", " ", text).lower() and (
         "fonts.googleapis.com" in text.lower() or "@fontsource" in text.lower())
+
+
+def _check_tracking(cls, blocks, expected, selectors):
+    """The mark's letter-spacing against the value ruled for its selector.
+
+    Returns a finding string, or None when the mark tracks correctly or when the
+    register rules nothing for this selector. **An unruled selector is silence,
+    not a pass**, which is only safe because verify_type asserts up front that
+    every mark selector has a tracking entry. That assertion was written after
+    this docstring claimed it existed -- a false enforcement claim, caught by
+    arming the case rather than by reading the comment.
+    """
+    key = next((c for c in cls.split() if c in selectors and c in expected), None)
+    if key is None:
+        return None
+    want = _em(expected[key])
+    rule = _rule_for(cls, blocks)
+    raw = (rule or {}).get("letter-spacing")
+    if raw is None:
+        # letter-spacing defaults to `normal`, which is zero. An untracked mark
+        # is exactly what the three raster generators shipped for months.
+        return (f"declares no letter-spacing, so it tracks at zero; the register "
+                f"rules {expected[key]} for .{key}")
+    got = _em(raw)
+    if got is None:
+        return (f"tracks at {raw}, which is not an em length; the register rules "
+                f"{expected[key]} for .{key} and the web system is relative")
+    if got != want:
+        return (f"tracks at {raw} where the register rules {expected[key]} "
+                f"for .{key}")
+    return None
 
 
 def verify_type(cfg, rep, workdir: Path):
@@ -1002,11 +1052,30 @@ def verify_type(cfg, rep, workdir: Path):
 
     mark_family = reg["mark_family"]
     mark_weight = reg.get("mark_weight")
+    mark_tracking = {k: v for k, v in reg.get("mark_tracking", {}).items()
+                     if not k.startswith("_")}
     mark_string = reg["mark_string"]
     selectors = set(reg["mark_selectors"]["selectors"])
     body_family = reg["body_family"]
     exempt_link = set(reg.get("no_canonical_link", {}).get("paths", []))
     tokens = emitted_token_values(engine)
+
+    # THE REGISTER MUST BE COMPLETE BEFORE IT CAN BE COMPARED AGAINST. A mark
+    # selector with no ruled tracking makes _check_tracking silent on every
+    # surface that uses it -- a check that runs, finds the mark, and verifies one
+    # axis fewer than its name implies. Assert the two lists agree, once, rather
+    # than discovering the gap as an absence of findings.
+    for sel in sorted(selectors):
+        if sel not in mark_tracking:
+            rep.fail("type", "profile.json",
+                     f"type_register names .{sel} as mark-bearing and rules no "
+                     f"tracking for it, so every mark using that selector is "
+                     f"checked for face and weight and not for tracking")
+    for sel in sorted(mark_tracking):
+        if sel not in selectors:
+            rep.fail("type", "profile.json",
+                     f"type_register rules tracking for .{sel}, which is not in "
+                     f"mark_selectors, so nothing will ever be compared against it")
 
     links, checked = {}, 0
     for name in [r for r in cfg["repos"] if not r.startswith("_")]:
@@ -1058,6 +1127,10 @@ def verify_type(cfg, rep, workdir: Path):
                              f"<{tag} class=\"{cls}\"> renders the mark in the "
                              f"right face at the wrong weight: it {detail}, and "
                              f"the register rules {mark_weight}")
+                elif (_tracking_finding := _check_tracking(
+                        cls, blocks, mark_tracking, selectors)):
+                    rep.fail("type", where,
+                             f"<{tag} class=\"{cls}\"> {_tracking_finding}")
                 elif not _requests_family(body, mark_family):
                     rep.fail("type", where,
                              f"draws {mark_family} and never requests it, so the "
