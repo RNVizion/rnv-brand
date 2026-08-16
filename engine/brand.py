@@ -316,11 +316,42 @@ STATUS = {
 }
 
 # ------------------------------------------------------- texture + type
+# ROLE -> {family, weights, ...}. Reshaped 2026-08-15 from role -> family.
+#
+# WHY THE SHAPE CHANGED: BRAND_TYPE.md rules a weight for every role -- the mark
+# is Montserrat *Black*, not Montserrat -- and F8 rules one weight-axis standard
+# per face, "request the weights actually drawn and nothing synthesised". A map
+# of role to family string cannot express either, so both rulings were
+# unenforceable at the source no matter how carefully they were written down.
+#
+# `weights` is a tuple of the weights that should be REQUESTED. For a variable
+# face it holds the two endpoints of the range and `variable` is True; consumers
+# read `variable` before reading the tuple. `italic` and `opsz` are carried where
+# the face has them, because a font link that omits an axis silently synthesises
+# it, which F8 forbids.
+#
+# THE MARK ROLE IS NEW AND IT CLOSES R1. tokens() builds font tokens by
+# comprehension over this dict, so before today the emitter could produce exactly
+# four font tokens while twelve pages consumed five. `--rnv-font-mark` was not
+# missing from a list, it was unemittable, and any consumer adopting emit_css()
+# lost the mark. Adding a role is additive: no existing token name or value
+# moves, so no consumer breaks.
+#
+# TWO CONFLICTS WITH THE REGISTER, encoded as measured rather than as ruled, and
+# routed rather than silently resolved. BRAND_TYPE.md's mono row says 400/500/600;
+# the canonical font link requests 400;500;600;700 and site rules that use
+# --font-mono draw 500 and 700. The register understates by a weight that ships.
+# And in the other direction, no site rule draws mono 400 or 600 explicitly --
+# they may be inherited, or they may be two weights requested and never used,
+# which is the same F8 violation from the other side. The values below match the
+# shipped link; the register is the thing that needs the ruling.
 TYPE = {
-    "display": "Bricolage Grotesque",
-    "mono": "JetBrains Mono",
-    "serif-italic": "Instrument Serif",
-    "body": "Inter",
+    "mark":         {"family": "Montserrat",          "weights": (900,)},
+    "display":      {"family": "Bricolage Grotesque", "weights": (300, 800),
+                     "variable": True, "opsz": (12, 96)},
+    "serif-italic": {"family": "Instrument Serif",    "weights": (400,), "italic": True},
+    "mono":         {"family": "JetBrains Mono",      "weights": (400, 500, 600, 700)},
+    "body":         {"family": "Inter",               "weights": (400, 500, 600)},
 }
 
 # ---------------------------------------- resolver contract (rnv-color-mcp)
@@ -373,7 +404,10 @@ def tokens(surface: str = "web") -> dict[str, str]:
         **palettes[surface],
         "rule": _rgba(GOLD, RULE_ALPHA),
         **{f"status-{name}": value for name, value in STATUS.items()},
-        **{f"font-{role}": f'"{family}"' for role, family in TYPE.items()},
+        # Reads spec["family"], not the value, since TYPE became a dict of dicts
+        # on 2026-08-15. The emitted token name and string are unchanged for the
+        # four roles that already existed; `mark` is new.
+        **{f"font-{role}": f'"{spec["family"]}"' for role, spec in TYPE.items()},
     }
 
 
