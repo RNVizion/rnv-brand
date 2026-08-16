@@ -450,6 +450,12 @@
     "mark_family": "Montserrat",
     "mark_string": "RNVizion",
     "mark_weight": 900,
+    "mark_tracking": {
+      "_comment": "Expected letter-spacing per mark selector. KEYED ON SELECTOR BECAUSE THE SELECTOR IS THE ROLE -- the same reason the mark needs a class discriminator at all. rnv-live's mark is 0.09em at 1.05rem because it is a nav mark by role, not because of its size, and a guard cannot infer role from contents. THE MAPPING HOLDS ONLY WHILE EACH SELECTOR IS USED AT ONE SIZE CLASS: put a .logo at display size and selector stops standing in for role, and this block has to split. Values are what every surface ships today, verified across all fourteen marks. Written with a leading zero for readability; the check parses the number, because `.06em` and `0.06em` are the same value written two ways and a string compare would report drift where none exists. The three raster generators are outside this entirely -- PIL, no markup, 1.8px absolute, held true by a three-file coupling and nothing else.",
+      "logo": "0.09em",
+      "wordmark": "0.09em",
+      "mark": "0.06em"
+    },
     "body_family": "Inter",
     "mark_selectors": {
       "_comment": "THE MARK IS A ROLE AND TEXT ALONE CANNOT IDENTIFY IT. The brand name also appears as an author byline on eight blog files, in page titles, and in the footer's long form; those are mentions of the name, not renderings of the mark, and the register's Labels row permits them in mono. A class list is required alongside the exact-text test because a check cannot infer the role from the contents -- the contents are the brand name either way. Same argument as F13's single-member allowlist: an inferred scope is a hole.",
