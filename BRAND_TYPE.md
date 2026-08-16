@@ -3,7 +3,14 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-08-16 (rev 5 — **R2 is built, and it found this register's own worst case live on
+Last locked: 2026-08-16 (rev 6 — **the coverage boundary rev 5 stated has moved, and a register
+that understates its own guard misleads exactly as much as one that overstates it.** `verify_type`
+now asserts all three axes of the mark: face, **weight** and **tracking**. Weight was one value with
+no variation. Tracking turned out not to need the ruling this document said it needed first — the
+survey found each mark selector carries exactly one value across every surface, so **the selector is
+the role**, which is the same discriminator the mark detection already relies on. The caveat that
+replaces the ruling is recorded below: the mapping holds only while each selector is used at one
+size class. rev 5 — **R2 is built, and it found this register's own worst case live on
 a deployed surface.** `rnv-live` rendered the brand mark in JetBrains Mono at 700 with `0.02em` —
 four revisions after decision #15 retired the wordmark from mono, on the one surface nothing had
 ever read. Fixed to Montserrat 900 at `0.09em`, the nav value, because it is a nav mark by role.
@@ -406,14 +413,34 @@ build.
     `aiii/`, where `.wordmark` is the AIII initiative mark in mono by decision — same class, two
     roles, one surface each. A check cannot infer "this is the wordmark" from contents, because the
     contents are the brand name either way.
-  - **COVERAGE BOUNDARY, stated so nobody assumes more.** The guard checks the **face**. Weight and
-    tracking are declared on the same rule and are **not** asserted. `rnv-live` carried a wrong face
-    *and* wrong tracking, and only the face is why it failed — Montserrat 900 at `0.02em` would have
-    passed. Weight is a small increment, always 900 with no variation. Tracking is not: the expected
-    value depends on **role** rather than size, and a guard cannot infer role, so it needs an
-    expected value recorded here per mark selector before any code.
-  - **The three raster generators are outside it entirely** — Python drawing with PIL, no markup to
-    parse. Their 1.8px is held true by the three-file coupling and nothing else.
+  - **COVERAGE BOUNDARY, and it moved on 2026-08-16.** The guard now asserts **all three axes** of
+    the mark — face, weight and tracking — each proven end to end against a planted regression on a
+    live file. Rev 5 stated the boundary at face only, which was true when written and false a few
+    hours later; **a register that understates its own guard misleads exactly as much as one that
+    overstates it**, because the next reader assumes the axis they care about is uncovered and
+    checks it by hand, or worse, adds a second guard for it.
+    - **Weight** is `900` on all fourteen marks with no variation, so it is one assertion and needed
+      no ruling. A mark declaring *no* weight is a finding rather than a skip: it inherits, so its
+      weight depends on whatever the page sets around it. Keywords resolve rather than reject —
+      `bold` is 700 and reads as a plausible mark weight to anyone not holding this register, so the
+      failure says "it is bold, which is 700" rather than "not 900".
+    - **Tracking did not need the ruling this document said it needed.** Rev 5 recorded that the
+      expected value depends on role rather than size and that a guard cannot infer role. Both true —
+      but the survey found each mark selector carries exactly **one** value across every surface
+      that uses it: `.logo` and `.wordmark` at `0.09em`, `.mark` at `0.06em`. **The selector is the
+      role**, which is the discriminator the mark detection already relies on, so the ruling was
+      already implicit in the surfaces and unambiguous.
+    - **THE CAVEAT THAT REPLACES IT.** That mapping holds only while each selector is used at one
+      size class. Put a `.logo` at display size and selector stops standing in for role, and
+      `type_register.mark_tracking` has to split. Recorded because the mapping will look like a
+      permanent fact long after it stops being one.
+    - **Values are parsed, not compared as text.** `/card/` writes `.06em` and the nav writes
+      `0.09em`; the leading zero is formatting. A string compare reports drift where none exists —
+      the whitespace problem one level down, in the value rather than the declaration.
+  - **The three raster generators are still outside it entirely** — Python drawing with PIL, no
+    markup to parse. Their 1.8px is held true by the three-file coupling and, since 2026-08-16, by a
+    prompt: a change to this document now prints the coupled manual work into the run summary. **A
+    prompt, not a guard** — it does not verify the generators were updated and must never claim to.
 - **[confirm/fill] A formal mark spec** — clearspace, minimum sizes, ratios. Deferred until the
   first external use demands it. Decision #15 settles the *face*, not the spec.
 
