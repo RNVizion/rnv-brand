@@ -3,7 +3,14 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-08-15 (rev 3 — **the raster surfaces are ruled and the tracking system is now
+Last locked: 2026-08-15 (rev 4 — **three implementation facts the ruling did not carry, and one
+figure this project published wrong.** The tracking helper is duplicated across all three
+generators, so **a change to raster tracking is a three-file change**; per-glyph drawing discards
+kerning, which widens the mark by a fraction of a pixel; and the measured width change is +13.0%
+at 20px and +8.7% at 30px, not the single "12%" the handoff gave. That handoff also printed the
+30px tracked width as 167px when it is 161px — **it applied the nav's `0.09em` to a row the ruling
+puts at `0.06em`**, which is the inverse-idiom failure this very section warns about, committed in
+the table demonstrating the ruling. Corrected below. rev 3 — **the raster surfaces are ruled and the tracking system is now
 two systems, not two values.** The OG generators drew the mark at zero tracking while every web
 surface tracked it, so the same wordmark had two letterforms depending on where it was seen.
 Ruled: **raster is an absolute 1.8px gap; the web keeps its em values unchanged.** The reasoning is
@@ -166,6 +173,35 @@ raster mark has no type size to scale with** — the generator fixes it, and the
 that one size forever. So the thing to rule for raster is the optical gap itself; the em value is
 only how each generator expresses it. That both expressions land on values already ruled for the
 web is confirmation, not the reason.
+
+**MEASURED WIDTHS, because the mark gets wider and the figure was published wrong once.**
+
+| Mark size | Untracked | At 1.8px | Change |
+|---|---|---|---|
+| 20px | 98.6px | **111.4px** | **+13.0%** |
+| 30px | 147.8px | **160.7px** | **+8.7%** |
+
+The change differs by size because the gap is constant while the word is not — seven gaps of 1.8px
+is a larger fraction of a 99px word than of a 148px one. **A single averaged figure hides that**,
+and the handoff of 2026-08-15 published one: "a 12% width change", with the 30px row given as
+167px. 167 is `0.09em` arithmetic — 30 × 0.09 × 7 gaps — applied to a row the ruling puts at
+`0.06em`. **That is the inverse-idiom failure recorded three paragraphs above, committed inside the
+table demonstrating the ruling.** Anyone re-measuring against 167 lands 6px off.
+
+**Nothing in the three generators measures the mark**, verified: every right-aligned element anchors
+to the canvas edge as `W - MARGIN - dw`. The width change is real and worth publishing, but there is
+nothing downstream to re-measure in these files today.
+
+**Per-glyph drawing discards kerning.** PIL has no letter-spacing, so tracking is drawn by advancing
+`textlength(ch)` per character, which sums the individual advances and loses the pair adjustments a
+single `draw.text()` would apply. The mark runs **0.20px wide at 20px and 0.30px at 30px** as a
+result. Sub-pixel, recorded in each generator's docstring so a later reader does not file it as a
+defect, and it does not move the ruled 1.8px gap — only the total.
+
+**THE HELPER IS DUPLICATED IN ALL THREE GENERATORS, so a tracking change is a three-file change.**
+Correct for standalone scripts with no shared import, and the same shape as the nav's inline CSS —
+but written down here rather than discovered, because the failure mode is landing two of three and
+having one OG surface disagree with the other two.
 
 **A CONSTANT 1.8px ACROSS THE WEB TOO WAS CONSIDERED AND REJECTED ON MEASUREMENT.** It would have
 moved the nav from `0.09em` to `0.129em` and the card from `0.06em` to `0.052em`. The card change
