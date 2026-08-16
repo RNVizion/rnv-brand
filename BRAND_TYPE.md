@@ -1,0 +1,302 @@
+# RNVizion Brand Type
+
+The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
+import from there; never hardcode. This doc is the human-readable explanation.
+
+Last locked: 2026-08-15 (rev 1 — created because type had outgrown its section. Brand Book §3.2
+and §3.3 had reached 11,368 characters against §3.1's 1,274, which is a register wearing a
+section number rather than a summary. Four of the last five Brand Book decisions were type
+decisions, and a parallel register had already formed on its own: the F-series prefixed its
+items with `F` **specifically to avoid colliding with the Brand Book decision log**, which is
+the system reporting that type needed a home and improvising one. That register retires here.
+Brand Book §3.2/§3.3 were reduced to pointers **in the same change**, because a convenience
+copy is a second canonical entry wearing a disclaimer — see the note on that under Who owns
+what.)
+
+---
+
+## Who owns what
+
+Three artifacts describe type, and two of them describing the same thing twice is the drift
+this system exists to prevent. The split, so nothing is stated in two places:
+
+| Artifact | Owns |
+|---|---|
+| **Brand Book §3.2 / §3.3** | The summary and the fact that a ruling exists. Points here; does not restate |
+| **`BRAND_TYPE.md`** (this file) | The register, the rules, the exemptions, and the reasoning behind them |
+| **`engine/brand.py`** (`TYPE`) | The values. Every consumer imports them from there |
+
+**This mirrors the colour split deliberately, including the reason it exists.** `BRAND_COLORS.md`
+carried a typography block for months as a "(reference)" convenience copy. Rev 14 retired it and
+recorded why: it was not a stale copy of a current fact but **three retired ones at once** — it
+gave the wordmark to JetBrains Mono after decision #15 took it away, wrote body as "Inter /
+system stack" after F2 split that phrase, and had no row for the mark face at all. The label
+"(reference)" did not stop it being read and followed.
+
+**Two canonical entries that disagree are invisible to review, because each reads coherently
+alone.** That is not a hypothetical here: decision #15 exists *because* §3.2's roles list and
+§3.3's lockup template disagreed about the wordmark for five revisions, and neither review nor
+re-reading caught it. **It was caught by building** — the card generator followed the roles
+list, produced a mark that did not match the AIII lockup already shipping, and was corrected on
+sight.
+
+---
+
+## What makes a face a brand face
+
+A face is in this register when it is **shipped, versioned and controllable** — downloaded into
+the repo or requested from a pinned font link, and drawable by both the web and raster pipelines.
+
+**Fallback names are not brand faces.** `system-ui`, `-apple-system`, `Segoe UI`, `ui-monospace`,
+`Georgia`, and the bare generics are what renders when a brand face does not arrive. They are
+recorded where they appear because they describe the degraded state, not the intended one.
+
+**Five faces are yours.** Bricolage Grotesque, Montserrat, Instrument Serif, JetBrains Mono, Inter.
+
+---
+
+## The register
+
+| Role | Face | Weight / axis | Where it lives |
+|---|---|---|---|
+| **Mark** | **Montserrat** | **900 (Black)** | The RNVizion mark at every size and in every medium; initiative lockup letterforms; IG aphorism cards and carousels |
+| Display | Bricolage Grotesque | variable, 300–800 | Site headings, blog titles, OG share titles, the name block on résumé cards |
+| Emphasis | Instrument Serif | italic | Pull lines, deks, the italicised signature phrases, the card back |
+| Labels, kickers, long form | JetBrains Mono | 400 / 500 / 600 | The tracked long form beneath a mark, uppercase tracked kickers, footers, captions |
+| Body | Inter | 400 / 500 / 600 | Running text |
+
+**The JetBrains Mono row no longer claims wordmarks and no longer claims the nav.** It was
+narrowed on 2026-08-11 when decision #15 gave the mark to Montserrat Black, then narrowed again
+the same day when the nav ruling turned out to be global rather than size-scoped.
+
+**The body row was one phrase describing two things.** "Inter / system stack" read as a single
+answer while nine pages ran Inter and the two highest-traffic pages — homepage and blog index —
+ran a bare system stack with no brand face at any position. Ruled to Inter on 2026-08-11 (F2) and
+verified on `main`. **Running text is a bigger visible surface than the mark**: the mark is eight
+characters of nav; this was every paragraph on the two pages most people see first.
+
+---
+
+## The mark
+
+**Montserrat Black, gold on dark. Ruled 2026-08-11, founder-confirmed, Brand Book decision #15.**
+
+**The ruling is global.** There is no size-scoped exception. A size-scoped reading was offered and
+not taken; recorded plainly, because a rule with a quiet exception in it is what produced the
+original contradiction.
+
+**The string is `RNVizion`, in that casing, on every surface.** `RNVIZION` is not the spelled-out
+long form and never was — the long form is *Research N' Vizion*. The two were confused because
+tracked mono uppercase is also the house kicker treatment and they look alike at small size. One
+raster generator drew `" ".join("RNVIZION")` for months on that confusion.
+
+### Tracking is a two-value system
+
+| Size | Tracking | Proven on |
+|---|---|---|
+| 14px (nav) | **`0.09em`** | eleven nav pages + the post template |
+| Display | **`0.06em`** | `/card/` at 2.15rem on screen and 25pt in print |
+
+**Both values are positive, and the sign is the part worth holding.** Two earlier values were
+retired: `-.015em`, carried from the pre-ruling card generator, and a single `+0.033em` that the
+F-register ruled briefly before the size split emerged. The negative value was **a monospace
+correction carried onto a proportional face** — wrong in sign, not merely in magnitude. A
+monospace face pads its sidebearings by construction; a proportional black one does not.
+
+**Small type wants more space, not less.** The display rule and the small-size rule point in
+opposite directions, which is the inverse-idiom failure in a new domain: a correction that is
+right at one size is not right at the other by implication.
+
+**One loose phrase retired with them:** the original note said Montserrat Black needs tracking
+pulled in "or the counters close up." Tracking moves the space *between* letters and does not
+touch a counter at all.
+
+### The lockup template
+
+Established by the AIII mark: **mark letterforms in Montserrat Black gold, above a hairline gold
+rule, with the spelled-out name beneath in tracked JetBrains Mono.** New initiative marks follow
+this template so the family reads as one hand.
+
+**This is the entry that won decision #15**, because it describes a constructed artifact the
+ecosystem already ships rather than a category. The tiebreak was not seniority or specificity in
+the abstract — **prefer the entry that describes an artifact that exists over the one that
+describes a class**, because the artifact is checkable.
+
+---
+
+## Stacks, tokens and axes
+
+**Ruled 2026-08-11** (F1, F3, F7, F8):
+
+- **A brand face leads every stack; the system face is a fallback, never a first choice.** A stack
+  with no brand face in it is not a stack, it is a surrender. This settled the body split without
+  needing a separate decision.
+- **Fallback chains run three tiers:** brand → system → generic. Two-tier chains satisfy the first
+  rule but degrade to the browser default rather than the OS face. Both are legal; only one is
+  graceful.
+- **One token vocabulary: `--font-{role}`, with `--font-mark` added.** Three vocabularies were live
+  for the same five roles — the main pages, `aiii/`'s shortened set, and the `--rnv-font-{role}`
+  set emitted by `brand.py` that **no page consumes**.
+- **One weight-axis standard per face.** Request the weights actually drawn and nothing synthesised.
+  A standard that does not name its axes leaves the next page to pick its own.
+
+**The mark gets its own token so it cannot move by accident.** Without `--font-mark`, the mark
+borrows `--font-mono` or `--font-display` and shifts whenever someone retunes a face it was only
+ever sharing a variable with — drift with no edit to the mark at all.
+
+---
+
+## The initiative-page exception
+
+**Brand Book decision #16, register F13, ruled 2026-08-11.** The one documented exception, and it
+is an exception **to a role rather than to a face**.
+
+**Initiative pages set running text in the display face at weight 340, not in the body face.**
+`aiii/index.html` is the template. The register exists to read differently from a post; that
+difference is carried by the texture of the running text, so it is load-bearing rather than
+decorative. Company briefings inherit it if that surface is ever built.
+
+**What it does not license.** Only the body role is substituted. The mark stays Montserrat Black,
+labels and kickers stay JetBrains Mono, emphasis stays Instrument Serif Italic. It does not extend
+to blog posts, the résumé, the bio, or `/card/`, and it is not general permission to choose a face
+per page — the substitute is the display face specifically, because it is the only other face the
+page already carries at reading size.
+
+**The enforceable half: the exception lives in the selector, never in the token.** The page
+declares all five tokens at canonical values, then sets
+`body { font-family: var(--font-display); font-weight: 340; }`. A page implementing it by
+redefining `--font-body` to Bricolage Grotesque **has made its own tokens lie**, and every check
+reading token values goes blind on that page while still reporting green.
+
+Verified on `main` 2026-08-12: `aiii/index.html` declares all five tokens including `--font-mark`,
+keeps `--font-body` at `'Inter', …`, and makes the substitution in the selector.
+
+**[confirm/fill] The carve-out has no enumerable scope.** It is written for a class with exactly
+one member. A check cannot infer "initiative page" from a page's contents, because the contents
+are the thing being permitted — it needs a path allowlist or a naming convention. **A single-member
+allowlist is honest and cheap; an inferred one is a hole.** Until one exists, the second initiative
+page either ships into a guard that flags it as drift, or the guard was loose enough to be pointless.
+
+---
+
+## Type is owed to every publicly seen surface
+
+**Ruled 2026-08-11 (F5).** HTML, raster image, print and social carry the same faces in the same
+roles. **The rendering technology is not an exemption.** Internal surfaces hold to the same
+standard at lower urgency.
+
+This mattered immediately. The site handoff reached eleven HTML pages and stopped there, while the
+**OG share images** — what renders in every link preview, and so the highest-reach surface in the
+ecosystem — were drawing the wordmark in JetBrains Mono from three Python generators the note
+never mentioned.
+
+**`font.sh` (repo root) fetches three faces** into `assets/fonts/`: `BricolageGrotesque.ttf`,
+`JetBrainsMono.ttf`, `Montserrat.ttf`. **Instrument Serif is deliberately not fetched** (F9), so no
+raster surface can use it; `font.sh` carries what `scripts/` draws, and the roster of five lives
+here.
+
+**The raster side fails silently too.** `load_font()` falls back to `ImageFont.load_default()` on a
+missing file with no error — a bitmap face, not even a system one. Same shape as the CSS fallback,
+different pipeline.
+
+---
+
+## Exemptions a guard must not flag as drift
+
+- **`/card/` does not carry the canonical font link, by decision.** It requests exactly the three
+  faces and four weights it draws and nothing else. The rule is *a page requests every face it
+  draws and no face it doesn't*; the twelve chrome pages share one string only because they happen
+  to draw all five.
+- **`aiii/` declares `--font-mark` and never uses it** — decision #18. The page carries no site
+  nav, so there is no wordmark on it to set in the mark face; the Montserrat request was removed and
+  the token declaration kept, so the five-token vocabulary stays identical on every page. A comment
+  in the file names what to restore and when.
+- **`/card/` is generated.** Its mark tracking lives in `scripts/generate_contact_card.py`, not in
+  `card/index.html`. A checker reading the page reads a build artifact.
+
+**The guard direction is the inverse of the condition that prompted it.** Loading the mark face and
+never drawing it wastes a request and **renders correctly**. Drawing `var(--font-mark)` without
+requesting the family puts the wordmark in a fallback and is **visibly wrong**. Only one of those is
+a brand failure, and it is not the one that was found — so a check built naively from that finding
+would guard the harmless direction.
+
+---
+
+## Two ways a type change fails silently
+
+Both verified, both recorded because the next person will hit them.
+
+**The face is not loaded.** Changing `font-family` without adding the face to the font link falls
+through the stack to system sans — no error, no console warning, no visible failure except a mark
+that is not the mark. Montserrat had **zero occurrences** on the site when decision #15 was made.
+
+**A value carries across sizes that should not.** The nav's `-0.5px` was `-0.036em` at 14px, tuned
+for a monospace face; the card's `-.015em` was the same error at display size. Both looked like
+values to preserve and both were wrong.
+
+---
+
+## Open
+
+- **`engine/brand.py` cannot name the face that carries the mark.** `TYPE` holds four roles;
+  Montserrat appears **zero times** in the file. Sharper, because it is checkable: `tokens()` builds
+  font tokens by comprehension over `TYPE`, so the emitter can produce exactly as many font tokens
+  as `TYPE` has roles — four. **`--rnv-font-mark` is not missing from a list; it is unemittable.**
+  The site declares five tokens on every nav page. Handed to Brand Infrastructure as R1.
+- **No font fact exists in `profile.json`.** Nothing watches type; the nav could disagree with this
+  register indefinitely and nothing would say so. Not a checker failure — no checker was pointed
+  here. Handed as R2.
+- **[confirm/fill] Tracking is undefined between the two ruled sizes.** 14px and display are ruled;
+  the OG generators draw the mark at **20px and 30px** and nothing says which value applies. Not
+  academic: the F-register closed the `generate_site_og.py` question partly on the arithmetic that
+  `+0.033em` at 20px is 0.66px and therefore sub-pixel and safely dropped. **At the ruled `0.09em`
+  that figure is 1.8px** — nearly three times what was dismissed, and no longer sub-pixel. The
+  conclusion may still be right; the reasoning under it does not survive the value change.
+- **[confirm/fill] A formal mark spec** — clearspace, minimum sizes, ratios. Deferred until the
+  first external use demands it. Decision #15 settles the *face*, not the spec.
+
+---
+
+## The F-register, retired here
+
+The working scan that carried these items is superseded by this file. Outcomes preserved; the
+`F` prefix existed to avoid colliding with the Brand Book decision log and is kept for traceability.
+
+| # | Decision | Outcome |
+|---|---|---|
+| F1 | Brand face leads every stack | Ruled — yes |
+| F2 | Body face | Ruled — Inter, system behind it |
+| F3 | Fallback chain depth | Ruled — three tiers |
+| F4 | The `cards/` orphan | Closed — deleted 2026-08-12 |
+| F5 | Is decision #15 global to the raster pipeline? | Ruled — yes |
+| F6 | `generate_site_og.py`'s spaced `R N V I Z I O N` | Closed on evidence — the mark; face, case and spacing all fixed |
+| F7 | One token vocabulary | Ruled — `--font-{role}` plus `--font-mark` |
+| F8 | One weight-axis standard per face | Ruled — yes, nothing synthesised |
+| F9 | Does `font.sh` fetch Instrument Serif? | Closed — no, by design |
+| F10 | Mark tracking | **Superseded** — the single `+0.033em` gave way to the two-value system above |
+| F11 | Type fact in `profile.json` | Open — R1 + R2 |
+| F12 | `BRAND_COLORS.md` typography block | Closed — retired rev 14, now points here |
+| F13 | Initiative-page body face | Ruled — narrow reading; Brand Book decision #16 |
+| F14 | `profile.json` phone | Closed — resolved in v1.3.0 |
+
+**Three items in that scan were stale when it was retired** — F10's `+0.033em`, a target section
+still naming `-.015em`, and a nav description written before the change shipped. A working scan
+pressed into service as a register goes stale the way any second canonical copy does, which is
+part of why this file exists.
+
+---
+
+## Colour — not here
+
+**`BRAND_COLORS.md` owns colour. This file owns type.** No colour value is restated here, including
+the gold the mark is set in; where a colour is named above it is naming a surface, not defining a
+value.
+
+---
+
+## Evidence base
+
+Brand Book decisions **#15** (mark face), **#16** (initiative-page body), **#18** (`aiii/`
+Montserrat request), **#19** (hex notation, colour but same discipline). Register F1–F14, retired
+above. Verification against `main` on 2026-08-11, 08-12, 08-14 and 08-15; every figure in this file
+was read from a shipped artifact rather than a handoff note.
