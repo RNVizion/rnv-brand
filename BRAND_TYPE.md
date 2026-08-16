@@ -3,7 +3,13 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-08-15 (rev 2 — **R1 is closed at the source and this register's mono row was
+Last locked: 2026-08-15 (rev 3 — **the raster surfaces are ruled and the tracking system is now
+two systems, not two values.** The OG generators drew the mark at zero tracking while every web
+surface tracked it, so the same wordmark had two letterforms depending on where it was seen.
+Ruled: **raster is an absolute 1.8px gap; the web keeps its em values unchanged.** The reasoning is
+below and it is the more useful half — an em value exists so tracking scales with type size, and a
+raster mark has no type size to scale with. A constant absolute gap was considered for the web too
+and rejected on measurement, not taste. rev 2 — **R1 is closed at the source and this register's mono row was
 wrong.** `engine/brand.py`'s `TYPE` was reshaped from `role -> family` to `role -> {family,
 weights}` and gained the `mark` role, so `--rnv-font-mark` is emittable for the first time and the
 five roles below are five roles at the source. **The reshape was forced by this file:** a map of
@@ -133,12 +139,41 @@ long form and never was — the long form is *Research N' Vizion*. The two were 
 tracked mono uppercase is also the house kicker treatment and they look alike at small size. One
 raster generator drew `" ".join("RNVIZION")` for months on that confusion.
 
-### Tracking is a two-value system
+### Tracking is two systems, because the media differ
 
-| Size | Tracking | Proven on |
-|---|---|---|
-| 14px (nav) | **`0.09em`** | eleven nav pages + the post template |
-| Display | **`0.06em`** | `/card/` at 2.15rem on screen and 25pt in print |
+**Web — relative, unchanged.**
+
+| Size | Tracking | Gap | Proven on |
+|---|---|---|---|
+| 14px (nav) | **`0.09em`** | 1.26px | ten nav pages + the post template |
+| Display | **`0.06em`** | 2.06px at 2.15rem | `/card/` on screen and 25pt in print |
+
+**Raster — absolute, ruled 2026-08-15.** Every generated mark carries a **1.8px** gap.
+
+| Generator | Mark size | Expressed as | Gap |
+|---|---|---|---|
+| `generate_site_og.py` | 20px | `0.09em` | 1.80px |
+| `generate_og.py` | 30px | `0.06em` | 1.80px |
+| `generate_project_card.py` | 30px | `0.06em` | 1.80px |
+
+**All three drew the mark at zero tracking until this ruling**, while every web surface tracked it.
+The same wordmark had two letterforms depending on where it was seen, and the OG image is the
+highest-reach artifact in the system — it renders in every link preview.
+
+**WHY RASTER IS RULED IN PIXELS AND THE WEB IS NOT.** An `em` value exists so tracking scales with
+type size. On the web that is right: type resizes, reflows, and responds to a root font size. **A
+raster mark has no type size to scale with** — the generator fixes it, and the image renders at
+that one size forever. So the thing to rule for raster is the optical gap itself; the em value is
+only how each generator expresses it. That both expressions land on values already ruled for the
+web is confirmation, not the reason.
+
+**A CONSTANT 1.8px ACROSS THE WEB TOO WAS CONSIDERED AND REJECTED ON MEASUREMENT.** It would have
+moved the nav from `0.09em` to `0.129em` and the card from `0.06em` to `0.052em`. The card change
+is invisible — 2.06px to 1.8px on a 182px wordmark. The nav change is not: **1.8px beside 14px
+letterforms is 12.9% of the em, where beside 34px letterforms it is 5.2%.** The eye reads the
+proportion, not the pixel count, which is the entire reason tracking is expressed in em. A constant
+absolute gap makes small type read airy and large type read tight — the opposite of consistent —
+and `0.129em` at 14px sits in the territory the kickers use for uppercase labels.
 
 **Both values are positive, and the sign is the part worth holding.** Two earlier values were
 retired: `-.015em`, carried from the pre-ruling card generator, and a single `+0.033em` that the
@@ -293,12 +328,15 @@ values to preserve and both were wrong.
 - **No font fact exists in `profile.json`.** Nothing watches type; the nav could disagree with this
   register indefinitely and nothing would say so. Not a checker failure — no checker was pointed
   here. Handed as R2.
-- **[confirm/fill] Tracking is undefined between the two ruled sizes.** 14px and display are ruled;
-  the OG generators draw the mark at **20px and 30px** and nothing says which value applies. Not
-  academic: the F-register closed the `generate_site_og.py` question partly on the arithmetic that
-  `+0.033em` at 20px is 0.66px and therefore sub-pixel and safely dropped. **At the ruled `0.09em`
-  that figure is 1.8px** — nearly three times what was dismissed, and no longer sub-pixel. The
-  conclusion may still be right; the reasoning under it does not survive the value change.
+- **~~[confirm/fill] Tracking is undefined between the two ruled sizes.~~ RULED 2026-08-15.** See
+  the raster table above: 1.8px absolute, expressed as `0.09em` at 20px and `0.06em` at 30px. The
+  original finding is worth keeping because of how it was reached — the F-register closed the
+  `generate_site_og.py` question partly on the arithmetic that `+0.033em` at 20px is 0.66px and
+  therefore sub-pixel and safely dropped. **Two things were wrong with that.** The ruled nav value
+  is `0.09em`, not `+0.033em`, so the figure being dismissed was not the ruled one; and at 30px the
+  figure it *did* dismiss is 0.99px, which is not sub-pixel either. **A conclusion can survive its
+  own reasoning being wrong, and this one did not — the generators shipped untracked.** Three
+  generator edits are with the Brand Architect chat.
 - **[confirm/fill] A formal mark spec** — clearspace, minimum sizes, ratios. Deferred until the
   first external use demands it. Decision #15 settles the *face*, not the spec.
 
