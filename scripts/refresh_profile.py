@@ -75,6 +75,7 @@ import json
 import re
 import subprocess
 import sys
+from html.parser import HTMLParser
 import tarfile
 import tempfile
 import time
@@ -789,6 +790,262 @@ def _count_parametrized_files(root: Path) -> int:
     return n
 
 
+# --------------------------------------------------------------------------
+# R2 — the type guard
+# --------------------------------------------------------------------------
+
+class _MarkFinder(HTMLParser):
+    """Elements whose entire text is the mark string, tagged with their class."""
+
+    def __init__(self, mark, selectors):
+        super().__init__(convert_charrefs=True)
+        self.mark, self.selectors = mark, selectors
+        self.stack, self.hits = [], []
+
+    def handle_starttag(self, tag, attrs):
+        self.stack.append((tag, dict(attrs).get("class", "")))
+
+    def handle_startendtag(self, tag, attrs):
+        pass
+
+    def handle_endtag(self, tag):
+        if self.stack:
+            self.stack.pop()
+
+    def handle_data(self, data):
+        # TWO DISCRIMINATORS, BOTH REQUIRED, and each alone produces false
+        # findings on a live surface. THE MARK IS A ROLE, NOT A STRING.
+        #
+        #   text only  -> the blog byline renders the brand name as an author
+        #                 credit in mono on eight files, which the register's
+        #                 Labels row explicitly permits ("the tracked long form
+        #                 beneath a mark ... footers, captions").
+        #   class only -> `.wordmark` is the AIII initiative mark on aiii/ (mono,
+        #                 correct by decision) and was the RNVizion brand mark on
+        #                 rnv-live. Same class, two roles, one surface each.
+        #
+        # A check cannot infer "this is the wordmark" from contents, because the
+        # contents are the brand name either way. Same argument that makes F13's
+        # allowlist honest and an inferred scope a hole.
+        if data.strip() != self.mark or not self.stack:
+            return
+        if self.stack[-1][0] in NON_RENDERING_TAGS:
+            return
+        for _, cls in reversed(self.stack):
+            for c in cls.split():
+                if c in self.selectors:
+                    return self.hits.append((self.stack[-1][0], cls))
+
+
+NON_RENDERING_TAGS = {"title", "script", "style", "meta", "option", "textarea"}
+
+
+def css_declarations(text):
+    """selector -> {property: value}, parsed rather than matched.
+
+    DECLARATIONS, NEVER BYTES. `.logo .dot` exists in four different whitespace
+    formattings across the files that carry it -- identical declarations,
+    identical values, identical order. A byte comparison reports four-way drift
+    where nothing drifted, and a guard that false-fails gets loosened, which is
+    how the real failure gets through.
+
+    COMMENTS ARE STRIPPED FIRST, and that is not tidiness. A CSS comment can
+    carry a colon, and this splits declarations on `:` -- so a rule whose comment
+    explains the rule swallows the first real declaration and the property
+    vanishes. Found by commenting the mark rule on rnv-live and watching the
+    guard report that same mark as undeclared.
+    """
+    text = re.sub(r"/\*.*?\*/", " ", text, flags=re.S)
+    out = {}
+    for m in re.finditer(r"([^{}]+)\{([^{}]*)\}", text):
+        sel = " ".join(m.group(1).split()).split("\n")[-1].strip()
+        decls = {}
+        for d in m.group(2).split(";"):
+            if ":" in d:
+                k, v = d.split(":", 1)
+                decls[k.strip()] = " ".join(v.split())
+        if sel and decls:
+            out.setdefault(sel, {}).update(decls)
+    return out
+
+
+def emitted_token_values(engine):
+    """token name -> value, from the engine's own emitter.
+
+    A page may declare its tokens inline, as the site does, or receive them from
+    a stylesheet generated at deploy time that the page never contains, as
+    rnv-live does. Resolving only against the file would report every rnv-live
+    token as undeclared -- failing on the surface whose tokens are the MOST
+    controlled, precisely because they come from source.
+    """
+    out = {}
+    for surface in ("web", "app", "records"):
+        try:
+            r = subprocess.run([sys.executable, str(engine), "--css", surface],
+                               capture_output=True, text=True, timeout=30)
+        except Exception:
+            return out
+        for m in re.finditer(r"(--rnv-[a-z0-9-]+)\s*:\s*([^;]+);", r.stdout):
+            out[m.group(1)] = m.group(2).strip()
+    return out
+
+
+def _resolve_family(cls, blocks, tokens):
+    """The font-family declared for a class, with one level of var() resolution."""
+    for name in cls.split():
+        for sel, decls in blocks.items():
+            if sel.split()[-1].lstrip(".") == name and "font-family" in decls:
+                fam = decls["font-family"]
+                v = re.match(r"var\((--[a-z0-9-]+)\)", fam)
+                if v:
+                    return tokens.get(v.group(1), v.group(1))
+                return fam
+    return None
+
+
+def _requests_family(text, family):
+    """Does this file actually LOAD the face, by any of the three mechanisms?
+
+    The site requests through a Google Fonts link, rnv-live through an
+    @fontsource npm import, and a self-contained page could use @font-face. All
+    three are the same rule wearing different syntax, which is why this asks the
+    question rather than looking for one shape.
+    """
+    f = family.strip().strip('"\'').lower()
+    for line in text.splitlines():
+        low = line.lower()
+        if f not in low:
+            continue
+        if ("fonts.googleapis.com" in low or "@fontsource" in low
+                or "@font-face" in low or "src:" in low):
+            return True
+    return f in re.sub(r"(?s)<style.*?</style>", " ", text).lower() and (
+        "fonts.googleapis.com" in text.lower() or "@fontsource" in text.lower())
+
+
+def verify_type(cfg, rep, workdir: Path):
+    """R2. Every rendering of the mark uses the mark face, and requests it.
+
+    NOT A `CHECKS` MEMBER, for the same two reasons as verify_tokens. Every one
+    of the fourteen repos names its check groups explicitly, so a new registry
+    key runs on zero surfaces while reading armed in the source. And this is not
+    repo-shaped: it compares surfaces against a register and an emitter, which is
+    verify_facts' shape rather than run_repo's. **Surfaces are discovered** -- any
+    repo that grows an HTML or .astro file is checked from that moment, with no
+    list to update and none to forget.
+
+    WHAT IT CATCHES, in the order the register ranks them:
+
+      1. The mark drawn in a face that is not the mark face. This is the failure
+         with a live example: rnv-live rendered the brand mark in JetBrains Mono
+         at 700 until 2026-08-16, four revisions after decision #15 retired the
+         wordmark from mono, and nothing reported it.
+      2. The mark face drawn but never requested. **The direction matters and it
+         was nearly built backwards.** Loading a face and not drawing it is a
+         wasted request that renders fine -- aiii/ does exactly that, kept
+         deliberately per decision #18. Drawing a face without loading it puts
+         the wordmark in a fallback and is visibly wrong. Arm the second.
+      3. The canonical font link drifting on one page out of the set that shares
+         it. No stored copy: the set defines itself, so there is nothing to go
+         stale. Pages the register exempts are excluded first.
+      4. F13 -- any page redefining `--font-body` away from the body face, which
+         must fail even on an initiative page permitted to *use* another face in
+         its `body` selector. The two conditions read different layers, and a
+         token-only check would pass a page while verifying nothing.
+    """
+    reg = cfg.get("type_register")
+    if not reg:
+        rep.fail("type", "profile.json",
+                 "type_register is absent; the mark face, the mark string and "
+                 "the mark-bearing selectors are all unknown, so no surface was "
+                 "checked. Restore it rather than removing this check")
+        return
+
+    engine = REPO_ROOT / "engine" / "brand.py"
+    if not engine.exists():
+        rep.fail("type", "engine/brand.py",
+                 "not found; token values could not be resolved and no mark was "
+                 "verified")
+        return
+
+    mark_family = reg["mark_family"]
+    mark_string = reg["mark_string"]
+    selectors = set(reg["mark_selectors"]["selectors"])
+    body_family = reg["body_family"]
+    exempt_link = set(reg.get("no_canonical_link", {}).get("paths", []))
+    tokens = emitted_token_values(engine)
+
+    links, checked = {}, 0
+    for name in [r for r in cfg["repos"] if not r.startswith("_")]:
+        root, why = fetch_repo(name, workdir)
+        if root is None:
+            rep.miss("type", name,
+                     f"could not fetch ({why}); no mark on this surface was "
+                     f"verified. {MISS_HINT}")
+            continue
+        for relpath, body in text_files(root):
+            if not relpath.endswith((".html", ".astro")):
+                continue
+            where = f"{name}/{relpath}"
+            blocks = css_declarations(body)
+            local = dict(tokens)
+            for decls in blocks.values():
+                for k, v in decls.items():
+                    if k.startswith("--"):
+                        local[k] = v
+
+            finder = _MarkFinder(mark_string, selectors)
+            try:
+                finder.feed(body)
+            except Exception:
+                rep.warn("type", where, "could not be parsed as markup; no mark "
+                                        "on this file was verified")
+                continue
+
+            for tag, cls in finder.hits:
+                checked += 1
+                fam = _resolve_family(cls, blocks, local)
+                if fam is None:
+                    rep.fail("type", where,
+                             f"<{tag} class=\"{cls}\"> renders the mark and no "
+                             f"font-family is declared for it, so it inherits "
+                             f"whatever the page happens to set")
+                elif mark_family.lower() not in fam.lower():
+                    rep.fail("type", where,
+                             f"<{tag} class=\"{cls}\"> renders the mark in "
+                             f"{fam.split(',')[0].strip()} rather than "
+                             f"{mark_family}")
+                elif not _requests_family(body, mark_family):
+                    rep.fail("type", where,
+                             f"draws {mark_family} and never requests it, so the "
+                             f"mark renders in a fallback face. Loading without "
+                             f"drawing is harmless; this is the other direction")
+
+            if relpath not in exempt_link and not any(
+                    relpath.endswith(e) for e in exempt_link):
+                for m in re.finditer(r"https://fonts\.googleapis\.com/css2\?[^\"'>]+", body):
+                    links.setdefault(m.group(0), []).append(where)
+
+            for sel, decls in blocks.items():
+                if "--font-body" in decls and body_family.lower() not in decls["--font-body"].lower():
+                    rep.fail("type", where,
+                             f"redefines --font-body away from {body_family}. "
+                             f"An initiative page may USE another face in its "
+                             f"body selector; it may not redefine the token")
+
+    if len(links) > 1:
+        ranked = sorted(links.items(), key=lambda kv: -len(kv[1]))
+        for link, pages in ranked[1:]:
+            for pg in pages:
+                rep.fail("type", pg,
+                         f"font link differs from the {len(ranked[0][1])} pages "
+                         f"that share one string; no exemption covers it")
+    if checked == 0:
+        rep.note("type", "-",
+                 "no surface in the ecosystem renders the mark; nothing compared")
+    rep.checks += 1
+
+
 def verify_tokens(cfg, rep, workdir: Path):
     """Every `var(--rnv-*)` on a surface must resolve against what emit_css emits.
 
@@ -1215,6 +1472,7 @@ def main():
             verify_facts(cfg, rep, Path(tmp))
             # Unconditional, not a CHECKS member. See verify_tokens' docstring.
             verify_tokens(cfg, rep, Path(tmp))
+            verify_type(cfg, rep, Path(tmp))
         scanned.append("manifest")
 
     if args.root:
