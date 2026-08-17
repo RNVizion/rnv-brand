@@ -72,21 +72,45 @@ BRAND_GOLD = "#d2bc93"         # brand gold (primary) — never varies across su
 # describes the colour, this note describes the job, and the two read as
 # opposites to anyone meeting the name cold.
 #
-# THE VALUE WAS PROPOSED FOR CHANGE ON 2026-08-17 AND THE PROPOSAL WAS WRONG.
-# The case was that #b19145 sits under its floor everywhere on light: 3.00:1 as
-# accent text, 2.75:1 as a ring on #f5f5f5, 3.00:1 as a fill under white text.
-# Every figure was correct and the conclusion was not, because BRAND_COLORS.md
-# had already ruled the usage: gold FILLS and BOUNDS on light, it does not carry
-# small text alone, and text on gold is #000000 -- which reads 7.01:1 here.
-# Deriving #8c7337 would have moved the ruled pairing from 7.01 down to 4.62 to
-# fix a usage the register forbids. THE VALUE WAS NEVER WRONG; TWO APPS PAINT
-# WHITE ON THE FILL WHERE THE REGISTER RULES BLACK.
+# VALUE CHANGED 2026-08-17: #b19145 -> #8c7337. THE REASON IS NOT "the old value
+# was low", it is that a rounded figure was rounded ACROSS the threshold it was
+# being used to authorise. BRAND_COLORS.md recorded gold-on-white as 3.00:1 and
+# permitted it "large, bold, or paired" on that basis. The true figure is
+# 2.997638:1 -- short of the 3.0 large-text and non-text floors by 0.0024. Every
+# permission built on that row was void, and nothing said so because 3.00 is what
+# a contrast tool DISPLAYS. rnv-color-mcp returns 3.0 for this pair and flags
+# AA_large_text false and AA_ui_components false in the same response. The number
+# was read; the flags were not.
 #
-# The lesson is worth more than the value: the apps were read, a rule was
-# inferred from what they do, and a replacement was derived before the document
-# that governs them was opened. Verify against the artifact that rules, not the
-# artifact that consumes.
-BRAND_DARK_GOLD = "#b19145"    # light-mode surfaces -- see above
+# WHAT #b19145 ACTUALLY DID, measured against each job's own floor:
+#
+#   as TEXT on #ffffff          4.5 floor   2.9976 FAIL  ->  4.5429 pass
+#   as TEXT on #eeeeee          4.5 floor   2.5837 FAIL  ->  3.9156 FAIL (both)
+#   as a BORDER on #ffffff      3.0 floor   2.9976 FAIL  ->  4.5429 pass
+#   as a BORDER on #f5f5f5      3.0 floor   2.7495 FAIL  ->  4.1670 pass
+#   as a FILL, black on it      4.5 floor   7.0055 pass  ->  4.6226 pass
+#   as a FILL, white on it      4.5 floor   2.9976 FAIL  ->  4.5429 pass
+#
+# One job of six, not one done well and three conditionally. The register's own
+# "the border carries the signal" permission fails: a gold border on white is the
+# same 2.9976, and on the window ground 2.7495.
+#
+# THE COST IS REAL AND IS NOT HIDDEN. Black on the fill drops 7.0055 -> 4.6226.
+# That is headroom traded on the one job the old value did well, to bring four
+# failing jobs across. Text on #eeeeee still fails and is still not permitted.
+#
+#   rule    hold hue 42.2 and saturation 43.9%, lower lightness until 4.5:1 on #ffffff
+#   walk    L 0.482 #b19145 2.9976 -> 0.457 #a88941 3.3230 -> 0.432 #9f823e 3.6606
+#           -> 0.407 #957a3a 4.0993 -> 0.382 #8c7337 4.5429
+#   taken   the first step that clears, not the first that looks right
+#
+# TEXT ON GOLD IS STILL BLACK. At the new value black is 4.6226 and white 4.5429,
+# so black remains correct and BRAND_COLORS.md's rule survives the change. Three
+# apps paint white on the fill against that rule; that is a separate fix and it
+# is not what this value change is for.
+#
+# Cross-checked through rnv-color-mcp rather than trusted to arithmetic.
+BRAND_DARK_GOLD = "#8c7337"    # light-mode surfaces -- see above
 BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 
 # ------------------------------------------------- the rest of the register
