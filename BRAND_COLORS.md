@@ -483,6 +483,16 @@ nothing said so, because 3.00 is what a contrast tool *displays*: `rnv-color-mcp
 this pair and flags `AA_large_text: false` and `AA_ui_components: false` in the same response. **The
 number was read and the flags were not.**
 
+**The instrument is being changed as a result, ruled 2026-08-17:** `ratio` returns the value
+unrounded, and `display` shows **three decimals, truncated rather than rounded.** Truncation is the
+part that matters — three decimals alone moves the trap without removing it, since a true 4.4996
+still *rounds* onto 4.500. A figure that can only err toward *fail* cannot authorise a usage the
+value does not support. Routed to the colour chat; the `wcag` flags are unchanged and were always
+correct.
+
+**Every other measured figure in this register was audited for the same problem. None sits within
+0.02 of a WCAG bar**, so nothing else here could have been rounded across one.
+
 `BRAND_DARK_GOLD` moved to **`#8c7337`** on 2026-08-17 as a result. Both columns below, so the
 trade is visible rather than asserted:
 
