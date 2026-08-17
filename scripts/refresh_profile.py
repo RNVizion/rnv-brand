@@ -72,6 +72,7 @@ import argparse
 import fnmatch
 import io
 import json
+import datetime
 import re
 import subprocess
 import sys
@@ -1005,6 +1006,136 @@ def _check_tracking(cls, blocks, expected, selectors):
     return None
 
 
+def _parse_when(raw):
+    """An RFC 9116-style timestamp as an aware datetime, or None.
+
+    Refuses rather than guesses: a date it cannot parse produces a finding, not a
+    skip. "Cannot compare, therefore fine" is how a guard reads armed and
+    enforces nothing, and a date is the one value where that failure is silent
+    for months before it becomes an outage.
+    """
+    if not isinstance(raw, str):
+        return None
+    v = raw.strip().replace("Z", "+00:00")
+    try:
+        dt = datetime.datetime.fromisoformat(v)
+    except ValueError:
+        return None
+    return dt if dt.tzinfo else dt.replace(tzinfo=datetime.timezone.utc)
+
+
+def verify_expiring(cfg, rep, workdir: Path):
+    """Surfaces that go stale on a calendar rather than on a change.
+
+    THE ONLY CHECK HERE THAT COMPARES AGAINST `now`. Everything else in this file
+    asserts that two strings match; this asserts that a date is still comfortably
+    ahead of today, and there is nothing to derive it from -- the file IS the
+    source.
+
+    IT FIRES WHILE THE SURFACE IS STILL CORRECT, and that is the point. A
+    security.txt thirty days from expiry is perfectly valid; warning about it is
+    the whole job, because by the time it is wrong nothing else will ever prompt
+    a refresh. That also makes the scheduled run load-bearing rather than a
+    convenience: an expiring surface goes stale with no commit anywhere, so the
+    Monday cron is the only thing that will ever notice.
+
+    TWO HALVES, AND THE SECOND IS THE ONE THAT GETS FORGOTTEN. Assert the date is
+    ahead of now -- and assert the file's date still matches the manifest's. If
+    the file was refreshed and the manifest was not, that is ordinary drift, and
+    a check that only looked forward would report a comfortable margin against a
+    figure nobody had updated.
+
+    NOT A `CHECKS` MEMBER. Each entry carries its own `repo`, so it is not
+    repo-shaped, and a new registry key would run on zero surfaces until fourteen
+    manifest entries opted in. Unconditional in the facts pass, same dispatch as
+    verify_tokens and verify_type.
+    """
+    block = cfg.get("expiring_surfaces") or {}
+    entries = {k: v for k, v in block.items() if not k.startswith("_")}
+    if not entries:
+        rep.note("expiring", "-",
+                 "expiring_surfaces declares nothing; no dated surface is tracked")
+        rep.checks += 1
+        return
+
+    now = datetime.datetime.now(datetime.timezone.utc)
+    for relpath, spec in sorted(entries.items()):
+        repo = spec["repo"]
+        field = spec["field"]
+        where = f"{repo}/{relpath}"
+
+        declared = _parse_when(spec.get("value"))
+        if declared is None:
+            rep.fail("expiring", "profile.json",
+                     f"expiring_surfaces[{relpath}].value is not a parseable "
+                     f"timestamp, so nothing could be compared against it")
+            continue
+
+        root, why = fetch_repo(repo, workdir)
+        if root is None:
+            rep.miss("expiring", repo,
+                     f"could not fetch ({why}); {relpath} was not checked for "
+                     f"expiry. {MISS_HINT}")
+            continue
+
+        page = root / relpath
+        if not page.exists():
+            rep.fail("expiring", where,
+                     f"does not exist; the {field} this manifest tracks could "
+                     f"not be read. If the file moved, move the entry in the "
+                     f"same change")
+            continue
+
+        body = page.read_text(encoding="utf-8", errors="ignore")
+        found = None
+        for line in body.splitlines():
+            if line.strip().lower().startswith(f"{field.lower()}:"):
+                found = line.split(":", 1)[1].strip()
+                break
+        if found is None:
+            rep.fail("expiring", where,
+                     f"carries no {field} field; RFC 9116 requires one and the "
+                     f"manifest tracks it, so the surface has no expiry to check")
+            continue
+
+        actual = _parse_when(found)
+        if actual is None:
+            rep.fail("expiring", where,
+                     f"{field} is {found!r}, which is not a parseable timestamp")
+            continue
+
+        # HALF TWO, FIRST: a comfortable margin measured against a stale figure
+        # is a comfortable margin against nothing.
+        if actual != declared:
+            rep.fail("expiring", where,
+                     f"{field} reads {actual.date()} and the manifest declares "
+                     f"{declared.date()}. One of them was refreshed and the "
+                     f"other was not; fix the manifest rather than the file if "
+                     f"the surface is the newer one")
+            continue
+
+        days = (actual - now).days
+        if days < 0:
+            rep.fail("expiring", where,
+                     f"{field} passed {abs(days)} days ago on {actual.date()}. "
+                     f"The surface is live and expired")
+        elif days <= spec["fail_days"]:
+            rep.fail("expiring", where,
+                     f"{field} is {days} days away on {actual.date()}, inside "
+                     f"the {spec['fail_days']}-day floor. Refresh it now")
+        elif days <= spec["warn_days"]:
+            rep.warn("expiring", where,
+                     f"{field} is {days} days away on {actual.date()}, inside "
+                     f"the {spec['warn_days']}-day window. Still valid, which is "
+                     f"why this fires now rather than later")
+        else:
+            rep.note("expiring", where,
+                     f"{field} is {days} days away on {actual.date()}; the "
+                     f"{spec['warn_days']}-day window opens "
+                     f"{(actual - datetime.timedelta(days=spec['warn_days'])).date()}")
+    rep.checks += 1
+
+
 def verify_threshold_prose(cfg, rep, workdir: Path):
     """The eval gates as PRINTED on the resume page, against the manifest.
 
@@ -1671,6 +1802,7 @@ def main():
             verify_tokens(cfg, rep, Path(tmp))
             verify_type(cfg, rep, Path(tmp))
             verify_threshold_prose(cfg, rep, Path(tmp))
+            verify_expiring(cfg, rep, Path(tmp))
         scanned.append("manifest")
 
     if args.root:
