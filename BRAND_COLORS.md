@@ -3,7 +3,17 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-15 (rev 15 — **hex notation is lowercase**, recorded below under names and
+Last locked: 2026-08-17 (rev 16 — **`BRAND_DARK_GOLD` moved from `#b19145` to `#8c7337`, and the
+reason is a rounding rather than a redesign.** This register read gold-on-white as 3.00:1 and
+granted permissions on that figure. The true value is **2.997638** — under the 3.0 large-text and
+non-text floors by 0.0024 — so every permission below the fill row was void. The old value passed
+**one of six** jobs, not one well and three conditionally: its own "the border carries the signal"
+clause failed, because a gold border on white *is* that same 2.9976. Nothing caught it because 3.00
+is what a contrast tool **displays** — `rnv-color-mcp` returns `3.0` for this pair and flags
+`AA_large_text: false` in the same response, and the number was read while the flags were not. The
+constants are also renamed to **`BRAND_GOLD`** and **`BRAND_DARK_GOLD`** in every repo including
+`engine/brand.py`, retiring the "identifiers are local by design" rule. rev 15 — **hex notation is
+lowercase**, recorded below under names and
 values; applied across the five desktop apps on 2026-08-15 and already true in `brand.py`.
 **The ring's boundary figures drop to one decimal** and carry their display condition: the
 two-decimal forms claimed a precision the estimate does not have, and the two files that held
@@ -98,7 +108,7 @@ tool primitives, or one product's call.
 | Color | Hex | RGB | Canonical use |
 |---|---|---|---|
 | Brand gold | `#d2bc93` | 210, 188, 147 | **The accent on black and dark surfaces.** Site, social, OG cards, wordmark, every app's dark theme |
-| Dark gold | `#b19145` | 177, 145, 69 | **The accent on light surfaces.** Every app's light theme; also gold's shade on dark, where full gold is too loud |
+| Brand dark gold | `#8c7337` | 140, 115, 55 | **The accent on light surfaces.** Every app's light theme; also gold's shade on dark, where full gold is too loud. Was `#b19145` until 2026-08-17 — the contrast table below records why it moved and what it cost |
 
 **The split is confirmed by the code, not just declared.** `#b19145` appears zero times on
 rnvizion.dev and zero times in the corpus Space — both all-dark surfaces, both gold-only.
@@ -466,19 +476,50 @@ whichever app shows warnings on a light surface.
 Everything else leaves usage to the surface. This one stays because it protects the identity
 color from being used where it stops reading.
 
-| Usage | Ratio | Reading |
-|---|---|---|
-| Black on a `#b19145` fill | 7.01:1 | Strong; gold's best job on light |
-| `#b19145` paired with a border or underline | — | Fine; the border carries the signal |
-| `#b19145` text on `#ffffff` | 3.00:1 | At the line; acceptable large, bold, or paired |
-| `#b19145` text on `#eeeeee` | 2.58:1 | Thin |
-| `#b19145` text on `#e0e0e0` | 2.27:1 | Don't |
+**THIS TABLE WAS WRONG AND THE ERROR WAS ONE ROUNDING.** It read `#b19145` on `#ffffff` as
+**3.00:1** and granted permissions on that figure. The true value is **2.997638:1** — short of the
+3.0 large-text and non-text floors by 0.0024. Every permission below the fill row was void, and
+nothing said so, because 3.00 is what a contrast tool *displays*: `rnv-color-mcp` returns `3.0` for
+this pair and flags `AA_large_text: false` and `AA_ui_components: false` in the same response. **The
+number was read and the flags were not.**
 
-**On light, gold fills and bounds; it doesn't carry small text alone.** Existing usage mostly
-complies already — selected tabs pair gold with an underline, hover buttons with a border,
-pressed states use gold as the fill with black on top.
+`BRAND_DARK_GOLD` moved to **`#8c7337`** on 2026-08-17 as a result. Both columns below, so the
+trade is visible rather than asserted:
 
-Text on gold is `#000000` on both surfaces: black on `#b19145` is 7.01:1, white is 3.00:1.
+| Usage | Floor | `#b19145` | `#8c7337` |
+|---|---|---|---|
+| Black on the fill | 4.5:1 | **7.0055** pass | **4.6226** pass |
+| Gold as a border on `#ffffff` | 3:1 | **2.9976 FAIL** | 4.5429 pass |
+| Gold as a border on `#f5f5f5` | 3:1 | **2.7495 FAIL** | 4.1670 pass |
+| Gold as text on `#ffffff` | 4.5:1 | **2.9976 FAIL** | 4.5429 pass |
+| White on the fill | 4.5:1 | **2.9976 FAIL** | 4.5429 pass |
+| Gold as text on `#eeeeee` | 4.5:1 | **2.5837 FAIL** | **3.9156 FAIL** |
+| Gold as text on `#e0e0e0` | 4.5:1 | **2.2700 FAIL** | **3.4400 FAIL** |
+
+**One job of six passed under the old value, not one strongly and three conditionally.** The
+"paired with a border or underline" permission failed on its own terms: if gold *is* the border, it
+is the same 2.9976 on panel and 2.7495 on the window ground.
+
+**The cost is real and is not hidden.** Black on the fill drops 7.0055 → 4.6226 — headroom traded
+on the one job the old value did well, to bring four failing jobs across. The last two rows still
+fail and are still not permitted.
+
+**On light, gold fills, bounds and — as of the value change — carries text.** The old rule existed
+because the old value could not carry text; it could not carry a border either, which the rule did
+not know.
+
+**TEXT ON GOLD IS STILL `#000000`.** At `#8c7337`, black is 4.6226 and white is 4.5429. Black stays
+correct and this rule survives the value change untouched. **Three apps paint white on the gold fill
+against it** — `rnv-icon-builder`, `rnv-color-picker` and `rnv-text-transformer` — and that is a
+separate fix, not something the value change licenses.
+
+**A third artifact carried a fourth version of this.** `rnv-text-transformer/docs/RNV_Brand_Color_System.md`
+holds its own contrast table: six of seven rows wrong, five understating harmlessly and one
+overstating. It reads `#b19145` / `#ffffff` as **4.0:1, "AA (large text)"** and calls gold-on-white
+"sufficient contrast" with none of this register's conditions. **The code implements the doc**:
+`accent_text` and `selection_text` are `#ffffff` in that repo's light palette, the second reaching
+eight widget classes. That is not drift from this register — it is a false number in a repo's own
+document, faithfully followed. **A wrong figure with a citation outranks a right one without.**
 
 ---
 
