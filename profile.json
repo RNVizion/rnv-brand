@@ -159,11 +159,20 @@
     }
   },
   "eval_thresholds": {
-    "_comment": "The three gates. Declared in rnv-ask-the-corpus/eval/thresholds.json and quoted on the resume; the checker verifies the two agree. COVERAGE GAP, recorded 2026-08-09 rather than assumed away: resume/index.html prints all three percentages and repos['rnvizion.github.io'].checks does NOT include 'thresholds', so the site copy is declared here and verified nowhere. Values match today; a change to thresholds.json would go stale on that page silently. 'thresholds' is deliberately NOT added to that repo's checks -- the dispatch looks for eval/thresholds.json, which the site repo does not have, so it would fail spuriously. The real fix is a check that reads the printed percentages off the page; tooling chat.",
+    "_comment": "The three gates. Declared in rnv-ask-the-corpus/eval/thresholds.json, carried here, and quoted in prose on the resume page. check_thresholds verifies this manifest against the source file; verify_threshold_prose verifies the page against this manifest, so the chain runs source -> manifest -> surface with no unverified hop. CLOSED 2026-08-16, and the original note here was wrong about why: it said adding 'thresholds' to the site repo would 'fail spuriously' because the dispatch looks for eval/thresholds.json. It would not fail -- check_thresholds returns early on a missing file, so it would run, find nothing, and PASS having verified nothing. Quieter and worse than the failure predicted, and the reason the fix is a separate check rather than an extra entry in a checks array.",
     "retrieval_accuracy": 85.0,
     "ooc_refusal_accuracy": 90.0,
     "false_refusal_rate": 10.0,
     "source_of_truth": "rnv-ask-the-corpus/eval/thresholds.json",
+    "prose": {
+      "_comment": "THE NEEDLE IS THE PHRASE, NOT THE NUMBER, and the direction word is the reason. `85%` matches anything on the page, and flipping 'at or above' to 'at or below' leaves the number intact while inverting the gate -- the value would still agree and the sentence would be a lie. {value} is substituted from the figure above, so the phrase and the value cannot drift apart here the way they can in prose. A phrase that no longer matches is a FAILURE and not a skip: it means the page was reworded, and a check that quietly stops finding its needle is a check that verifies nothing while reporting clean.",
+      "surface": "rnvizion.github.io/resume/index.html",
+      "phrases": {
+        "retrieval_accuracy": "retrieval accuracy at or above {value}%",
+        "ooc_refusal_accuracy": "out-of-corpus refusal at or above {value}%",
+        "false_refusal_rate": "false-refusal rate at or below {value}%"
+      }
+    },
     "appears_in": [
       "rnvizion.github.io",
       "rnv-ask-the-corpus"
