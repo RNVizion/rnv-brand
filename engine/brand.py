@@ -22,9 +22,16 @@ adding a ramp step is not.
 
 Consumers mirror, they do not import. Each repo carries its own copy of the
 values it needs, sourced from here and corrected when drift is detected, so a
-program is never one network call away from knowing its own colors. Identifiers
-are local by design (BRAND_GOLD in the MCP mirror, GOLD here); the drift check
-compares values, never names.
+program is never one network call away from knowing its own colors. The drift
+check still compares values, never names.
+
+IDENTIFIERS ARE NO LONGER LOCAL BY DESIGN -- retired 2026-08-17. That rule let a
+mirror name a value whatever suited it, on the grounds that only values were
+canonical, and it produced four conventions for one colour across six repos:
+BRAND_GOLD_DARK in three apps, _GOLD_BRAND in the mixer, bare literals in the
+transformer, and DARK_GOLD here. The names are BRAND_GOLD and BRAND_DARK_GOLD
+everywhere now, this file included. A brand system that cannot hold one
+identifier across its own repos is not positioned to align anyone else's.
 """
 
 # ---------------------------------------------------------- canonical trio
@@ -60,8 +67,26 @@ compares values, never names.
 #
 # NOTHING CAUGHT THE DAY THE TWO SIDES DISAGREED. Not a checker failure -- no
 # checker was ever pointed at notation. Same shape as type before R2.
-GOLD = "#d2bc93"         # brand gold (primary) — never varies across surfaces
-DARK_GOLD = "#b19145"    # dark gold (light-mode accent)
+BRAND_GOLD = "#d2bc93"         # brand gold (primary) — never varies across surfaces
+# FOR LIGHT-MODE SURFACES. It is darker BECAUSE the ground is lighter -- the name
+# describes the colour, this note describes the job, and the two read as
+# opposites to anyone meeting the name cold.
+#
+# THE VALUE WAS PROPOSED FOR CHANGE ON 2026-08-17 AND THE PROPOSAL WAS WRONG.
+# The case was that #b19145 sits under its floor everywhere on light: 3.00:1 as
+# accent text, 2.75:1 as a ring on #f5f5f5, 3.00:1 as a fill under white text.
+# Every figure was correct and the conclusion was not, because BRAND_COLORS.md
+# had already ruled the usage: gold FILLS and BOUNDS on light, it does not carry
+# small text alone, and text on gold is #000000 -- which reads 7.01:1 here.
+# Deriving #8c7337 would have moved the ruled pairing from 7.01 down to 4.62 to
+# fix a usage the register forbids. THE VALUE WAS NEVER WRONG; TWO APPS PAINT
+# WHITE ON THE FILL WHERE THE REGISTER RULES BLACK.
+#
+# The lesson is worth more than the value: the apps were read, a rule was
+# inferred from what they do, and a replacement was derived before the document
+# that governs them was opened. Verify against the artifact that rules, not the
+# artifact that consumes.
+BRAND_DARK_GOLD = "#b19145"    # light-mode surfaces -- see above
 BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 
 # ------------------------------------------------- the rest of the register
@@ -75,8 +100,8 @@ WEB_BLACK = "#0a0a0f"    # rnvizion.dev ground; social and OG base
 # The six the brand commits to. Gold on dark, dark gold on light; dark gold is
 # additionally gold's shade on dark, where full gold is too loud.
 PERMANENT = {
-    "gold": GOLD,
-    "dark-gold": DARK_GOLD,
+    "gold": BRAND_GOLD,
+    "dark-gold": BRAND_DARK_GOLD,
     "charcoal": BRAND_BLACK,
     "black": TRUE_BLACK,
     "web-black": WEB_BLACK,
@@ -105,8 +130,8 @@ APP = {
     "border": "#333333",
     "text": "#e0e0e0",
     "text-dim": "#aaaaaa",
-    "accent": GOLD,
-    "accent-light-mode": DARK_GOLD,
+    "accent": BRAND_GOLD,
+    "accent-light-mode": BRAND_DARK_GOLD,
     "text-on-gold": TRUE_BLACK,
 }
 
@@ -125,7 +150,7 @@ WEB = {
     "text": "#e8e8f0",
     "text-dim": "#9a9ab0",
     "text-faint": "#5a5a72",
-    "accent": GOLD,
+    "accent": BRAND_GOLD,
     "accent-violet": "#b794ff",  # secondary, sparing
     "accent-warm": "#ffd166",    # secondary, sparing
     # ---- signals ---------------------------------------------------------
@@ -250,8 +275,8 @@ RECORDS = {
     "ink": "#e7e3d8",          # body, headings, names
     "ink-mute": "#9b978c",     # bylines, definitions, footer links
     "ink-faint": "#6f6c64",    # kickers and small labels ONLY — see above
-    "accent": GOLD,
-    "gold-dim": _rgba(GOLD, GOLD_DIM_ALPHA),
+    "accent": BRAND_GOLD,
+    "gold-dim": _rgba(BRAND_GOLD, GOLD_DIM_ALPHA),
 }
 
 # ---------------------------------------------------------- status (app)
@@ -302,7 +327,7 @@ STATUS = {
     #   4.58:1 on APP card, 5.55 panel, 6.70 window -- AA normal text passes.
     #   3.13:1 on white -- AA normal text FAILS, which is why `error` above
     #   stays as-is for light mode. This is a dark-theme value, not a
-    #   replacement. Same shape as GOLD / DARK_GOLD: one colour, two grounds.
+    #   replacement. Same shape as BRAND_GOLD / BRAND_DARK_GOLD: one colour, two grounds.
     #   CIEDE2000 25.92 from signal-live, "clearly different" -- the error text
     #   and the live wine cannot be confused, which was the open question when
     #   red was chosen for the live signal.
@@ -393,12 +418,12 @@ RNV_BRAND = {
     "brand black": BRAND_BLACK,
     "rnv black": BRAND_BLACK,
     "charcoal": BRAND_BLACK,
-    "gold": GOLD,
-    "brand gold": GOLD,
-    "rnv gold": GOLD,
-    "dark gold": DARK_GOLD,
-    "gold dark": DARK_GOLD,
-    "light-mode gold": DARK_GOLD,
+    "gold": BRAND_GOLD,
+    "brand gold": BRAND_GOLD,
+    "rnv gold": BRAND_GOLD,
+    "dark gold": BRAND_DARK_GOLD,
+    "gold dark": BRAND_DARK_GOLD,
+    "light-mode gold": BRAND_DARK_GOLD,
     "black": TRUE_BLACK,
     "true black": TRUE_BLACK,
     "white": WHITE,
@@ -413,11 +438,17 @@ def tokens(surface: str = "web") -> dict[str, str]:
     if surface not in palettes:
         raise ValueError("surface must be 'web', 'app', or 'records'")
     return {
-        "gold": GOLD,
-        "gold-dark": DARK_GOLD,
+        "gold": BRAND_GOLD,
+        # `dark-gold`, matching PERMANENT and the constant. This file carried
+        # THREE word orders for one colour until 2026-08-17 -- DARK_GOLD the
+        # constant, "dark-gold" in PERMANENT, "gold-dark" emitted. Safe to move:
+        # rnv-live consumed --rnv-gold-dark zero times, verified before landing,
+        # and nothing else reads this namespace. verify_tokens catches it if that
+        # ever stops being true.
+        "dark-gold": BRAND_DARK_GOLD,
         "black": BRAND_BLACK,
         **palettes[surface],
-        "rule": _rgba(GOLD, RULE_ALPHA),
+        "rule": _rgba(BRAND_GOLD, RULE_ALPHA),
         **{f"status-{name}": value for name, value in STATUS.items()},
         # Reads spec["family"], not the value, since TYPE became a dict of dicts
         # on 2026-08-15. The emitted token name and string are unchanged for the
