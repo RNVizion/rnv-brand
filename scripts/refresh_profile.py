@@ -1005,6 +1005,87 @@ def _check_tracking(cls, blocks, expected, selectors):
     return None
 
 
+def verify_threshold_prose(cfg, rep, workdir: Path):
+    """The eval gates as PRINTED on the resume page, against the manifest.
+
+    THE HOP THIS CLOSES. `check_thresholds` verifies the manifest against
+    rnv-ask-the-corpus/eval/thresholds.json, so source and manifest agree. The
+    page then quotes all three gates in prose and nothing compared them, so the
+    chain ran source -> manifest -> (nothing) -> surface. Raise a gate in
+    thresholds.json and the page keeps advertising the old bar, correctly
+    formatted, indefinitely.
+
+    WHY NOT ADD `thresholds` TO THE SITE REPO'S CHECK GROUPS. The manifest's own
+    comment said that would "fail spuriously" because the dispatch looks for
+    eval/thresholds.json, which the site does not have. **It would not fail.**
+    check_thresholds returns early on a missing file, so it would run, find
+    nothing and PASS -- verifying nothing while reporting clean. That is quieter
+    and worse than the failure predicted, and it is why this is a separate check
+    rather than one more entry in a checks array.
+
+    THE NEEDLE IS THE PHRASE, NOT THE NUMBER. `85%` matches anything on a page.
+    More to the point, flipping "at or above" to "at or below" leaves the number
+    intact and inverts the gate: the value agrees and the sentence is a lie. The
+    phrase carries the direction word, and {value} is substituted from the
+    manifest so phrase and figure cannot drift apart in the config the way they
+    can in prose.
+    """
+    et = cfg.get("eval_thresholds", {})
+    prose = et.get("prose")
+    if not prose:
+        rep.fail("thresholds", "profile.json",
+                 "eval_thresholds.prose is absent; the printed gates were not "
+                 "compared against anything")
+        return
+
+    surface = prose["surface"]
+    phrases = {k: v for k, v in prose["phrases"].items() if not k.startswith("_")}
+    repo, _, relpath = surface.partition("/")
+
+    root, why = fetch_repo(repo, workdir)
+    if root is None:
+        rep.miss("thresholds", repo,
+                 f"could not fetch ({why}); the printed gates were not verified. "
+                 f"{MISS_HINT}")
+        return
+
+    page = root / relpath
+    if not page.exists():
+        # An early return here would be a check that reads armed: the page moved
+        # or was renamed, and reporting nothing looks identical to agreeing.
+        rep.fail("thresholds", surface,
+                 "does not exist; the gates it is supposed to print were not "
+                 "compared. If the page moved, move eval_thresholds.prose.surface "
+                 "in the same change")
+        return
+
+    body = page.read_text(encoding="utf-8", errors="ignore")
+    flat = " ".join(body.split())
+    for gate, template in sorted(phrases.items()):
+        if gate not in et:
+            rep.fail("thresholds", "profile.json",
+                     f"eval_thresholds.prose names {gate}, which is not a gate "
+                     f"in eval_thresholds; nothing will ever be compared for it")
+            continue
+        value = et[gate]
+        needle = template.format(value=int(value) if float(value).is_integer() else value)
+        if needle.lower() not in flat.lower():
+            rep.fail("thresholds", surface,
+                     f"does not print \"{needle}\". Either the figure moved and "
+                     f"the page did not, or the page was reworded and this check "
+                     f"has stopped finding its needle -- both matter, and the "
+                     f"second one is the quiet failure")
+    for gate in sorted(et):
+        if gate.startswith("_") or gate in ("source_of_truth", "appears_in", "prose"):
+            continue
+        if gate not in phrases:
+            rep.fail("thresholds", "profile.json",
+                     f"eval_thresholds carries {gate} and eval_thresholds.prose "
+                     f"rules no phrase for it, so that gate is verified against "
+                     f"the source and never against the page")
+    rep.checks += 1
+
+
 def verify_type(cfg, rep, workdir: Path):
     """R2. Every rendering of the mark uses the mark face, and requests it.
 
@@ -1589,6 +1670,7 @@ def main():
             # Unconditional, not a CHECKS member. See verify_tokens' docstring.
             verify_tokens(cfg, rep, Path(tmp))
             verify_type(cfg, rep, Path(tmp))
+            verify_threshold_prose(cfg, rep, Path(tmp))
         scanned.append("manifest")
 
     if args.root:
