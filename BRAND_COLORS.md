@@ -3,7 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-17 (rev 16 — **`BRAND_DARK_GOLD` moved from `#b19145` to `#8c7337`, and the
+Last locked: 2026-08-17 (rev 17 — **the derivation rule is published, and a hole is named.** Three
+applications derived `-14` from the same base independently; `rnv-color-picker` pointed out that
+**three apps agreeing is luck, not design**, and that an unpublished derivation permits four *values*
+for one colour — worse than four names, because a wrong value is invisible in a diff.
+`engine/brand.py` now carries `lighten()` and both derivatives with their walks. **Dark-mode pressed
+is recorded as OPEN**, since the two apps disagree and it is a design question rather than a
+measurement. **And there is no light-mode error text:** `#dc3545` reads 4.1528 on a light panel, and
+`error-text` is a dark-theme value that would make it *worse*. rev 16 — **`BRAND_DARK_GOLD` moved from `#b19145` to `#8c7337`, and the
 reason is a rounding rather than a redesign.** This register read gold-on-white as 3.00:1 and
 granted permissions on that figure. The true value is **2.997638** — under the 3.0 large-text and
 non-text floors by 0.0024 — so every permission below the fill row was void. The old value passed
@@ -493,6 +500,127 @@ correct.
 **Every other measured figure in this register was audited for the same problem. None sits within
 0.02 of a WCAG bar**, so nothing else here could have been rounded across one.
 
+---
+
+### The table above was still incomplete, and the gap was structural
+
+`rnv-text-transformer` found it in implementation: **the table measures gold as a *border* on
+`#f5f5f5` and never as *text* on `#f5f5f5`.** Same pair, different floor — 4.1670 clears 3:1 and
+fails 4.5:1. That app was doing it in seven places: group box titles, tab labels, button hover
+labels, status text, tip text, the current line number.
+
+**Rows are now per surface, not per usage.** The question an app asks is never *"may gold be text?"*
+— it is *"may gold be text **here**."*
+
+| ground | `BRAND_DARK_GOLD` `#8c7337` as text | `BRAND_DARK_GOLD_DEEP` `#7e6529` as text |
+|---|---|---|
+| `#ffffff` | **4.5429 pass** | 5.5547 pass |
+| `#fafafa` | 4.3525 fail | 5.3217 pass |
+| `#f5f5f5` | 4.1670 fail | 5.0949 pass |
+| `#eeeeee` | 3.9156 fail | 4.7875 pass |
+| `#e8e8e8` | 3.7078 fail | **4.5334 pass** |
+| `#e0e0e0` | 3.4414 fail | 4.2078 fail |
+| `#d0d0d0` | 2.9440 fail | 3.6013 fail |
+
+**Below `#e8e8e8`, gold does not carry text.** A ruling, not a missing value.
+
+### Two jobs are mutually exclusive, so a second value is structural
+
+At the 4.5:1 floor, as luminance bands:
+
+```
+gold as a FILL with black text     needs  L >= 0.17500
+gold as TEXT on #ffffff            needs  L <= 0.18333   overlap, 0.0083 wide
+gold as TEXT on #f5f5f5            needs  L <= 0.16402   no overlap
+gold as TEXT on #e8e8e8            needs  L <= 0.14043   no overlap
+```
+
+`#8c7337` sits at **L 0.18113**, inside the only band that exists — and that band exists on pure
+white alone. **No single value can carry text on `#f5f5f5` or darker and also take black as a
+fill.** This forecloses a fourth revision of the value.
+
+**And the derivative hits the same wall one step down.** Covering `#d0d0d0` needs −29 → `#6f561a`,
+which clears that ground at 4.5054 and then fails black-on-fill at **3.0219**.
+
+### The unit of audit is the pairing, not the value
+
+Every failure in this section has a **correct value on both sides**. `#8c7337` is the ruled gold and
+`#f5f5f5` is the ruled surface. **A value census reports it clean** — as every census to date has,
+including ones widened to RGB tuples and 8-digit `#AARRGGBB`.
+
+The guard that catches them walks the generated stylesheets, **resolves each foreground against its
+real background**, applies the floor, and carries an `ACCEPTED` dict where every exception names its
+reason — with a companion test that fails when an entry goes stale. `rnv-text-transformer` shipped it
+in roughly forty lines. **That is the ecosystem guard, not another value sweep.**
+
+### The derivation rule, published 2026-08-17
+
+**The brand holds two golds per mode and derives the rest.** That is the intended structure and a
+third registered gold is the wrong fix. What was missing was the **rule**.
+
+```python
+lighten(color, step)   # uniform per-channel, clamped 0-255. Holds hue exactly.
+
+BRAND_DARK_GOLD_DEEP = lighten(BRAND_DARK_GOLD, -14)   # #7e6529  light-mode TEXT
+BRAND_GOLD_HOVER     = lighten(BRAND_GOLD,       13)   # #dfc9a0  dark-mode HOVER
+```
+
+**Published because three applications derived the same value independently** — `rnv-text-transformer`,
+`rnv-icon-builder` and `rnv-color-picker` each arrived at `-14` from the same base. As
+`rnv-color-picker` put it: **three apps agreeing is luck, not design.** Nothing anywhere would have
+caught a fourth picking `-13`.
+
+**An unpublished derivation permits four *values* for one colour, which is worse than four names** —
+a wrong name is visible in a diff and a wrong value is not. Same shape as the
+`BRAND_GOLD_DARK` → `BRAND_DARK_GOLD` rename, one level down.
+
+**Light pressed is an alias, not a value.** No darker pressed shade keeps black text on light.
+
+**Dark pressed is OPEN and this register does not rule it.** `rnv-text-transformer` derives
+`lighten(BRAND_GOLD, -23)`; `rnv-color-picker` returns pressed to the accent in both modes. Both are
+legible as fills — black reads 8.79 on the derivative and 11.35 on the accent — so it is not a
+contrast question but whether a pressed state must be *visibly distinct*. Until ruled, either is
+permitted and an app should say which. **Hand-writing the value is not.**
+
+**Hand-written variants are what this replaces.** They existed in every app as literals and **no two
+agreed on method**: `#dcc9a3` at `+10/+13/+16`, `#b7a480` at `−27/−24/−19`, both hue-shifting,
+because non-uniform steps do not hold hue. One of them, `#c4a458`, was a tint of a gold **already
+retired** — orphaned, still rendering, nothing to flag it. **No contrast check would have: an
+orphaned gold can be perfectly legible.**
+
+### There is no light-mode error text, and that is now named
+
+`STATUS["error"]` `#dc3545` is a **fill** colour. As text on a light panel it does not clear:
+
+| ground | `#f44336` retired | `#dc3545` ruled | `#e56b77` error-text |
+|---|---|---|---|
+| `#f5f5f5` light panel | 3.3777 fail | **4.1528 fail** | **2.8745 fail** |
+| `#ffffff` | 3.6824 fail | 4.5275 pass | 3.1338 fail |
+| `#1a1a1a` dark panel | 4.7263 pass | 3.8441 fail | 5.5537 pass |
+| `#2a2a2a` APP card | 3.8978 fail | 3.1703 fail | 4.5801 pass |
+
+**`error-text` is a dark-theme value and applying it to a light panel makes things worse** — 2.8745
+against the 3.3777 an app already had. **That advice was given in a handoff note and was wrong.** The
+4.58 was measured on the APP card and the 3.84 on the dark panel: both real, **neither the ground the
+app draws on.**
+
+**The decision is open.** Either rule a light-mode error text — `#d42d3d` measures 4.5406 on
+`#f5f5f5` and 4.9503 on `#ffffff`, by the same downward walk that produced `error-text` — or rule
+explicitly that error text on a light panel is out of scope, **so apps stop carrying an open
+exemption for it.** The apps need to know which way it goes more than they need a particular answer.
+
+### Hover moves *away* from the ground, in both modes
+
+| | ground | accent | hover | direction |
+|---|---|---|---|---|
+| dark | `#1a1a1a` | `#d2bc93` | `#dfc9a0` | lighter |
+| light | `#f5f5f5` | `#8c7337` | `#7e6529` | **deeper** |
+
+Stated as *away from the ground*, it is one rule for both modes. Stated as *"lighter tint for hover
+feedback"* — which is what the apps' local docs said — it is **wrong half the time**. The old light
+hover went lighter on a light ground, which is why white on it measured 2.3868. **Expect this in
+every app with a light mode; it is inherited, not introduced.**
+
 `BRAND_DARK_GOLD` moved to **`#8c7337`** on 2026-08-17 as a result. Both columns below, so the
 trade is visible rather than asserted:
 
@@ -518,7 +646,13 @@ fail and are still not permitted.
 because the old value could not carry text; it could not carry a border either, which the rule did
 not know.
 
-**TEXT ON GOLD IS STILL `#000000`.** At `#8c7337`, black is 4.6226 and white is 4.5429. Black stays
+**TEXT ON GOLD: BLACK IS PREFERRED, WHITE IS PERMITTED WHERE IT SERVES A DELIBERATE INVERSION.**
+At `#8c7337`, black is 4.6226 and white is 4.5429 — **both clear the 4.5 floor.** Black remains the
+default and the better number. **The condition is the value:** at `#b19145` white measured 2.9976
+and was *not* permitted, which was a compliance failure rather than a style choice. Ruled at the
+request of `rnv-text-transformer`, which asked rather than choosing silently.
+
+At `#8c7337`, black is 4.6226 and white is 4.5429. Black stays
 correct and this rule survives the value change untouched. **Three apps paint white on the gold fill
 against it** — `rnv-icon-builder`, `rnv-color-picker` and `rnv-text-transformer` — and that is a
 separate fix, not something the value change licenses.
