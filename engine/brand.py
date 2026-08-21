@@ -111,6 +111,88 @@ BRAND_GOLD = "#d2bc93"         # brand gold (primary) — never varies across su
 #
 # Cross-checked through rnv-color-mcp rather than trusted to arithmetic.
 BRAND_DARK_GOLD = "#8c7337"    # light-mode surfaces -- see above
+
+
+def lighten(color: str, step: int) -> str:
+    """Raise every channel by `step`, clamped to 0-255. Negative darkens.
+
+    A UNIFORM PER-CHANNEL STEP, which holds hue exactly -- #8c7337 and its -14
+    derivative both measure 42.4 degrees. It is also the relationship the light
+    palettes have always used between accent and hover tint (#b19145 -> #c4a458
+    is +19 on every channel), so this is the house method rather than an import.
+
+    Lifted here from rnv-text-transformer, where it was written first. It is in
+    the register because three applications derived the same value from the same
+    base with the same step, independently -- and nothing anywhere would have
+    caught a fourth picking -13.
+    """
+    c = color.lstrip("#")
+    return "#%02x%02x%02x" % tuple(
+        max(0, min(255, int(c[i:i + 2], 16) + step)) for i in (0, 2, 4)
+    )
+
+
+# THE DERIVATION RULE, PUBLISHED SO THE STEP STOPS BEING GUESSED.
+#
+# The brand holds TWO golds per mode and derives the rest. That is the intended
+# structure and a third registered gold is the wrong fix. What was missing is the
+# RULE: three apps agreeing on -14 is luck, not design. An unpublished derivation
+# permits four VALUES for one colour, which is worse than four names -- a wrong
+# name is visible in a diff and a wrong value is not.
+#
+# LIGHT MODE spends its derivative on TEXT. BRAND_DARK_GOLD clears 4.5:1 as text
+# on pure white and on nothing else:
+#
+#   ground     BRAND_DARK_GOLD   -14 derivative
+#   #ffffff        4.5429 pass      5.5547 pass
+#   #f5f5f5        4.1670 FAIL      5.0949 pass
+#   #eeeeee        3.9156 FAIL      4.7875 pass
+#   #e8e8e8        3.7078 FAIL      4.5334 pass   <- binding
+#   #e0e0e0        3.4414 FAIL      4.2078 FAIL
+#
+#   rule    uniform per-channel step, which holds hue exactly
+#   walk    -13 #7f662a 4.4675 on #e8e8e8 -- fails
+#           -14 #7e6529 4.5334 on #e8e8e8 -- clears
+#   taken   the smallest step that clears, not the first that looks right
+#
+# COVERAGE STOPS AT #e8e8e8 and going darker does not extend it: -29 clears
+# #d0d0d0 at 4.5054 and then fails black-on-fill at 3.0219, the same exclusion one
+# step down. BELOW #e8e8e8, GOLD DOES NOT CARRY TEXT. A ruling, not a gap.
+#
+# NOT A FILL. Black on the -14 derivative is 3.7806, under the 4.5 text floor.
+# BRAND_DARK_GOLD remains the fill; this is the text value only.
+#
+# DARK MODE spends its derivative on HOVER, +13, and the evidence there was worse
+# than for light: the variants existed in every app as hand-written literals and
+# NO TWO AGREED ON METHOD. rnv-color-picker held #dcc9a3 (+10/+13/+16) and #b7a480
+# (-27/-24/-19), both hue-shifting, because non-uniform steps do not hold hue.
+#
+# LIGHT PRESSED IS AN ALIAS, NOT A VALUE. No darker pressed shade exists on light
+# that still keeps black text: 18% darker measures 3.37 for black-on-gold, which
+# would force white text and break the text-on-gold rule. Pressed is the accent.
+#
+# DARK PRESSED IS OPEN, AND THE TWO APPS DISAGREE. Recorded rather than ruled,
+# because it is a design question and not a measurement:
+#
+#   rnv-text-transformer  GOLD_PRESSED = lighten(BRAND_GOLD, -23) -> #bba57c
+#   rnv-color-picker      pressed returns to the accent in both modes
+#
+# Both are legible as fills -- black reads 8.79 on the derivative and 11.35 on the
+# accent -- so this is not a contrast question. It is whether a pressed state
+# needs to be visibly distinct, and by how much:
+#
+#   hover vs accent      1.1449:1 apart
+#   accent vs pressed    1.2924:1 apart   (with the -23 derivative)
+#
+# ARGUMENT FOR THREE STEPS: hover and pressed are different interactions, and a
+# pressed control that looks identical to its resting state gives no feedback.
+# ARGUMENT FOR TWO: light already collapses pressed into the accent by necessity,
+# and a dark-only third step means the two modes stop being described by one rule.
+# The register does not rule this yet. Until it does, an app may do either and
+# should say which in a comment. WHAT IT MUST NOT DO IS HAND-WRITE THE VALUE --
+# if it wants a pressed shade, it derives one with lighten().
+BRAND_DARK_GOLD_DEEP = lighten(BRAND_DARK_GOLD, -14)   # -> #7e6529, light-mode TEXT
+BRAND_GOLD_HOVER = lighten(BRAND_GOLD, 13)             # -> #dfc9a0, dark-mode HOVER
 BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 
 # ------------------------------------------------- the rest of the register
