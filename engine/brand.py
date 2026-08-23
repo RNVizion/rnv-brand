@@ -74,12 +74,12 @@ identifier across its own repos is not positioned to align anyone else's.
 #   BRAND_GOLD              the base
 #   BRAND_DARK_GOLD         a named gold -- the light-mode one
 #   BRAND_STILL_GOLD        a named gold -- stillness, registered
-#   BRAND_DOWN_GOLD         a named gold -- degraded, derived by rule
+#   BRAND_STANDBY_GOLD         a named gold -- degraded, derived by rule
 #   BRAND_HOVER_GOLD        a named gold -- dark-mode hover, derived by rule
 #   BRAND_DARK_GOLD_DEEP    a DERIVATIVE of BRAND_DARK_GOLD
 #
 # THREE WORDS NAME A ROLE; FOUR NAME A DERIVATIVE OF ONE. Being derived by rule
-# does not demote a gold to four words -- BRAND_DOWN_GOLD is computed and is
+# does not demote a gold to four words -- BRAND_STANDBY_GOLD is computed and is
 # still a role the brand names. What the fourth word marks is dependency: DEEP
 # has no meaning without the DARK_GOLD it is taken from.
 #
@@ -267,7 +267,7 @@ BRAND_STILL_GOLD = "#9b907a"   # stillness: not-live, dead, absence of life
 #           -49 #a18b62 14.4732  clearly different
 #   taken   the smallest step that clears, not the first that looks right
 #
-# ORDERING IS PART OF THE RULING: live 70.0 > down 55.9 > offline 54.3 in
+# ORDERING IS PART OF THE RULING: live 70.0 > standby 55.9 > offline 54.3 in
 # lightness. A degraded-but-present state must not recede FURTHER than an absent
 # one -- an earlier -49 candidate did exactly that and was rejected on it.
 #
@@ -279,7 +279,35 @@ BRAND_STILL_GOLD = "#9b907a"   # stillness: not-live, dead, absence of life
 # EVERY FIGURE HERE IS rnv-color-mcp's. An earlier hand-computed walk used dE76
 # and inflated these by three to four points, which would have put -30 on the
 # table as "clearly different" when the instrument calls it perceptible only.
-BRAND_DOWN_GOLD = lighten(BRAND_GOLD, -36)             # -> #ae986f, degraded ring
+BRAND_STANDBY_GOLD = lighten(BRAND_GOLD, -36)          # -> #ae986f, the standby ring
+
+# RENAMED FROM BRAND_DOWN_GOLD ON 2026-08-17, VALUE UNCHANGED. `down` and
+# `degraded` both assert that something is WRONG. Standby does not, and the state
+# covers a build underway, a stream being prepped, maintenance, AND a partial
+# outage -- some of which are good news. Naming the state for the bad half means
+# the amber can only ever be a warning, and A SIGNAL THAT CAN ONLY MEAN ONE THING
+# GETS USED FOR ONE THING.
+#
+# The traffic-light reading earns the colour rather than merely tolerating it:
+# green go, amber WAIT, dark nothing maps onto live / standby / offline more
+# cleanly than onto live / degraded / offline, where amber has to carry a fault it
+# may not have.
+#
+# TWO KINDS OF CHANGE, and which one applies is decided by what is wrong:
+#
+#   RENAME when the NAME means the wrong thing.
+#   KEEP the name and change the WORD when the name is right and only the word
+#   collides on a surface.
+#
+# `down` -> `standby` is the first: the name asserted a fault the state does not
+# have. `live` -> label ONLINE is the second: `live` is the brand's own word --
+# rnv-live, signal-live -- and stays as the state name; only the displayed word
+# moves, because LIVE already appears on that page as the hero kicker directly
+# above "Offline right now", and one word in two roles contradicts itself.
+#
+# Cheap now because rnv-live is the only consumer. A wrong name is visible in a
+# diff where a wrong value is not -- so this one is catchable, which is exactly
+# why it does not get to wait.
 BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 
 # ------------------------------------------------- the rest of the register
@@ -409,7 +437,7 @@ WEB = {
     # against the error red where the wine was 17.40, and 25.92 against
     # error-text. The error red was always this value's nearest neighbour.
     #
-    # signal-offline and signal-down happen to equal text-faint and accent-warm.
+    # signal-offline and signal-standby happen to equal text-faint and accent-warm.
     # THE MATCH IS INCIDENTAL AND THE SEAM IS DELIBERATE: text-faint moves for
     # legibility reasons and accent-warm for decorative ones, and neither should
     # drag a signal with it. Do not "de-duplicate" these.
@@ -432,11 +460,53 @@ WEB = {
     "signal-offline": "#5a5a72",   # receding by design; the absent state
     # THE RING IS NOW A SIGNAL CHANNEL, not unconditional chrome. It was gold in
     # every state; on rnv-live it becomes stateful so every channel agrees with
-    # the label instead of the fill carrying it alone:
+    # the label instead of the fill carrying it alone.
     #
-    #   live     ring BRAND_GOLD        fill signal-live     halo, breathing
-    #   down     ring BRAND_DOWN_GOLD   fill signal-down     still
-    #   offline  ring BRAND_STILL_GOLD  fill signal-offline  still
+    # FOUR CHANNELS, NOT THREE. An earlier version of this table folded the halo
+    # into live's motion cell and said "still" for the other two -- which reads as
+    # a statement about motion and says nothing about glow. A TABLE THAT OMITS A
+    # CHANNEL DOES NOT LOOK INCOMPLETE, IT LOOKS SETTLED, and the next reader
+    # reasons from three columns as though three is all there is. Same shape as
+    # the bg-2 collision: nothing renders wrong, every value is canonical, and the
+    # failure is in what the structure implies rather than what it states.
+    #
+    #   state    ring                  fill             halo        breath
+    #   live     signal-ring-live      signal-live      12px full   3s,  0.5 trough
+    #   standby  signal-ring-standby   signal-standby   8px  55%    5s,  0.7 trough
+    #   offline  signal-ring-still     signal-offline   none        still
+    #
+    # THREE OF THE FOUR CHANNELS ORDER, and the fourth cannot:
+    #   ring     10.680 > 7.073 > 6.268     orders
+    #   halo     12px   > 8px   > none      orders
+    #   breath   3s/0.5 > 5s/0.7 > still    orders
+    #   fill      2.561 < 13.698 > 2.953    DOES NOT ORDER, and must not be
+    #                                       described as though it does
+    # The fill carries HUE IDENTITY, not intensity -- live is a deep wine and
+    # standby a bright amber, so live's fill is the dimmest of the three. The
+    # ranking a reader gets comes from ring, halo and breath. Claiming "every
+    # channel steps down" would be a claim the table then inherits.
+    #
+    # STANDBY BREATHES, SLOWER AND SHALLOWER THAN LIVE. Offline means nothing is
+    # running; standby means something is running but is not the main event.
+    # Motion reads as life, so making it a GRADIENT rather than a binary is what
+    # makes standby a genuine middle state instead of offline in another colour.
+    # Less life, not no life. The fill reads 13.698 at full and 6.953 at its 0.7
+    # trough; the ring does not animate, so the boundary holds at 7.073 at every
+    # frame -- the 2026-08-14 ring/fill split still doing its job.
+    #
+    # THE HALO IS DIMMED ON STANDBY AND THAT IS NOT TASTE. signal-standby carries
+    # 5.35x the luminance contrast of signal-live -- 13.698 against 2.561 -- so a
+    # 12px halo of it at full strength reads LOUDER than live's, inverting the
+    # ordering the states exist to express. Hence 8px at 55%, cut on both axes.
+    #
+    # [confirm/fill] LIVE AND STANDBY HAVE NEVER BEEN RENDERED. rnv-live's pill is
+    # a static element with OFFLINE hardcoded, so those two states are applied by
+    # hand-editing markup. Every figure above is measured; halo radius and alpha,
+    # breath rate and trough depth are EYE CALLS NO EYE HAS MADE ON THE REAL
+    # SURFACE. A state toggle on that page turns an unverifiable design into a
+    # checkable one, which is worth more than any single value here: a three-state
+    # system exists today where two states have never rendered, and nothing in
+    # either repository would report that.
     #
     # THESE REFERENCE THE CONSTANTS RATHER THAN COPYING THEM, and that is the
     # OPPOSITE of the signal-offline / text-faint seam noted above. There the
@@ -444,9 +514,9 @@ WEB = {
     # the stillness colour -- if BRAND_STILL_GOLD moves, this moves with it,
     # because it is the same decision. Do not split them.
     "signal-ring-live": BRAND_GOLD,
-    "signal-ring-down": BRAND_DOWN_GOLD,
+    "signal-ring-standby": BRAND_STANDBY_GOLD,
     "signal-ring-still": BRAND_STILL_GOLD,
-    "signal-down": "#ffd166",      # service degraded or unavailable
+    "signal-standby": "#ffd166",      # service degraded or unavailable
 }
 
 # RESOLVED 2026-08-13. This ramp was named bg-0 / bg-1 / bg-2 while eleven
