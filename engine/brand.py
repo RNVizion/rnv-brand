@@ -67,6 +67,39 @@ identifier across its own repos is not positioned to align anyone else's.
 #
 # NOTHING CAUGHT THE DAY THE TWO SIDES DISAGREED. Not a checker failure -- no
 # checker was ever pointed at notation. Same shape as type before R2.
+# --------------------------------------------------- how figures are written
+# EVERY RATIO IN THIS FILE IS TRUNCATED, NOT ROUNDED, AND THE REASON IS THE
+# DIRECTION OF THE ERROR. Every contrast check here is a FLOOR -- value must be
+# at least T. Truncating can only ever understate a pass; rounding can
+# MANUFACTURE one:
+#
+#   #697f5a on --rnv-bg   true 4.499572...
+#     truncated 4.499  -> reads FAIL   correct, and matches the server's flag
+#     rounded   4.500  -> reads PASS   a false all-clear from arithmetic alone
+#
+# A false all-clear is worse than a false failure. This is the same failure that
+# retired #b19145: a figure rounded ACROSS the threshold it was authorising.
+#
+# THE BOUNDARY, WRITTEN DOWN WHILE IT IS IN VIEW. Truncation is conservative for
+# a FLOOR and PERMISSIVE for a CEILING. Every check in this system today is a
+# floor -- contrast minimums, minimum dE separation from STATUS.error, minimum dE
+# between ring states. **But a ceiling already exists in this file**: the claim
+# that a derivative "holds hue within a degree" is |dH| <= 1.0.
+#
+#   BRAND_STILL_GOLD    |dH| 0.952381 from BRAND_GOLD   truncates to 0.9, passes
+#   a hypothetical      |dH| 1.040000                   truncates to 1.0, PASSES
+#                                                       and should not
+#
+# It has slack today and would not announce itself when it stops. THE GENERAL
+# RULE IS NOT "TRUNCATE" -- it is ROUND IN THE DIRECTION THAT MAKES THE ASSERTION
+# HARDER TO SATISFY. Down for a floor, up for a ceiling. Truncation is that rule
+# applied to floors, and it silently flips from safe to unsafe the first time a
+# ceiling check appears.
+#
+# Raised by rnv-color-mcp on 2026-08-17, correcting its own earlier note that had
+# called the server's truncation a bias. The truncation was right; the rounding
+# was the error.
+
 # ---------------------------------------------------------- naming convention
 # GOLD SITS IN THE THIRD SLOT. Everything before it modifies it; a fourth word is
 # a DERIVATIVE of the three-word name to its left.
@@ -74,7 +107,7 @@ identifier across its own repos is not positioned to align anyone else's.
 #   BRAND_GOLD              the base
 #   BRAND_DARK_GOLD         a named gold -- the light-mode one
 #   BRAND_STILL_GOLD        a named gold -- stillness, registered
-#   BRAND_STANDBY_GOLD         a named gold -- degraded, derived by rule
+#   BRAND_STANDBY_GOLD      a named gold -- standby, derived by rule
 #   BRAND_HOVER_GOLD        a named gold -- dark-mode hover, derived by rule
 #   BRAND_DARK_GOLD_DEEP    a DERIVATIVE of BRAND_DARK_GOLD
 #
@@ -255,8 +288,8 @@ BRAND_HOVER_GOLD = lighten(BRAND_GOLD, 13)             # -> #dfc9a0, dark-mode H
 # seam as signal-offline equalling text-faint -- one degree less extreme.
 BRAND_STILL_GOLD = "#9b907a"   # stillness: not-live, dead, absence of life
 
-# DERIVED. The ring for a DEGRADED-but-present service, where stillness is for an
-# absent one. Down still has gold in it; offline has been drained.
+# DERIVED. The ring for something RUNNING BUT NOT THE MAIN EVENT, where stillness
+# is for something absent. Standby still has gold in it; offline has been drained.
 #
 #   rule    smallest uniform step whose CIEDE2000 from BRAND_GOLD crosses into
 #           "clearly different" -- the instrument's own interpretation band
@@ -268,7 +301,7 @@ BRAND_STILL_GOLD = "#9b907a"   # stillness: not-live, dead, absence of life
 #   taken   the smallest step that clears, not the first that looks right
 #
 # ORDERING IS PART OF THE RULING: live 70.0 > standby 55.9 > offline 54.3 in
-# lightness. A degraded-but-present state must not recede FURTHER than an absent
+# lightness. A running-but-not-primary state must not recede FURTHER than an absent
 # one -- an earlier -49 candidate did exactly that and was rejected on it.
 #
 #   on --rnv-bg      7.073:1
@@ -308,6 +341,20 @@ BRAND_STANDBY_GOLD = lighten(BRAND_GOLD, -36)          # -> #ae986f, the standby
 # Cheap now because rnv-live is the only consumer. A wrong name is visible in a
 # diff where a wrong value is not -- so this one is catchable, which is exactly
 # why it does not get to wait.
+#
+# AND THE RENAME WAS SHIPPED HALF-DONE THE FIRST TIME. The identifiers moved by
+# regex; four DESCRIPTIONS still called the state "degraded" -- including the one
+# line in the naming convention above and the comment on the emitted token. The
+# name moved and the meaning did not follow, so the reading this rename exists to
+# retire survived in exactly the comments a reader consults to learn what the
+# value is for. Caught by rnv-color-mcp, not by me, within the hour.
+#
+# A RENAME IS NOT COMPLETE WHEN THE IDENTIFIERS MOVE. It is complete when nothing
+# still describes the thing by the meaning that was retired. A mechanical pass
+# cannot do the second half: prose is where the meaning lives, and a regex cannot
+# tell a use of the retired word from a mention of it. The four survivors below
+# are mentions, inside this note, and are correct as written -- which is the
+# distinction that made the sweep unsafe in the first place.
 BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 
 # ------------------------------------------------- the rest of the register
@@ -476,10 +523,10 @@ WEB = {
     #   offline  signal-ring-still     signal-offline   none        still
     #
     # THREE OF THE FOUR CHANNELS ORDER, and the fourth cannot:
-    #   ring     10.680 > 7.073 > 6.268     orders
+    #   ring     10.679 > 7.073 > 6.267     orders
     #   halo     12px   > 8px   > none      orders
     #   breath   3s/0.5 > 5s/0.7 > still    orders
-    #   fill      2.561 < 13.698 > 2.953    DOES NOT ORDER, and must not be
+    #   fill      2.560 < 13.698 > 2.953    DOES NOT ORDER, and must not be
     #                                       described as though it does
     # The fill carries HUE IDENTITY, not intensity -- live is a deep wine and
     # standby a bright amber, so live's fill is the dimmest of the three. The
@@ -495,7 +542,7 @@ WEB = {
     # frame -- the 2026-08-14 ring/fill split still doing its job.
     #
     # THE HALO IS DIMMED ON STANDBY AND THAT IS NOT TASTE. signal-standby carries
-    # 5.35x the luminance contrast of signal-live -- 13.698 against 2.561 -- so a
+    # 5.35x the luminance contrast of signal-live -- 13.698 against 2.560 -- so a
     # 12px halo of it at full strength reads LOUDER than live's, inverting the
     # ordering the states exist to express. Hence 8px at 55%, cut on both axes.
     #
@@ -516,7 +563,7 @@ WEB = {
     "signal-ring-live": BRAND_GOLD,
     "signal-ring-standby": BRAND_STANDBY_GOLD,
     "signal-ring-still": BRAND_STILL_GOLD,
-    "signal-standby": "#ffd166",      # service degraded or unavailable
+    "signal-standby": "#ffd166",      # running, but not the main event
 }
 
 # RESOLVED 2026-08-13. This ramp was named bg-0 / bg-1 / bg-2 while eleven
