@@ -3,7 +3,15 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-17 (rev 17 — **the derivation rule is published, and a hole is named.** Three
+Last locked: 2026-08-23 (rev 18 — **the ring stopped being chrome, and a claim in this register
+stopped being true with it.** It was gold in every state and therefore signalled nothing; on
+`rnv-live` it is now stateful across three states, so *"identical in all states"* is retired and the
+four-channel table replaces it. **Three of the four channels order and the fill cannot** — it carries
+hue identity rather than intensity, so live's fill is the dimmest of the three, and claiming
+otherwise would be a claim the table inherits. `signal-down` is renamed **`signal-standby`**: `down`
+asserted a fault the state does not have, where standby covers a build underway, maintenance, a
+stream being prepped *and* a partial outage. Values unchanged. **Every figure here is truncated, not
+rounded** — see the note under the contrast table. rev 17 — **the derivation rule is published, and a hole is named.** Three
 applications derived `-14` from the same base independently; `rnv-color-picker` pointed out that
 **three apps agreeing is luck, not design**, and that an unpublished derivation permits four *values*
 for one colour — worse than four names, because a wrong value is invisible in a diff.
@@ -371,10 +379,47 @@ decides something. `signal-live` means *RNVizion is on*, not *a video stream is 
 carries the availability dot on the site as well as the broadcast dot on `rnv-live`.
 
 **The ring is load-bearing, and since 2026-08-14 it is also still.** Every signal dot is drawn
-with a **0.75px** gold ring, identical in all states and on both surfaces, so the ring signals
-nothing and is simply the component's chrome. It carries the WCAG 1.4.11 boundary **at every
-frame**, because the fill breathes and the ring does not. That is what frees the fill to sit
-at 2.43:1. Remove the ring and every value in the set fails.
+with a **0.75px** ring, and it carries the WCAG 1.4.11 boundary **at every frame**, because the
+fill breathes and the ring does not. That is what frees the fill to sit at 2.43:1. Remove the ring
+and every value in the set fails.
+
+**IT IS NO LONGER IDENTICAL IN ALL STATES, AND THAT CHANGED ON 2026-08-17.** It was gold everywhere
+and therefore chrome — it signalled nothing. On `rnv-live` it became **stateful**, so every channel
+agrees with the label instead of the fill carrying the meaning alone. The site's hero dot is
+unaffected: it has one state and is always live, so its ring stays unconditional.
+
+**Four channels, and three of the four order:**
+
+| state | ring | fill | halo | breath |
+|---|---|---|---|---|
+| live | `signal-ring-live` `#d2bc93` | `signal-live` `#a5034e` | 12px, full | 3s, 0.5 trough |
+| standby | `signal-ring-standby` `#ae986f` | `signal-standby` `#ffd166` | 8px, 55% | 5s, 0.7 trough |
+| offline | `signal-ring-still` `#9b907a` | `signal-offline` `#5a5a72` | none | still |
+
+```
+ring     10.679 > 7.073 > 6.267     orders
+halo     12px   > 8px   > none      orders
+breath   3s/0.5 > 5s/0.7 > still    orders
+fill      2.560 < 13.698 > 2.953    DOES NOT ORDER
+```
+
+**The fill carries hue identity, not intensity** — live is a deep wine and standby a bright amber,
+so live's fill is the dimmest of the three. The ranking a reader gets comes from ring, halo and
+breath. *Every channel steps down* would be a claim this table then inherits, and it is not true.
+
+**The halo is dimmed on standby and that is not taste.** `signal-standby` carries **5.35x** the
+luminance contrast of `signal-live` — 13.698 against 2.560 — so a 12px halo of it at full strength
+reads *louder* than live's, inverting the ordering the states exist to express.
+
+**Standby breathes, slower and shallower.** Offline means nothing is running; standby means
+something is running but is not the main event. Motion reads as life, so making it a **gradient**
+rather than a binary is what makes standby a genuine middle state rather than offline in another
+colour. The ring does not animate, so the boundary holds at 7.073 at every frame.
+
+**[confirm/fill] Live and standby have never been rendered.** `rnv-live`'s pill carries `OFFLINE`
+by default and the other two states are applied by hand-editing markup. Every contrast figure above
+is measured; **halo radius and alpha, breath rate and trough depth are eye calls no eye has made on
+the real surface.** A state toggle on that page turns an unverifiable design into a checkable one.
 
 **The ring thinned from 1px to 0.75px on 2026-08-14, on both surfaces in one pass.**
 
