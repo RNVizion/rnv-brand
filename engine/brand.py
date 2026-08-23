@@ -67,6 +67,24 @@ identifier across its own repos is not positioned to align anyone else's.
 #
 # NOTHING CAUGHT THE DAY THE TWO SIDES DISAGREED. Not a checker failure -- no
 # checker was ever pointed at notation. Same shape as type before R2.
+# ---------------------------------------------------------- naming convention
+# GOLD SITS IN THE THIRD SLOT. Everything before it modifies it; a fourth word is
+# a DERIVATIVE of the three-word name to its left.
+#
+#   BRAND_GOLD              the base
+#   BRAND_DARK_GOLD         a named gold -- the light-mode one
+#   BRAND_STILL_GOLD        a named gold -- stillness, registered
+#   BRAND_DOWN_GOLD         a named gold -- degraded, derived by rule
+#   BRAND_HOVER_GOLD        a named gold -- dark-mode hover, derived by rule
+#   BRAND_DARK_GOLD_DEEP    a DERIVATIVE of BRAND_DARK_GOLD
+#
+# THREE WORDS NAME A ROLE; FOUR NAME A DERIVATIVE OF ONE. Being derived by rule
+# does not demote a gold to four words -- BRAND_DOWN_GOLD is computed and is
+# still a role the brand names. What the fourth word marks is dependency: DEEP
+# has no meaning without the DARK_GOLD it is taken from.
+#
+# Ruled 2026-08-17. It retires nothing in the apps: BRAND_DARK_GOLD_DEEP already
+# shipped in three repositories and already fits.
 BRAND_GOLD = "#d2bc93"         # brand gold (primary) — never varies across surfaces
 # FOR LIGHT-MODE SURFACES. It is darker BECAUSE the ground is lighter -- the name
 # describes the colour, this note describes the job, and the two read as
@@ -192,7 +210,76 @@ def lighten(color: str, step: int) -> str:
 # should say which in a comment. WHAT IT MUST NOT DO IS HAND-WRITE THE VALUE --
 # if it wants a pressed shade, it derives one with lighten().
 BRAND_DARK_GOLD_DEEP = lighten(BRAND_DARK_GOLD, -14)   # -> #7e6529, light-mode TEXT
-BRAND_GOLD_HOVER = lighten(BRAND_GOLD, 13)             # -> #dfc9a0, dark-mode HOVER
+BRAND_HOVER_GOLD = lighten(BRAND_GOLD, 13)             # -> #dfc9a0, dark-mode HOVER
+
+# ---------------------------------------------------------------- stillness
+# BRAND_STILL_GOLD IS REGISTERED, NOT DERIVED, AND THAT IS THE WHOLE POINT.
+# It means STILLNESS -- not-live, dead, the absence of life in something the
+# brand runs. It is the first permanent colour carrying a MEANING rather than a
+# role, and it will appear across brand products beyond this first consumer.
+#
+# THE TEST THAT DECIDED IT IS "WHAT MAKES THE VALUE MOVE":
+#   a DERIVATIVE moves when the derivation rule moves
+#   a REGISTERED value moves when the brand decides something
+# Make stillness a derivative and someone retuning a step -- for hover, for a new
+# ground, for any reason -- silently changes what death looks like. The coupling
+# would be wrong in DIRECTION, not merely in magnitude.
+#
+# AND THE METHOD PROVABLY CANNOT REACH IT. Checked all 400 uniform steps: none
+# produces #9b907a. Adding a constant to every channel preserves the channel
+# SPREAD, and spread is what saturation is -- so lighten() can dim a gold and
+# then re-concentrate it, but it cannot DRAIN one:
+#
+#   step    0  #d2bc93  S 41.2%
+#   step  -49  #a18b62  S 25.1%
+#   step  -80  #826c43  S 32.0%   <- saturation climbing again
+#   step -120  #5a441b  S 53.8%
+#   target     #9b907a  S 14.2%   unreachable
+#
+# The method was constraining the meaning. Registering it is what put a DRAINED
+# gold on the table at all; a darkened one reads as gold with the lights off,
+# where this reads as gold with the blood out. Same perceptual distance from the
+# brand gold -- CIEDE2000 14.56 against the darkened candidate's 14.47 -- and
+# opposite stories. No measurement resolves that choice, which is exactly when a
+# brand judgement is the right instrument.
+#
+#   on --rnv-bg      6.267:1   twice the 3:1 UI floor; the offline ring is the
+#                              only boundary carrier on that component
+#   dE from gold    14.5577   "clearly different" -- a colour, not an artifact
+#   dE from fill    30.893    stays distinct from the #5a5a72 it surrounds
+#   H 40.0  L 54.3  S 14.2    hue holds within a degree of the brand gold, so it
+#                              still reads as gold; saturation is the payload
+#
+# NEAR-NEIGHBOUR, recorded so it is not "fixed": RECORDS.ink-mute #9b978c sits
+# CIEDE2000 5.336 away. Different surfaces, never co-occurring. Same deliberate
+# seam as signal-offline equalling text-faint -- one degree less extreme.
+BRAND_STILL_GOLD = "#9b907a"   # stillness: not-live, dead, absence of life
+
+# DERIVED. The ring for a DEGRADED-but-present service, where stillness is for an
+# absent one. Down still has gold in it; offline has been drained.
+#
+#   rule    smallest uniform step whose CIEDE2000 from BRAND_GOLD crosses into
+#           "clearly different" -- the instrument's own interpretation band
+#   walk    -30 #b49e75  8.4035  perceptible at a glance
+#           -35 #af9970  9.9383  perceptible at a glance
+#           -36 #ae986f 10.2503  CLEARLY DIFFERENT  <- taken
+#           -39 #ab956c 11.1972  clearly different
+#           -49 #a18b62 14.4732  clearly different
+#   taken   the smallest step that clears, not the first that looks right
+#
+# ORDERING IS PART OF THE RULING: live 70.0 > down 55.9 > offline 54.3 in
+# lightness. A degraded-but-present state must not recede FURTHER than an absent
+# one -- an earlier -49 candidate did exactly that and was rejected on it.
+#
+#   on --rnv-bg      7.073:1
+#   dE from gold    10.2503   clearly different
+#   dE from still    7.0788   perceptible at a glance; the ring is not the only
+#                             channel -- fill, motion and the pill word all move
+#
+# EVERY FIGURE HERE IS rnv-color-mcp's. An earlier hand-computed walk used dE76
+# and inflated these by three to four points, which would have put -30 on the
+# table as "clearly different" when the instrument calls it perceptible only.
+BRAND_DOWN_GOLD = lighten(BRAND_GOLD, -36)             # -> #ae986f, degraded ring
 BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 
 # ------------------------------------------------- the rest of the register
@@ -208,6 +295,10 @@ WEB_BLACK = "#0a0a0f"    # rnvizion.dev ground; social and OG base
 PERMANENT = {
     "gold": BRAND_GOLD,
     "dark-gold": BRAND_DARK_GOLD,
+    # SEVENTH PERMANENT COLOUR, added 2026-08-17, and the first carrying a
+    # MEANING rather than a role. See BRAND_STILL_GOLD above for why it is
+    # registered and not derived.
+    "still-gold": BRAND_STILL_GOLD,
     "charcoal": BRAND_BLACK,
     "black": TRUE_BLACK,
     "web-black": WEB_BLACK,
@@ -339,6 +430,22 @@ WEB = {
     # the narrower reading.
     "signal-live": "#a5034e",      # on air / open / present
     "signal-offline": "#5a5a72",   # receding by design; the absent state
+    # THE RING IS NOW A SIGNAL CHANNEL, not unconditional chrome. It was gold in
+    # every state; on rnv-live it becomes stateful so every channel agrees with
+    # the label instead of the fill carrying it alone:
+    #
+    #   live     ring BRAND_GOLD        fill signal-live     halo, breathing
+    #   down     ring BRAND_DOWN_GOLD   fill signal-down     still
+    #   offline  ring BRAND_STILL_GOLD  fill signal-offline  still
+    #
+    # THESE REFERENCE THE CONSTANTS RATHER THAN COPYING THEM, and that is the
+    # OPPOSITE of the signal-offline / text-faint seam noted above. There the
+    # match is incidental and the two must move independently. Here the ring IS
+    # the stillness colour -- if BRAND_STILL_GOLD moves, this moves with it,
+    # because it is the same decision. Do not split them.
+    "signal-ring-live": BRAND_GOLD,
+    "signal-ring-down": BRAND_DOWN_GOLD,
+    "signal-ring-still": BRAND_STILL_GOLD,
     "signal-down": "#ffd166",      # service degraded or unavailable
 }
 
