@@ -3,7 +3,11 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-23 (rev 18 — **the ring stopped being chrome, and a claim in this register
+Last locked: 2026-08-23 (rev 18 — **stamp dates in this file are the clock of the commit that
+shipped the subject, with the short SHA beside them.** An earlier pass re-dated every 2026-08-17
+stamp to "today" on the belief that nothing happened that day. **Seven commits carry it**, and the
+gold value change demonstrably shipped in `1003a6c` on it. Corrected per stamp against
+`git log -S`, which is the only witness that does not depend on anyone's memory. — **the ring stopped being chrome, and a claim in this register
 stopped being true with it.** It was gold in every state and therefore signalled nothing; on
 `rnv-live` it is now stateful across three states, so *"identical in all states"* is retired and the
 four-channel table replaces it. **Three of the four channels order and the fill cannot** — it carries
@@ -123,7 +127,7 @@ tool primitives, or one product's call.
 | Color | Hex | RGB | Canonical use |
 |---|---|---|---|
 | Brand gold | `#d2bc93` | 210, 188, 147 | **The accent on black and dark surfaces.** Site, social, OG cards, wordmark, every app's dark theme |
-| Brand dark gold | `#8c7337` | 140, 115, 55 | **The accent on light surfaces.** Every app's light theme; also gold's shade on dark, where full gold is too loud. Was `#b19145` until 2026-08-23 — the contrast table below records why it moved and what it cost |
+| Brand dark gold | `#8c7337` | 140, 115, 55 | **The accent on light surfaces.** Every app's light theme; also gold's shade on dark, where full gold is too loud. Was `#b19145` until 2026-08-17 (`1003a6c`) — the contrast table below records why it moved and what it cost |
 
 **The split is confirmed by the code, not just declared.** `#b19145` appears zero times on
 rnvizion.dev and zero times in the corpus Space — both all-dark surfaces, both gold-only.
@@ -535,7 +539,7 @@ nothing said so, because 3.00 is what a contrast tool *displays*: `rnv-color-mcp
 this pair and flags `AA_large_text: false` and `AA_ui_components: false` in the same response. **The
 number was read and the flags were not.**
 
-**The instrument is being changed as a result, ruled 2026-08-23:** `ratio` returns the value
+**The instrument is being changed as a result, ruled 2026-08-17 (`24c3fab`):** `ratio` returns the value
 unrounded, and `display` shows **three decimals, truncated rather than rounded.** Truncation is the
 part that matters — three decimals alone moves the trap without removing it, since a true 4.4996
 still *rounds* onto 4.500. A figure that can only err toward *fail* cannot authorise a usage the
@@ -598,7 +602,7 @@ real background**, applies the floor, and carries an `ACCEPTED` dict where every
 reason — with a companion test that fails when an entry goes stale. `rnv-text-transformer` shipped it
 in roughly forty lines. **That is the ecosystem guard, not another value sweep.**
 
-### The derivation rule, published 2026-08-23
+### The derivation rule, published 2026-08-21 (`60bd56d`)
 
 **The brand holds two golds per mode and derives the rest.** That is the intended structure and a
 third registered gold is the wrong fix. What was missing was the **rule**.
@@ -666,7 +670,7 @@ feedback"* — which is what the apps' local docs said — it is **wrong half th
 hover went lighter on a light ground, which is why white on it measured 2.3868. **Expect this in
 every app with a light mode; it is inherited, not introduced.**
 
-`BRAND_DARK_GOLD` moved to **`#8c7337`** on 2026-08-23 as a result. Both columns below, so the
+`BRAND_DARK_GOLD` moved to **`#8c7337`** on 2026-08-17 (`1003a6c`) as a result. Both columns below, so the
 trade is visible rather than asserted:
 
 | Usage | Floor | `#b19145` | `#8c7337` |
