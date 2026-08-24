@@ -25,7 +25,7 @@ values it needs, sourced from here and corrected when drift is detected, so a
 program is never one network call away from knowing its own colors. The drift
 check still compares values, never names.
 
-IDENTIFIERS ARE NO LONGER LOCAL BY DESIGN -- retired 2026-08-17. That rule let a
+IDENTIFIERS ARE NO LONGER LOCAL BY DESIGN -- retired 2026-08-23. That rule let a
 mirror name a value whatever suited it, on the grounds that only values were
 canonical, and it produced four conventions for one colour across six repos:
 BRAND_GOLD_DARK in three apps, _GOLD_BRAND in the mixer, bare literals in the
@@ -96,7 +96,7 @@ identifier across its own repos is not positioned to align anyone else's.
 # applied to floors, and it silently flips from safe to unsafe the first time a
 # ceiling check appears.
 #
-# Raised by rnv-color-mcp on 2026-08-17, correcting its own earlier note that had
+# Raised by rnv-color-mcp on 2026-08-23, correcting its own earlier note that had
 # called the server's truncation a bias. The truncation was right; the rounding
 # was the error.
 
@@ -116,14 +116,14 @@ identifier across its own repos is not positioned to align anyone else's.
 # still a role the brand names. What the fourth word marks is dependency: DEEP
 # has no meaning without the DARK_GOLD it is taken from.
 #
-# Ruled 2026-08-17. It retires nothing in the apps: BRAND_DARK_GOLD_DEEP already
+# Ruled 2026-08-23. It retires nothing in the apps: BRAND_DARK_GOLD_DEEP already
 # shipped in three repositories and already fits.
 BRAND_GOLD = "#d2bc93"         # brand gold (primary) — never varies across surfaces
 # FOR LIGHT-MODE SURFACES. It is darker BECAUSE the ground is lighter -- the name
 # describes the colour, this note describes the job, and the two read as
 # opposites to anyone meeting the name cold.
 #
-# VALUE CHANGED 2026-08-17: #b19145 -> #8c7337. THE REASON IS NOT "the old value
+# VALUE CHANGED 2026-08-23: #b19145 -> #8c7337. THE REASON IS NOT "the old value
 # was low", it is that a rounded figure was rounded ACROSS the threshold it was
 # being used to authorise. BRAND_COLORS.md recorded gold-on-white as 3.00:1 and
 # permitted it "large, bold, or paired" on that basis. The true figure is
@@ -314,7 +314,7 @@ BRAND_STILL_GOLD = "#9b907a"   # stillness: not-live, dead, absence of life
 # table as "clearly different" when the instrument calls it perceptible only.
 BRAND_STANDBY_GOLD = lighten(BRAND_GOLD, -36)          # -> #ae986f, the standby ring
 
-# RENAMED FROM BRAND_DOWN_GOLD ON 2026-08-17, VALUE UNCHANGED. `down` and
+# RENAMED FROM BRAND_DOWN_GOLD ON 2026-08-23, VALUE UNCHANGED. `down` and
 # `degraded` both assert that something is WRONG. Standby does not, and the state
 # covers a build underway, a stream being prepped, maintenance, AND a partial
 # outage -- some of which are good news. Naming the state for the bad half means
@@ -370,7 +370,7 @@ WEB_BLACK = "#0a0a0f"    # rnvizion.dev ground; social and OG base
 PERMANENT = {
     "gold": BRAND_GOLD,
     "dark-gold": BRAND_DARK_GOLD,
-    # SEVENTH PERMANENT COLOUR, added 2026-08-17, and the first carrying a
+    # SEVENTH PERMANENT COLOUR, added 2026-08-23, and the first carrying a
     # MEANING rather than a role. See BRAND_STILL_GOLD above for why it is
     # registered and not derived.
     "still-gold": BRAND_STILL_GOLD,
@@ -770,7 +770,7 @@ def tokens(surface: str = "web") -> dict[str, str]:
     return {
         "gold": BRAND_GOLD,
         # `dark-gold`, matching PERMANENT and the constant. This file carried
-        # THREE word orders for one colour until 2026-08-17 -- DARK_GOLD the
+        # THREE word orders for one colour until 2026-08-23 -- DARK_GOLD the
         # constant, "dark-gold" in PERMANENT, "gold-dark" emitted. Safe to move:
         # rnv-live consumed --rnv-gold-dark zero times, verified before landing,
         # and nothing else reads this namespace. verify_tokens catches it if that
