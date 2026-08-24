@@ -25,7 +25,7 @@ values it needs, sourced from here and corrected when drift is detected, so a
 program is never one network call away from knowing its own colors. The drift
 check still compares values, never names.
 
-IDENTIFIERS ARE NO LONGER LOCAL BY DESIGN -- retired 2026-08-23. That rule let a
+IDENTIFIERS ARE NO LONGER LOCAL BY DESIGN -- retired 2026-08-17 (234dca6). That rule let a
 mirror name a value whatever suited it, on the grounds that only values were
 canonical, and it produced four conventions for one colour across six repos:
 BRAND_GOLD_DARK in three apps, _GOLD_BRAND in the mixer, bare literals in the
@@ -67,6 +67,28 @@ identifier across its own repos is not positioned to align anyone else's.
 #
 # NOTHING CAUGHT THE DAY THE TWO SIDES DISAGREED. Not a checker failure -- no
 # checker was ever pointed at notation. Same shape as type before R2.
+# ------------------------------------------------------ how stamps are written
+# EVERY DATE IN THIS FILE IS THE CLOCK OF THE COMMIT THAT SHIPPED ITS SUBJECT,
+# not the day someone wrote the comment. Where the commit is known it is cited
+# beside the date, because a short SHA is checkable and a date is not.
+#
+# THIS RULE EXISTS BECAUSE THE FILE WAS WRONG TWICE, IN OPPOSITE DIRECTIONS.
+# First: an assistant stamped twenty-six artifacts across one session without
+# ever calling a clock, inferring each date from context. Then, correcting that,
+# it re-dated every 08-17 stamp to "today" -- WITHOUT ASKING GIT EITHER. Three of
+# those had been right: the 17th happened, seven commits carry that date, and
+# `#8c7337` demonstrably first shipped in 8911f30 on it.
+#
+# THE SECOND PASS REPEATED THE METHOD OF THE FIRST. Both trusted the narrative
+# over the clock, and the clock was one command away:
+#
+#   git log --format="%h %ad" --date=short -S "<the subject>" -- engine/brand.py
+#
+# A FABRICATED NARRATIVE DOES NOT FABRICATE THE CLOCK. Shipping stamps a change
+# even when the narrator's calendar is wrong, which is exactly why the shipped
+# stamps were the recoverable ones. Correct PER STAMP against the commit that
+# shipped its subject; "today" is right only for a stamp about today.
+
 # --------------------------------------------------- how figures are written
 # EVERY RATIO IN THIS FILE IS TRUNCATED, NOT ROUNDED, AND THE REASON IS THE
 # DIRECTION OF THE ERROR. Every contrast check here is a FLOOR -- value must be
@@ -123,7 +145,7 @@ BRAND_GOLD = "#d2bc93"         # brand gold (primary) — never varies across su
 # describes the colour, this note describes the job, and the two read as
 # opposites to anyone meeting the name cold.
 #
-# VALUE CHANGED 2026-08-23: #b19145 -> #8c7337. THE REASON IS NOT "the old value
+# VALUE CHANGED 2026-08-17 (8911f30): #b19145 -> #8c7337. THE REASON IS NOT "the old value
 # was low", it is that a rounded figure was rounded ACROSS the threshold it was
 # being used to authorise. BRAND_COLORS.md recorded gold-on-white as 3.00:1 and
 # permitted it "large, bold, or paired" on that basis. The true figure is
@@ -770,7 +792,7 @@ def tokens(surface: str = "web") -> dict[str, str]:
     return {
         "gold": BRAND_GOLD,
         # `dark-gold`, matching PERMANENT and the constant. This file carried
-        # THREE word orders for one colour until 2026-08-23 -- DARK_GOLD the
+        # THREE word orders for one colour until 2026-08-17 (234dca6) -- DARK_GOLD the
         # constant, "dark-gold" in PERMANENT, "gold-dark" emitted. Safe to move:
         # rnv-live consumed --rnv-gold-dark zero times, verified before landing,
         # and nothing else reads this namespace. verify_tokens catches it if that
