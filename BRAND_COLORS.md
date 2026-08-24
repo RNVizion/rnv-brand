@@ -123,7 +123,7 @@ tool primitives, or one product's call.
 | Color | Hex | RGB | Canonical use |
 |---|---|---|---|
 | Brand gold | `#d2bc93` | 210, 188, 147 | **The accent on black and dark surfaces.** Site, social, OG cards, wordmark, every app's dark theme |
-| Brand dark gold | `#8c7337` | 140, 115, 55 | **The accent on light surfaces.** Every app's light theme; also gold's shade on dark, where full gold is too loud. Was `#b19145` until 2026-08-17 — the contrast table below records why it moved and what it cost |
+| Brand dark gold | `#8c7337` | 140, 115, 55 | **The accent on light surfaces.** Every app's light theme; also gold's shade on dark, where full gold is too loud. Was `#b19145` until 2026-08-23 — the contrast table below records why it moved and what it cost |
 
 **The split is confirmed by the code, not just declared.** `#b19145` appears zero times on
 rnvizion.dev and zero times in the corpus Space — both all-dark surfaces, both gold-only.
@@ -383,7 +383,7 @@ with a **0.75px** ring, and it carries the WCAG 1.4.11 boundary **at every frame
 fill breathes and the ring does not. That is what frees the fill to sit at 2.43:1. Remove the ring
 and every value in the set fails.
 
-**IT IS NO LONGER IDENTICAL IN ALL STATES, AND THAT CHANGED ON 2026-08-17.** It was gold everywhere
+**IT IS NO LONGER IDENTICAL IN ALL STATES, AND THAT CHANGED ON 2026-08-23.** It was gold everywhere
 and therefore chrome — it signalled nothing. On `rnv-live` it became **stateful**, so every channel
 agrees with the label instead of the fill carrying the meaning alone. The site's hero dot is
 unaffected: it has one state and is always live, so its ring stays unconditional.
@@ -535,7 +535,7 @@ nothing said so, because 3.00 is what a contrast tool *displays*: `rnv-color-mcp
 this pair and flags `AA_large_text: false` and `AA_ui_components: false` in the same response. **The
 number was read and the flags were not.**
 
-**The instrument is being changed as a result, ruled 2026-08-17:** `ratio` returns the value
+**The instrument is being changed as a result, ruled 2026-08-23:** `ratio` returns the value
 unrounded, and `display` shows **three decimals, truncated rather than rounded.** Truncation is the
 part that matters — three decimals alone moves the trap without removing it, since a true 4.4996
 still *rounds* onto 4.500. A figure that can only err toward *fail* cannot authorise a usage the
@@ -598,7 +598,7 @@ real background**, applies the floor, and carries an `ACCEPTED` dict where every
 reason — with a companion test that fails when an entry goes stale. `rnv-text-transformer` shipped it
 in roughly forty lines. **That is the ecosystem guard, not another value sweep.**
 
-### The derivation rule, published 2026-08-17
+### The derivation rule, published 2026-08-23
 
 **The brand holds two golds per mode and derives the rest.** That is the intended structure and a
 third registered gold is the wrong fix. What was missing was the **rule**.
@@ -666,7 +666,7 @@ feedback"* — which is what the apps' local docs said — it is **wrong half th
 hover went lighter on a light ground, which is why white on it measured 2.3868. **Expect this in
 every app with a light mode; it is inherited, not introduced.**
 
-`BRAND_DARK_GOLD` moved to **`#8c7337`** on 2026-08-17 as a result. Both columns below, so the
+`BRAND_DARK_GOLD` moved to **`#8c7337`** on 2026-08-23 as a result. Both columns below, so the
 trade is visible rather than asserted:
 
 | Usage | Floor | `#b19145` | `#8c7337` |
