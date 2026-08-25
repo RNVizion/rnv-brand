@@ -123,23 +123,42 @@ identifier across its own repos is not positioned to align anyone else's.
 # was the error.
 
 # ---------------------------------------------------------- naming convention
-# GOLD SITS IN THE THIRD SLOT. Everything before it modifies it; a fourth word is
-# a DERIVATIVE of the three-word name to its left.
+# GOLD SITS IN THE THIRD SLOT. Everything before it modifies it; a fourth word
+# marks a DERIVATIVE OR A STATE of the three-word name to its left.
 #
-#   BRAND_GOLD              the base
-#   BRAND_DARK_GOLD         a named gold -- the light-mode one
-#   BRAND_STILL_GOLD        a named gold -- stillness, registered
-#   BRAND_STANDBY_GOLD      a named gold -- standby, derived by rule
-#   BRAND_HOVER_GOLD        a named gold -- dark-mode hover, derived by rule
-#   BRAND_DARK_GOLD_DEEP    a DERIVATIVE of BRAND_DARK_GOLD
+#   BRAND_GOLD               the base
+#   BRAND_DARK_GOLD          a named gold -- the light-mode one
+#   BRAND_STILL_GOLD         a named gold -- stillness, registered
+#   BRAND_STANDBY_GOLD       a named gold -- standby, derived by rule
+#   BRAND_DARK_GOLD_DEEP     a DERIVATIVE of BRAND_DARK_GOLD
+#   BRAND_GOLD_HOVER         a STATE of BRAND_GOLD
+#   BRAND_DARK_GOLD_HOVER    the same state, of BRAND_DARK_GOLD
 #
-# THREE WORDS NAME A ROLE; FOUR NAME A DERIVATIVE OF ONE. Being derived by rule
-# does not demote a gold to four words -- BRAND_STANDBY_GOLD is computed and is
-# still a role the brand names. What the fourth word marks is dependency: DEEP
-# has no meaning without the DARK_GOLD it is taken from.
+# THE TEST IS NOT "IS IT DERIVED", IT IS "DOES IT EXIST WITHOUT ANOTHER GOLD".
+# BRAND_STANDBY_GOLD is computed by rule and is still a role the brand names --
+# standby is a thing the brand HAS. Hover is not: there is no hover without
+# something to hover over, and DEEP has no meaning without the DARK_GOLD it is
+# taken from. The fourth word marks dependency.
 #
-# Ruled 2026-08-23. It retires nothing in the apps: BRAND_DARK_GOLD_DEEP already
-# shipped in three repositories and already fits.
+# THIS RULING WAS WRONG WHEN FIRST WRITTEN, ON BOTH HALVES, AND IS CORRECTED
+# HERE. As shipped 2026-08-23 (996eade) it listed BRAND_GOLD_HOVER among the
+# roles and claimed "it retires nothing in the apps".
+#
+#   1. IT RETIRED AN IDENTIFIER IN FIVE OF SIX REPOSITORIES -- 43 occurrences of
+#      BRAND_GOLD_HOVER and GOLD_HOVER, every one holding #dfc9a0. The claim was
+#      made after checking that BRAND_DARK_GOLD_DEEP fits and NOT checking the
+#      identifier the same commit was renaming. The check that ran covered the
+#      half that was easy; practices doc section 4.
+#
+#   2. IT LEFT THE LIGHT-MODE COUNTERPART UNSPELLABLE. If hover is a three-word
+#      role, its dark-gold sibling is BRAND_DARK_HOVER_GOLD -- four words with
+#      gold in the FOURTH slot, which this convention forbids. As a state it is
+#      BRAND_DARK_GOLD_HOVER, gold third, and both modes spell symmetrically.
+#      A convention tested against one example is a convention tested against
+#      the example that suggested it.
+#
+# The apps' spelling was right and BRAND_COLORS.md's was right. The source was
+# the outlier, and reverting costs one file rather than five repositories.
 BRAND_GOLD = "#d2bc93"         # brand gold (primary) — never varies across surfaces
 # FOR LIGHT-MODE SURFACES. It is darker BECAUSE the ground is lighter -- the name
 # describes the colour, this note describes the job, and the two read as
@@ -265,7 +284,7 @@ def lighten(color: str, step: int) -> str:
 # should say which in a comment. WHAT IT MUST NOT DO IS HAND-WRITE THE VALUE --
 # if it wants a pressed shade, it derives one with lighten().
 BRAND_DARK_GOLD_DEEP = lighten(BRAND_DARK_GOLD, -14)   # -> #7e6529, light-mode TEXT
-BRAND_HOVER_GOLD = lighten(BRAND_GOLD, 13)             # -> #dfc9a0, dark-mode HOVER
+BRAND_GOLD_HOVER = lighten(BRAND_GOLD, 13)             # -> #dfc9a0, dark-mode HOVER
 
 # ---------------------------------------------------------------- stillness
 # BRAND_STILL_GOLD IS REGISTERED, NOT DERIVED, AND THAT IS THE WHOLE POINT.
@@ -690,6 +709,30 @@ STATUS = {
     # platform value that never conformed to either register, and a derived
     # variant that conforms while its base does not makes the pair incoherent.
     "error-text": "#e56b77",
+    # LIGHT-MODE ERROR TEXT, published 2026-08-24 because three applications had
+    # already derived it independently under TWO identifiers -- STATUS_ERROR_LIGHT
+    # in the picker and the transformer, STATUS_ERROR_TEXT_LIGHT in the palette
+    # manager. That is the condition publishing BRAND_DARK_GOLD_DEEP was meant to
+    # end, recurring in a different family: an unpublished derivation permits four
+    # VALUES for one colour, and here it also produced two NAMES.
+    #
+    # THE REGISTER SAID THIS COLOUR DID NOT EXIST WHILE THE BRAND BOOK SAID IT WAS
+    # RULED AND APPLIED. BRAND_COLORS.md rev 18 carried a heading "There is no
+    # light-mode error text"; Book v1.49 section 9 carried #c82131 as ruled. The
+    # apps followed the Book. Three sources, three answers -- practices doc
+    # section 5.5.0, and the measurement settles it.
+    #
+    #   error #dc3545 as TEXT on #f5f5f5   4.1528  FAIL, it is a fill colour
+    #   error-text #e56b77 on #f5f5f5      2.8745  FAIL, it is a DARK-theme value
+    #   this value on #f5f5f5              5.1810  pass
+    #                on #ffffff            5.6485  pass
+    #                on #eeeeee            4.8684  pass
+    #                on #e8e8e8            4.6100  pass
+    #
+    # Same uniform per-channel step as every other derivation here, holding hue.
+    # Named error-text-light rather than a fourth spelling: it is the light-mode
+    # sibling of error-text above, and the pair should read as a pair.
+    "error-text-light": lighten("#dc3545", -20),   # -> #c82131
 }
 
 # ------------------------------------------------------- texture + type
@@ -776,6 +819,20 @@ RNV_BRAND = {
     "dark gold": BRAND_DARK_GOLD,
     "gold dark": BRAND_DARK_GOLD,
     "light-mode gold": BRAND_DARK_GOLD,
+    # THE SEVENTH PERMANENT WAS UNRESOLVABLE FOR A DAY. still-gold entered
+    # PERMANENT on 2026-08-23 and no key here reached it, so the brand's own name
+    # resolver refused a permanent brand colour. PERMANENT and RNV_BRAND are two
+    # lists of the same thing, one gained a member and the other did not, and
+    # NOTHING COMPARED THEM -- the construct-with-no-consumer failure between two
+    # constructs that both have consumers.
+    #
+    # Guarded below by _resolver_covers_permanent(), which is the completeness
+    # check that should have existed before the gap did.
+    "still gold": BRAND_STILL_GOLD,
+    "still-gold": BRAND_STILL_GOLD,
+    "stillness": BRAND_STILL_GOLD,
+    "standby gold": BRAND_STANDBY_GOLD,
+    "standby-gold": BRAND_STANDBY_GOLD,
     "black": TRUE_BLACK,
     "true black": TRUE_BLACK,
     "white": WHITE,
@@ -784,6 +841,35 @@ RNV_BRAND = {
 }
 
 # ---------------------------------------------------------------- emitter
+
+def _resolver_covers_permanent():
+    """Every PERMANENT colour must be reachable by at least one resolver name.
+
+    THE GAP THIS CLOSES EXISTED FOR A DAY AND NOTHING REPORTED IT. `still-gold`
+    entered PERMANENT and no RNV_BRAND key reached it, so the brand's own name
+    resolver refused a permanent brand colour. PERMANENT and RNV_BRAND are two
+    lists of the same thing; one gained a member, the other did not, and nothing
+    compared them.
+
+    RUNS AT IMPORT, so a consumer mirroring this module fails on the mirror rather
+    than discovering it when someone asks for the colour out loud. That is the
+    difference between a check and a note: a note about this would have been true
+    and unread.
+    """
+    reachable = set(RNV_BRAND.values())
+    missing = {k: v for k, v in PERMANENT.items()
+               if not k.startswith("_") and v not in reachable}
+    if missing:
+        raise AssertionError(
+            "PERMANENT colours unreachable through RNV_BRAND: "
+            + ", ".join(f"{k}={v}" for k, v in sorted(missing.items()))
+            + " -- add a resolver key in the same change that adds the colour"
+        )
+
+
+_resolver_covers_permanent()
+
+
 def tokens(surface: str = "web") -> dict[str, str]:
     """Flat token map for one surface; the emitter's source of truth."""
     palettes = {"web": WEB, "app": APP, "records": RECORDS}
