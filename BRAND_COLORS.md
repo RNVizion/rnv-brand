@@ -3,7 +3,15 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-23 (rev 18 — **stamp dates in this file are the clock of the commit that
+Last locked: 2026-08-24 (rev 19 — **three corrections, and in two of them this register was the
+document the apps had correctly ignored.** It carried a heading saying **there is no light-mode
+error text** while Brand Book §9 ruled `#c82131` and three applications shipped it — under **two**
+identifiers, which is the unpublished-derivation failure recurring in another family. Now published
+as `STATUS["error-text-light"]`. **The hover-gold rename is reverted at source**: `BRAND_HOVER_GOLD`
+retired an identifier in five of six repositories, 43 occurrences, and left the light-mode
+counterpart unspellable — `BRAND_GOLD_HOVER`, which this register never stopped publishing, was
+right. And `still-gold` was a permanent colour the brand's own resolver refused for a day; the
+resolver keys and an import-time completeness guard both landed. rev 18 — **stamp dates in this file are the clock of the commit that
 shipped the subject, with the short SHA beside them.** An earlier pass re-dated every 2026-08-17
 stamp to "today" on the belief that nothing happened that day. **Seven commits carry it**, and the
 gold value change demonstrably shipped in `1003a6c` on it. Corrected per stamp against
@@ -21,7 +29,7 @@ applications derived `-14` from the same base independently; `rnv-color-picker` 
 for one colour — worse than four names, because a wrong value is invisible in a diff.
 `engine/brand.py` now carries `lighten()` and both derivatives with their walks. **Dark-mode pressed
 is recorded as OPEN**, since the two apps disagree and it is a design question rather than a
-measurement. **And there is no light-mode error text:** `#dc3545` reads 4.1528 on a light panel, and
+measurement. **And the light-mode error text is now published** as `STATUS["error-text-light"]` `#c82131`: `#dc3545` reads 4.1528 on a light panel, and
 `error-text` is a dark-theme value that would make it *worse*. rev 16 — **`BRAND_DARK_GOLD` moved from `#b19145` to `#8c7337`, and the
 reason is a rounding rather than a redesign.** This register read gold-on-white as 3.00:1 and
 granted permissions on that figure. The true value is **2.997638** — under the 3.0 large-text and
@@ -611,7 +619,7 @@ third registered gold is the wrong fix. What was missing was the **rule**.
 lighten(color, step)   # uniform per-channel, clamped 0-255. Holds hue exactly.
 
 BRAND_DARK_GOLD_DEEP = lighten(BRAND_DARK_GOLD, -14)   # #7e6529  light-mode TEXT
-BRAND_GOLD_HOVER     = lighten(BRAND_GOLD,       13)   # #dfc9a0  dark-mode HOVER
+BRAND_GOLD_HOVER     = lighten(BRAND_GOLD,       13)   # #dfc9a0  dark-mode HOVER  <- this spelling stands
 ```
 
 **Published because three applications derived the same value independently** — `rnv-text-transformer`,
@@ -637,7 +645,7 @@ because non-uniform steps do not hold hue. One of them, `#c4a458`, was a tint of
 retired** — orphaned, still rendering, nothing to flag it. **No contrast check would have: an
 orphaned gold can be perfectly legible.**
 
-### There is no light-mode error text, and that is now named
+### The light-mode error text, `#c82131` — published 2026-08-24
 
 `STATUS["error"]` `#dc3545` is a **fill** colour. As text on a light panel it does not clear:
 
@@ -653,10 +661,27 @@ against the 3.3777 an app already had. **That advice was given in a handoff note
 4.58 was measured on the APP card and the 3.84 on the dark panel: both real, **neither the ground the
 app draws on.**
 
-**The decision is open.** Either rule a light-mode error text — `#d42d3d` measures 4.5406 on
-`#f5f5f5` and 4.9503 on `#ffffff`, by the same downward walk that produced `error-text` — or rule
-explicitly that error text on a light panel is out of scope, **so apps stop carrying an open
-exemption for it.** The apps need to know which way it goes more than they need a particular answer.
+**RULED 2026-08-24: `STATUS["error-text-light"]` = `lighten(STATUS["error"], -20)` → `#c82131`.**
+
+| ground | ratio |
+|---|---|
+| `#ffffff` | 5.6485 |
+| `#f5f5f5` | 5.1810 |
+| `#eeeeee` | 4.8684 |
+| `#e8e8e8` | 4.6100 |
+
+**This heading said the opposite for two days while Brand Book §9 said it was ruled and applied, and
+three apps shipped it.** They derived `lighten(STATUS_ERROR, -20)` independently under **two**
+identifiers — `STATUS_ERROR_LIGHT` in `rnv-color-picker` and `rnv-text-transformer`,
+`STATUS_ERROR_TEXT_LIGHT` in `rnv-color-palette-manager`.
+
+**That is exactly the condition publishing `BRAND_DARK_GOLD_DEEP` was meant to end**, recurring in
+another family — and this time an unpublished derivation produced not only a risk of four values but
+**two actual names.** The candidate `#d42d3d` this section previously floated is retired: the Book's
+value was already ruled, already applied, and measures better.
+
+**Apps: align to `error-text-light`.** The name is the light-mode sibling of `error-text` above and
+the pair should read as a pair.
 
 ### Hover moves *away* from the ground, in both modes
 
