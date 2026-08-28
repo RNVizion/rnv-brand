@@ -441,8 +441,47 @@ APP = {
     "panel": BRAND_BLACK,
     "card": "#2a2a2a",
     "border": "#333333",
-    "text": "#e0e0e0",
-    "text-dim": "#aaaaaa",
+    # THE INK GRID, ruled 2026-08-28 together with this value, because the value
+    # moved only to satisfy it and neither is defensible alone.
+    #
+    #   grey(n) = n * 0x11, n in 0..15.  TRUE_BLACK -> WHITE in fifteen steps.
+    #
+    # IT GOVERNS INKS AND EDGES. IT DOES NOT GOVERN SURFACES AND IT NEVER CAN --
+    # `panel` is BRAND_BLACK #1a1a1a at n = 1.53 and `card` is #2a2a2a at n = 2.47.
+    # BRAND_BLACK is a permanent brand colour and will not move to fit a ladder.
+    # THE SCOPE IS WRITTEN INTO THE RULE rather than discovered by whoever extends
+    # the grid to surfaces and finds a permanent in the way.
+    #
+    #   ink   text      grey(13)  #dddddd    was #e0e0e0 at n = 13.18
+    #   ink   text-dim  grey(10)  #aaaaaa
+    #   edge  border    grey(3)   #333333
+    #
+    # WHY THE VALUE MOVED. #e0e0e0 was ONE HEX DOING TWO UNRELATED JOBS: ink in
+    # dark mode, and a light SURFACE in the apps' light palettes and in this
+    # register's own contrast tables. It refused to sit on the grid because the
+    # grid governs inks and half its uses were not ink. Split the roles and both
+    # halves land -- the ink half moves to grey(13); the surface half keeps
+    # #e0e0e0 and does not move, so BRAND_COLORS.md's two contrast rows stand.
+    #
+    # PRIMARY TEXT IS ONE ROLE WITH TWO MODE VALUES: dark is a grey on the ink
+    # grid, light is TRUE_BLACK. Already true in all five apps with no exceptions;
+    # unwritten is why it looked like a question.
+    #
+    # COST, measured on every ground it is drawn on. Contrast falls 0.20 to 0.44
+    # and the floor afterwards is 7.17 on the pressed plate #444444, the darkest
+    # ground it touches:
+    #
+    #   #444444  7.37 -> 7.17     #2a2a2a  10.87 -> 10.56
+    #   #3a3a3a  8.61 -> 8.37     #1a1a1a  13.18 -> 12.81
+    #   #333333  9.57 -> 9.30     #000000  15.90 -> 15.46
+    #
+    # SAFE TO MOVE, checked rather than assumed: nothing in this file derives from
+    # it, profile.json does not carry it, and rnv-live emits from --css web and
+    # reads WEB["text"] #e8e8f0, not this one. All six existing uses of #dddddd
+    # across the five apps sit under LIGHT palettes, so it collides with nothing
+    # it could render against.
+    "text": "#dddddd",
+    "text-dim": "#aaaaaa",   # grey(10)
     "accent": BRAND_GOLD,
     "accent-light-mode": BRAND_DARK_GOLD,
     "text-on-gold": TRUE_BLACK,
