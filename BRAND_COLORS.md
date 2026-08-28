@@ -3,7 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-24 (rev 19 — **three corrections, and in two of them this register was the
+Last locked: 2026-08-28 (rev 20 — **the ink grid is ruled and `APP["text"]` moved onto it.**
+`grey(n) = n * 0x11`; every ink and every edge lands on a step, in both modes, with no exceptions.
+`#e0e0e0` was the single exception and it was **one hex doing two jobs** — ink in dark mode, a light
+surface elsewhere — which is why it would not sit on a grid that governs inks. The ink half is now
+`grey(13)` `#dddddd`; the surface half keeps `#e0e0e0` and the two contrast rows below are
+unchanged. **The grid's scope is stated with the grid:** it governs inks and edges and never
+surfaces, because `APP["panel"]` is `BRAND_BLACK` at n = 1.53 and a permanent does not move to fit a
+ladder. rev 19 — **three corrections, and in two of them this register was the
 document the apps had correctly ignored.** It carried a heading saying **there is no light-mode
 error text** while Brand Book §9 ruled `#c82131` and three applications shipped it — under **two**
 identifiers, which is the unpublished-derivation failure recurring in another family. Now published
@@ -193,6 +200,56 @@ sits on `#0a0a0f`. Collapsing the darks re-renders all of them.
 ---
 
 ## The ramps, which are rules and not lists
+
+### The ink grid, ruled 2026-08-28
+
+```
+grey(n) = n * 0x11,  n in 0..15      TRUE_BLACK -> WHITE in fifteen steps
+```
+
+**Every ink and every edge lands on `grey(n)`, in both modes, with no exceptions.**
+
+| role | key | value | n |
+|---|---|---|---|
+| ink | `APP["text"]` | `#dddddd` | **13** |
+| ink | `APP["text-dim"]` | `#aaaaaa` | 10 |
+| edge | `APP["border"]` | `#333333` | 3 |
+
+**Primary text is one role with two mode values:** dark is a grey on the ink grid, light is
+`TRUE_BLACK`. Already true in all five apps with no app disagreeing — it had simply never been
+written down, which is why it read as a question rather than a rule.
+
+**THE GRID GOVERNS INKS AND EDGES. IT DOES NOT GOVERN SURFACES AND IT NEVER CAN.** `APP["panel"]` is
+`BRAND_BLACK` `#1a1a1a` at n = 1.53 and `APP["card"]` is `#2a2a2a` at n = 2.47. **`BRAND_BLACK` is a
+permanent brand colour and will not move to fit a ladder.** The scope is stated here rather than
+discovered by whoever extends the grid to surfaces and finds a permanent in the way — the same
+failure as a coverage boundary that decays, arriving in a ramp.
+
+### `APP["text"]` moved from `#e0e0e0` to `#dddddd` in the same change
+
+It moved **only** to satisfy the grid, so the grid and the move are one ruling; neither is
+defensible alone.
+
+**The value was one hex doing two unrelated jobs.** Ink in dark mode; a light **surface** in the
+apps' light palettes and in this register's own contrast tables below. It refused to sit on the grid
+because **the grid governs inks and half its uses were not ink.** Split the roles and both halves
+land — the ink half becomes `grey(13)`, the surface half keeps `#e0e0e0` and does not move. **The
+two contrast rows further down are about the surface and stand unchanged.**
+
+| ground | before | after |
+|---|---|---|
+| `#444444` pressed plate | 7.37 | **7.17** |
+| `#3a3a3a` hover | 8.61 | 8.37 |
+| `#333333` border | 9.57 | 9.30 |
+| `#2a2a2a` card | 10.87 | 10.56 |
+| `#1a1a1a` panel | 13.18 | 12.81 |
+| `#000000` window | 15.90 | 15.46 |
+
+Floor after the move is **7.17**, on the darkest ground it ever touches. Nothing approaches a bar.
+
+**Checked rather than assumed:** nothing in `engine/brand.py` derives from it, `profile.json` does
+not carry it, `rnv-live` emits from `--css web` and reads `WEB["text"]` `#e8e8f0` — so no web surface
+moves — and all six existing uses of `#dddddd` across the five apps sit under **light** palettes.
 
 ### The neutral ramp
 
