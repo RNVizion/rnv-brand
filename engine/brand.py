@@ -480,7 +480,33 @@ APP = {
     # reads WEB["text"] #e8e8f0, not this one. All six existing uses of #dddddd
     # across the five apps sit under LIGHT palettes, so it collides with nothing
     # it could render against.
-    "text": "#dddddd",
+    "text": "#dddddd",   # grey(13)
+
+    # COINCIDENCE IS PERMITTED AND MUST BE NAMED, ruled 2026-08-28.
+    #
+    # Publishing the grid created a class this register had only ever met once
+    # before: an app-owned ramp step landing on a REGISTERED value while doing a
+    # different job. rnv-text-transformer's light `border_light` is grey(13), and
+    # so is this ink. They are not the same value and must not be collapsed --
+    # IF THIS INK EVER MOVES OFF grey(13), THAT BORDER MUST NOT FOLLOW IT.
+    #
+    # THE SEAM ALREADY HAS A NAME HERE. signal-offline equals text-faint exactly,
+    # and the rule twenty lines into WEB reads "do not de-duplicate these": one
+    # moves for legibility, the other for the type ramp, and a shared hex is not
+    # shared ownership. This is that rule meeting an app ramp instead of two
+    # register families.
+    #
+    # THE APPS' `COINCIDENT` TABLE IS THE MACHINE-READABLE FORM OF IT AND IS
+    # ADOPTED AS THE RECORDING FORM. Name, the register entry it shares a value
+    # with, and why it is not the same role -- asserted in four directions so it
+    # cannot rot: a coincidence that stops coinciding fails, one whose register
+    # entry changed identity fails, one naming a `register`-classified constant
+    # fails, and one with no written reason fails.
+    #
+    # THE ALTERNATIVE WAS CONSIDERED AND REJECTED. Telling apps to avoid grid
+    # positions the register occupies would put holes at arbitrary indices in
+    # every app ramp, and a ramp with holes is worse than a coincidence with a
+    # reason -- the holes carry no explanation and the next author closes them.
     "text-dim": "#aaaaaa",   # grey(10)
     "accent": BRAND_GOLD,
     "accent-light-mode": BRAND_DARK_GOLD,
