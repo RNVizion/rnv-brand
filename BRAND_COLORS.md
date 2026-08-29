@@ -3,7 +3,15 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-28 (rev 20 — **the ink grid is ruled and `APP["text"]` moved onto it.**
+Last locked: 2026-08-28 (rev 21 — **three rulings out of the ink-grid rollout, and two of them
+came from applying the grid rather than from looking for defects.** **Coincidence is permitted and
+must be named:** publishing the grid means an app ramp step can land on a registered value while
+doing a different job, and the apps' `COINCIDENT` table is adopted as the recording form — the same
+seam as `signal-offline` equalling `text-faint`, meeting an app ramp instead of two register
+families. **`#d0d0d0` is retired as a light interaction ground**, found independently by two apps
+and settled at the value rather than at either dialog. **And the light-surface ladder is NOT ruled
+here** — the anchor offered for it does not hold, and the reason is in the ramp section below.
+rev 20 — **the ink grid is ruled and `APP["text"]` moved onto it.**
 `grey(n) = n * 0x11`; every ink and every edge lands on a step, in both modes, with no exceptions.
 `#e0e0e0` was the single exception and it was **one hex doing two jobs** — ink in dark mode, a light
 surface elsewhere — which is why it would not sit on a grid that governs inks. The ink half is now
@@ -250,6 +258,71 @@ Floor after the move is **7.17**, on the darkest ground it ever touches. Nothing
 **Checked rather than assumed:** nothing in `engine/brand.py` derives from it, `profile.json` does
 not carry it, `rnv-live` emits from `--css web` and reads `WEB["text"]` `#e8e8f0` — so no web surface
 moves — and all six existing uses of `#dddddd` across the five apps sit under **light** palettes.
+
+### The light-surface ladder is not ruled, and here is what has to be true before it can be
+
+**The problem is real and correctly diagnosed: nine light surfaces across four apps sit between grid
+n = 12.24 and n = 15.00 — under three steps of `0x11`.** Nine distinguishable surfaces cannot live
+in 2.76 steps of a ladder that steps by seventeen. The dark side does not have this problem because
+it never used the ink grid for surfaces.
+
+**But the anchor offered for the light ladder does not hold.** The claim was
+`invert(#0a0a0a) = #f5f5f5` — *the light ground is the reflection of the dark canvas*. The
+arithmetic is right and **`#0a0a0a` is not a value this brand holds.** The canvas is `WEB_BLACK`
+`#0a0a0f`, and:
+
+| dark value | registered | inverts to | in use on the light side |
+|---|---|---|---|
+| `TRUE_BLACK` `#000000` | yes | `#ffffff` | **yes, 32 uses** |
+| `BRAND_BLACK` `#1a1a1a` | yes | `#e5e5e5` | **no uses at all** |
+| `WEB_BLACK` `#0a0a0f` | yes | `#f5f5f0` | no — `#f5f5f5` is a near miss |
+| `#0a0a0a` | **no** | `#f5f5f5` | 15 uses |
+
+**Inversion anchors exactly one value in use, and it is `#ffffff`.** `#f5f5f5` looked anchored
+because `#0a0a0a` is one byte from the canvas in the blue channel alone. That is a coincidence with a
+colour the brand does not hold, and building a ladder on it would pin fifteen uses to a value nothing
+in the register defines.
+
+**The dark ladder that was offered as the model is also not published.** `BRAND_BLACK ± 0x10` gives
+`#0a0a0a`, `#1a1a1a`, `#2a2a2a`, `#3a3a3a` — but `APP` holds `panel` `#1a1a1a`, `card` `#2a2a2a`,
+and `border` `#333333`, which is **not** `#3a3a3a`. Two rungs of that ladder are in use, two are not,
+and one value in the family is off it. **It is a pattern two values wide, not a published rule**, so
+mirroring it would mean deriving the light side from something the dark side has not settled either.
+
+**`#e8e8e8` does have independent standing** and that part is right: it is the published coverage
+boundary for gold as text, and any ladder stepping over it makes that ruling harder to state.
+
+**What has to happen first, in order:**
+
+1. **Rule the dark surface ladder**, which is two-thirds specified and entirely within this register.
+   Until `border` at `#333333` versus a `#3a3a3a` rung is settled, there is no model to mirror.
+2. **Decide which of the nine light values are real distinctions.** Four carry 65 of the 71 uses —
+   `#ffffff` 32, `#f5f5f5` 15, `#eeeeee` 11, `#e0e0e0` 7. The other five have nine uses between them.
+   **That is a judgement about whether a user can tell a list-alternate row from a list header, and
+   it is made by looking, not by measuring.**
+3. **Then derive**, with `#e8e8e8` fixed as a rung because it is already load-bearing.
+
+**Until then the dark half is what should be built**, and it is fully specified today.
+
+### `#d0d0d0` is retired as a light interaction ground, ruled 2026-08-28
+
+**Two applications reached this independently, which is the argument for the register holding it.**
+`rnv-color-picker` already carried `#d0d0d0` in its `RETIRED` table as *"the tab hover ground no gold
+cleared"*. `rnv-color-palette-manager` then hit the same wall in its About dialog: a hover plate at
+`#d0d0d0` with a `BRAND_DARK_GOLD_DEEP` label reads **3.601:1**, under the 4.5 floor and well below
+the published boundary.
+
+**The register already ruled the outcome and the apps were violating it, not disagreeing with it:**
+*below `#e8e8e8`, gold does not carry text.* `#d0d0d0` is grid n = 12.24, two full steps under.
+
+**The fix is neither of the two the apps proposed.** Moving the plate above `#e8e8e8` treats one
+dialog; dropping gold from the label treats one label. **The value is the defect** — a light
+interaction ground dark enough that nothing in the gold family clears text on it, discovered twice
+by two apps that never compared notes.
+
+**Ruling: `#d0d0d0` is not a light interaction ground.** Light hover and pressed plates stay at or
+above `#e8e8e8`, which is where the gold-as-text boundary already sits. That is one rule covering
+both instances and every future one, rather than two fixes covering two dialogs.
 
 ### The neutral ramp
 
