@@ -3,7 +3,13 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-28 (rev 21 — **three rulings out of the ink-grid rollout, and two of them
+Last locked: 2026-08-29 (rev 22 — **the dark surface ladder is ruled with all four rungs
+registered, and the light hover plate is settled at `#e8e8e8`.** `APP` gains `canvas` `#0a0a0a`,
+`panel-hover` `#3a3a3a` and `hover-light` `#e8e8e8`; no existing value moved. **A correction from
+this side is recorded rather than quietly dropped:** rev 21 called the dark ladder "two-thirds
+specified" on the grounds that `border` `#333333` is not a rung — it is `grey(3)` on the ink grid,
+an edge rather than a surface, and was never part of this ladder. The wrong reading is what sent the
+app side hunting a gap that did not exist. rev 21 — **three rulings out of the ink-grid rollout, and two of them
 came from applying the grid rather than from looking for defects.** **Coincidence is permitted and
 must be named:** publishing the grid means an app ramp step can land on a registered value while
 doing a different job, and the apps' `COINCIDENT` table is adopted as the recording form — the same
@@ -323,6 +329,62 @@ by two apps that never compared notes.
 **Ruling: `#d0d0d0` is not a light interaction ground.** Light hover and pressed plates stay at or
 above `#e8e8e8`, which is where the gold-as-text boundary already sits. That is one rule covering
 both instances and every future one, rather than two fixes covering two dialogs.
+
+### The dark surface ladder, ruled 2026-08-29 — all four rungs registered
+
+```
+BRAND_BLACK + n * 0x10,  n in -1..+2
+```
+
+| n | value | role | key |
+|---|---|---|---|
+| −1 | `#0a0a0a` | canvas, image-viewer ground | **`APP["canvas"]`** — was app-owned |
+| 0 | `#1a1a1a` | panel | `APP["panel"]`, `BRAND_BLACK` |
+| +1 | `#2a2a2a` | card | `APP["card"]` |
+| +2 | `#3a3a3a` | panel hover | **`APP["panel-hover"]`** — was app-owned |
+
+**The two ends were app-owned and are now registered.** A brand that publishes the middle of a
+ladder and leaves the edges to applications is publishing a derivation nobody can check.
+
+**`border` is not a rung, and its absence was never a gap.** An earlier reading from this side
+called the ladder *"two-thirds specified"* because `APP["border"]` `#333333` is not `#3a3a3a`.
+**`#333333` is `grey(3)` exactly on the ink grid, and that grid governs inks *and edges*.** A border
+is an edge. It was measured against the wrong family and reported as a hole in this one — the
+correction is recorded rather than quietly applied, because the wrong reading is what sent the app
+side looking for a rung that does not exist.
+
+**`#0a0a0a` is not `WEB_BLACK`, and the seam is deliberate.** The web canvas is `#0a0a0f` — same
+lightness, blue channel lifted. This register already rules it: **app neutrals are pure grey,
+R = G = B, without exception**, and the web ground carries a tint the apps do not. Two canvases one
+byte apart is not drift.
+
+**And that near-miss is what made the light-side inversion anchor look convincing.**
+`invert(#0a0a0a) = #f5f5f5` is true of a colour the brand does not hold; `invert(#0a0a0f) = #f5f5f0`
+is true of one it does. The same one-byte seam produced a correct-looking derivation on one side and
+a false one on the other.
+
+### The light hover plate is `#e8e8e8`, and it is not a choice
+
+`#d0d0d0` was retired and nothing replaced it. The plate is bounded from both sides:
+
+| plate | gold `#7e6529` | separation from `#ffffff` |
+|---|---|---|
+| `#d0d0d0` | 3.6013 fail | 1.5424 |
+| `#e0e0e0` | 4.2078 fail | 1.3200 |
+| `#e5e5e5` | 4.4095 fail | 1.2596 |
+| **`#e8e8e8`** | **4.5334 pass** | **1.2252** |
+| `#eeeeee` | 4.7875 pass | 1.1602 |
+| `#f5f5f5` | 5.0949 pass | 1.0902 |
+
+**The band is `#e8e8e8` and lighter, and `#e8e8e8` is its dark edge** — so it is the only member
+that maximises separation from the base while clearing the label. Every lighter option is a strictly
+worse plate. **This was asked as a choice and the arithmetic does not leave one.**
+
+**It is also the published gold-as-text boundary, reached from the other direction.** The apps walked
+*up* from a failing plate; this register walked *down* from a failing text colour; both stopped here.
+**A boundary two independent walks land on is doing real work.**
+
+Dark needs nothing: `BRAND_GOLD` on the panel-hover rung reads 6.1503.
 
 ### The neutral ramp
 
