@@ -3,7 +3,15 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-29 (rev 22 — **the dark surface ladder is ruled with all four rungs
+Last locked: 2026-08-30 (rev 23 — **the hover plate moves from `#e8e8e8` to `#eeeeee` one day after
+being ruled, and a claim is withdrawn with it.** The first ruling measured separation from the base
+and called the result dominance; it never measured **margin on the binding constraint**, where
+`#e8e8e8` clears by 0.0334 and `#eeeeee` by 0.2875. `#e8e8e8` is the ground the light gold is
+*calibrated against* — plate and gold would have failed on the same rounding. **Eleven hover keys
+across four apps already held `#eeeeee` and zero held `#e8e8e8`**; the ruling reasoned from a
+contrast table about a question the shipped code had settled. `#e8e8e8` keeps every other role.
+**And rev 22's "two independent walks" claim is withdrawn as a tautology** — same equation, two
+unknowns, and the crossing always lands on whatever ground you fed it. rev 22 — **the dark surface ladder is ruled with all four rungs
 registered, and the light hover plate is settled at `#e8e8e8`.** `APP` gains `canvas` `#0a0a0a`,
 `panel-hover` `#3a3a3a` and `hover-light` `#e8e8e8`; no existing value moved. **A correction from
 this side is recorded rather than quietly dropped:** rev 21 called the dark ladder "two-thirds
@@ -363,28 +371,55 @@ byte apart is not drift.
 is true of one it does. The same one-byte seam produced a correct-looking derivation on one side and
 a false one on the other.
 
-### The light hover plate is `#e8e8e8`, and it is not a choice
+### The light hover plate is `#eeeeee` — corrected 2026-08-30, the day after it was ruled
 
-`#d0d0d0` was retired and nothing replaced it. The plate is bounded from both sides:
+**The first ruling put it on `#e8e8e8` and said the arithmetic left no choice. It measured one axis
+and called the result dominance.**
 
-| plate | gold `#7e6529` | separation from `#ffffff` |
+| plate | gold `#7e6529` | margin | error-red `#c82131` | margin | separation from `#ffffff` |
+|---|---|---|---|---|---|
+| `#e8e8e8` | 4.5334 | **+0.0334** | 4.6100 | +0.1100 | 1.2252 |
+| **`#eeeeee`** | 4.7875 | **+0.2875** | 4.8684 | +0.3684 | 1.1602 |
+
+**The axis it did not measure is margin on the binding constraint.** `#e8e8e8` is the value at which
+the next step down fails — and it is the ground `BRAND_DARK_GOLD_DEEP` is *calibrated against*,
+marked `<- binding` in its own derivation. Putting every hover in every app on it couples plate to
+gold so tightly that one rounding fails them together: `-13` instead of `-14` gives 4.4675 and both
+go at once.
+
+**A boundary is not a plate. A working state should not sit on the last value that works.**
+
+**And the applications had already answered it.** Eleven hover keys across four apps hold `#eeeeee`;
+**zero** hold `#e8e8e8`, whose every use is a static surface. **The ruling reasoned from a contrast
+table about a question the shipped code had already settled.**
+
+**`#e8e8e8` is not retired and not weakened.** It stays registered, stays the published gold-as-text
+coverage boundary, and keeps its three surface uses and its role as the binding ground. It is doing
+real work; it is simply not the hover.
+
+### A claim withdrawn, in the same change
+
+Rev 22 argued that the apps walking *up* from a failing plate and this register walking *down* from a
+failing text colour and **both stopping at `#e8e8e8`** was *"a boundary two independent walks land on
+is doing real work."*
+
+**The walks were never independent.** It is one equation — `cr(gold, ground) >= 4.5` — solved for two
+unknowns. The register fixed a set of grounds and took the **smallest step clearing its darkest
+one**, which calibrates the gold *to* that ground. Asking afterwards which ground the gold clears
+returns the ground you fed it:
+
+| darkest ground fed | step chosen | crossing then lands at |
 |---|---|---|
-| `#d0d0d0` | 3.6013 fail | 1.5424 |
-| `#e0e0e0` | 4.2078 fail | 1.3200 |
-| `#e5e5e5` | 4.4095 fail | 1.2596 |
-| **`#e8e8e8`** | **4.5334 pass** | **1.2252** |
-| `#eeeeee` | 4.7875 pass | 1.1602 |
-| `#f5f5f5` | 5.0949 pass | 1.0902 |
+| `#eeeeee` | −10 | `#eeeeee` |
+| `#e8e8e8` | −14 | `#e8e8e8` |
+| `#e0e0e0` | −19 | `#e0e0e0` |
+| `#dddddd` | −21 | `#dddddd` |
 
-**The band is `#e8e8e8` and lighter, and `#e8e8e8` is its dark edge** — so it is the only member
-that maximises separation from the base while clearing the label. Every lighter option is a strictly
-worse plate. **This was asked as a choice and the arithmetic does not leave one.**
+**Every time. That is arithmetic, not corroboration.**
 
-**It is also the published gold-as-text boundary, reached from the other direction.** The apps walked
-*up* from a failing plate; this register walked *down* from a failing text colour; both stopped here.
-**A boundary two independent walks land on is doing real work.**
-
-Dark needs nothing: `BRAND_GOLD` on the panel-hover rung reads 6.1503.
+**The gold-as-text ruling stands on the six-job table** — one value passing one job of six against
+another passing five — which is real independent evidence. Raised by the app side, which was right to
+refuse unsafe support for a ruling it agrees with.
 
 ### The neutral ramp
 
