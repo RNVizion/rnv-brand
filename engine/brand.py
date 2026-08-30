@@ -438,9 +438,36 @@ GOLD_DIM_ALPHA = 0.52  # secondary gold, Records surface
 # panels); the website runs the blue-tinted ramp. Intentional, not drift.
 APP = {
     "window": TRUE_BLACK,
+    # THE DARK SURFACE LADDER, ruled 2026-08-29. Four rungs on a permanent anchor:
+    #
+    #   BRAND_BLACK + n * 0x10,  n in -1..+2
+    #     n = -1   #0a0a0a   canvas, image-viewer ground
+    #     n =  0   #1a1a1a   panel        <- BRAND_BLACK
+    #     n = +1   #2a2a2a   card
+    #     n = +2   #3a3a3a   panel hover
+    #
+    # ALL FOUR ARE NOW REGISTERED. The two ends were app-owned. A brand that
+    # publishes the middle of a ladder and leaves the edges to applications is
+    # publishing a derivation nobody can check -- the unpublished-step failure,
+    # arriving in a ramp instead of a colour.
+    #
+    # BORDER IS NOT A RUNG AND ITS ABSENCE WAS NEVER A GAP. An earlier reading
+    # from this side called this ladder "two-thirds specified" because
+    # APP["border"] #333333 is not #3a3a3a. #333333 is grey(3) EXACTLY on the ink
+    # grid, and that grid governs inks AND EDGES. A border is an edge. It was
+    # measured against the wrong family and reported as a hole in this one.
+    #
+    # #0a0a0a IS NOT WEB_BLACK, AND THE SEAM IS DELIBERATE. The web canvas is
+    # #0a0a0f -- same lightness, blue channel lifted. This register already rules
+    # it: app neutrals are pure grey, R = G = B, without exception, and the web
+    # ground carries a tint the apps do not. Two canvases one byte apart is not
+    # drift -- and that near-miss is exactly what made an inversion anchor look
+    # convincing on the light side when it was not.
+    "canvas": "#0a0a0a",
     "panel": BRAND_BLACK,
     "card": "#2a2a2a",
-    "border": "#333333",
+    "panel-hover": "#3a3a3a",
+    "border": "#333333",   # grey(3) on the INK grid: an edge, not a surface
     # THE INK GRID, ruled 2026-08-28 together with this value, because the value
     # moved only to satisfy it and neither is defensible alone.
     #
@@ -508,6 +535,35 @@ APP = {
     # every app ramp, and a ramp with holes is worse than a coincidence with a
     # reason -- the holes carry no explanation and the next author closes them.
     "text-dim": "#aaaaaa",   # grey(10)
+
+    # THE LIGHT HOVER PLATE, ruled 2026-08-29, and it is not a choice.
+    #
+    # #d0d0d0 was retired as a light interaction ground and nothing replaced it.
+    # The plate is bounded from both sides, and the bands leave exactly one value
+    # sitting at the binding edge:
+    #
+    #   dark enough to read as a state change against the #ffffff base
+    #   light enough that BRAND_DARK_GOLD_DEEP clears 4.5 as its label
+    #
+    #     #d0d0d0  gold 3.6013 FAIL   base separation 1.5424
+    #     #e0e0e0  gold 4.2078 FAIL                   1.3200
+    #     #e5e5e5  gold 4.4095 FAIL                   1.2596
+    #     #e8e8e8  gold 4.5334 pass                   1.2252   <- the dark edge
+    #     #eeeeee  gold 4.7875 pass                   1.1602
+    #     #f5f5f5  gold 5.0949 pass                   1.0902
+    #
+    # THE BAND IS #e8e8e8 AND LIGHTER, AND #e8e8e8 IS ITS DARK EDGE, so it is the
+    # only member that maximises separation from the base while clearing the
+    # label. Every lighter option is a strictly worse plate. This was asked as a
+    # choice and the arithmetic does not leave one.
+    #
+    # IT IS ALSO THE PUBLISHED GOLD-AS-TEXT BOUNDARY, reached from the other
+    # direction: the apps walked UP from a failing plate, this register walked
+    # DOWN from a failing text colour, and both stopped here. A boundary two
+    # independent walks land on is doing real work.
+    #
+    # DARK NEEDS NOTHING: BRAND_GOLD on the panel-hover rung reads 6.1503.
+    "hover-light": "#e8e8e8",
     "accent": BRAND_GOLD,
     "accent-light-mode": BRAND_DARK_GOLD,
     "text-on-gold": TRUE_BLACK,
