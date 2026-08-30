@@ -536,34 +536,66 @@ APP = {
     # reason -- the holes carry no explanation and the next author closes them.
     "text-dim": "#aaaaaa",   # grey(10)
 
-    # THE LIGHT HOVER PLATE, ruled 2026-08-29, and it is not a choice.
+    # THE LIGHT HOVER PLATE. #eeeeee, corrected 2026-08-30 from a ruling made the
+    # day before, and the correction is worth more than the value.
     #
-    # #d0d0d0 was retired as a light interaction ground and nothing replaced it.
-    # The plate is bounded from both sides, and the bands leave exactly one value
-    # sitting at the binding edge:
+    # THE FIRST RULING PUT IT ON #e8e8e8 AND SAID "the arithmetic does not leave a
+    # choice". It argued: the plate must be dark enough to read against the
+    # #ffffff base and light enough that BRAND_DARK_GOLD_DEEP clears 4.5 as its
+    # label; the band is #e8e8e8 and lighter; #e8e8e8 is its dark edge and so
+    # maximises separation from the base; every lighter option is dominated.
     #
-    #   dark enough to read as a state change against the #ffffff base
-    #   light enough that BRAND_DARK_GOLD_DEEP clears 4.5 as its label
+    # IT MEASURED ONE AXIS AND CALLED THE RESULT DOMINANCE. The axis it did not
+    # measure is margin on the binding constraint:
     #
-    #     #d0d0d0  gold 3.6013 FAIL   base separation 1.5424
-    #     #e0e0e0  gold 4.2078 FAIL                   1.3200
-    #     #e5e5e5  gold 4.4095 FAIL                   1.2596
-    #     #e8e8e8  gold 4.5334 pass                   1.2252   <- the dark edge
-    #     #eeeeee  gold 4.7875 pass                   1.1602
-    #     #f5f5f5  gold 5.0949 pass                   1.0902
+    #     plate      gold      margin     error-red   margin
+    #     #e8e8e8    4.5334    +0.0334    4.6100      +0.1100
+    #     #eeeeee    4.7875    +0.2875    4.8684      +0.3684
     #
-    # THE BAND IS #e8e8e8 AND LIGHTER, AND #e8e8e8 IS ITS DARK EDGE, so it is the
-    # only member that maximises separation from the base while clearing the
-    # label. Every lighter option is a strictly worse plate. This was asked as a
-    # choice and the arithmetic does not leave one.
+    # A BOUNDARY IS NOT A PLATE. #e8e8e8 is the value at which the next step down
+    # FAILS. It is also the ground this file's own gold derivation is calibrated
+    # against -- marked "<- binding" above. Putting every hover in every
+    # application on it couples plate to gold so tightly that one rounding fails
+    # them together: -13 instead of -14 gives 4.4675 and both go at once.
     #
-    # IT IS ALSO THE PUBLISHED GOLD-AS-TEXT BOUNDARY, reached from the other
-    # direction: the apps walked UP from a failing plate, this register walked
-    # DOWN from a failing text colour, and both stopped here. A boundary two
-    # independent walks land on is doing real work.
+    # AND THE APPLICATIONS HAD ALREADY ANSWERED IT. Eleven hover keys across four
+    # apps hold #eeeeee; ZERO hold #e8e8e8. Every use #e8e8e8 has is a static
+    # surface. The convergence was there to be read and the ruling did not read
+    # it -- it reasoned from a contrast table about a question the shipped code
+    # had already settled.
+    #
+    # #e8e8e8 IS NOT RETIRED AND NOT WEAKENED. It stays registered, stays the
+    # published gold-as-text coverage boundary, and keeps its three surface uses
+    # and its role as the binding ground in the derivation. It is doing real work.
+    # It is simply not the hover: A WORKING STATE SHOULD NOT SIT ON THE LAST VALUE
+    # THAT WORKS.
+    #
+    # A CLAIM WITHDRAWN IN THE SAME CHANGE, because it was load-bearing for a
+    # separate ruling and would not have held it up. This file argued that the
+    # apps walking UP from a failing plate and this register walking DOWN from a
+    # failing text colour and both stopping at #e8e8e8 was "a boundary two
+    # independent walks land on".
+    #
+    # THE WALKS WERE NEVER INDEPENDENT. It is one equation -- cr(gold, ground) >=
+    # 4.5 -- solved for two unknowns. The register fixed a set of grounds and took
+    # the SMALLEST step clearing its darkest one, which calibrates the gold TO
+    # that ground. Asking afterwards which ground the gold clears returns the
+    # ground you fed it. Demonstrated by varying it:
+    #
+    #     darkest ground fed    step chosen    crossing then lands at
+    #     #eeeeee               -10            #eeeeee
+    #     #e8e8e8               -14            #e8e8e8
+    #     #e0e0e0               -19            #e0e0e0
+    #     #dddddd               -21            #dddddd
+    #
+    # Every time. That is arithmetic, not corroboration. THE GOLD-AS-TEXT RULING
+    # STANDS ON THE SIX-JOB TABLE ABOVE -- one value passing one job of six
+    # against another passing five -- which is real independent evidence. Raised
+    # by the app side, which was right to refuse unsafe support for a ruling it
+    # agrees with.
     #
     # DARK NEEDS NOTHING: BRAND_GOLD on the panel-hover rung reads 6.1503.
-    "hover-light": "#e8e8e8",
+    "hover-light": "#eeeeee",   # grey(14)
     "accent": BRAND_GOLD,
     "accent-light-mode": BRAND_DARK_GOLD,
     "text-on-gold": TRUE_BLACK,
