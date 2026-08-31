@@ -3,7 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-30 (rev 23 — **the hover plate moves from `#e8e8e8` to `#eeeeee` one day after
+Last locked: 2026-08-30 (rev 24 — **the gold-as-text boundary was governing without being owned.**
+Rev 23 said `#e8e8e8` "stays registered". It had **no key in any dict** — fourteen mentions in
+`engine/brand.py` comments and none in the source of truth, so the register published a derivation
+while leaving its input app-owned, and two applications held it locally with nothing to mirror.
+**Registered as `GOLD_TEXT_GROUND_FLOOR`**, with an import-time guard asserting
+`BRAND_DARK_GOLD_DEEP` still clears it. **That is the unpublished-derivation failure inverted:** not
+a step nobody could check, but a *constraint* nobody could mirror. Raised by the app side, which
+found it by trying to wire the value and discovering there was nothing to wire to. rev 23 — **the hover plate moves from `#e8e8e8` to `#eeeeee` one day after
 being ruled, and a claim is withdrawn with it.** The first ruling measured separation from the base
 and called the result dominance; it never measured **margin on the binding constraint**, where
 `#e8e8e8` clears by 0.0334 and `#eeeeee` by 0.2875. `#e8e8e8` is the ground the light gold is
@@ -393,9 +400,24 @@ go at once.
 **zero** hold `#e8e8e8`, whose every use is a static surface. **The ruling reasoned from a contrast
 table about a question the shipped code had already settled.**
 
-**`#e8e8e8` is not retired and not weakened.** It stays registered, stays the published gold-as-text
-coverage boundary, and keeps its three surface uses and its role as the binding ground. It is doing
-real work; it is simply not the hover.
+**`#e8e8e8` is not retired and not weakened**, but *"stays registered"* was **false when written** —
+it had no key in any dict and appeared only in comments and in this document's prose. It is doing
+register work with no register entry, which nobody noticed because the surrounding text read as
+though it had one.
+
+**Registered 2026-08-30 as `GOLD_TEXT_GROUND_FLOOR`**, named for the role that makes it load-bearing:
+it is the darkest light ground on which the gold family carries text, and **the binding input to the
+`BRAND_DARK_GOLD_DEEP` derivation.** The derivative is defined as the smallest step that clears it.
+
+**It is a boundary, not a rung**, and registering it does not pre-empt the light surface ladder. If
+that ladder later steps over this value the boundary still holds and still constrains the gold.
+
+**And the coupling is now checked rather than described.** `_deep_gold_clears_its_floor()` runs at
+import and fails if either value moves without the other — armed both ways: `-13` gives 4.4675, and
+moving the floor to `#e0e0e0` gives 4.2078. The margin is **0.0334**, which is why it is a check and
+not a comment: a coupling that tight cannot be maintained by anyone remembering it.
+
+It keeps its three surface uses and its role as the binding ground. It is simply not the hover.
 
 ### A claim withdrawn, in the same change
 
