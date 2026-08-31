@@ -3,7 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-30 (rev 24 — **the gold-as-text boundary was governing without being owned.**
+Last locked: 2026-08-31 (rev 25 — **the two-gold rule is published; it was real, unwritten, and
+broken in three of five apps.** On a light ground, gold as **text** is `BRAND_DARK_GOLD_DEEP` and
+gold as a **fill or edge** is `BRAND_DARK_GOLD` — and neither can do the other's job, so it is a rule
+rather than a preference. Both values were already published; **the rule selecting between them lived
+in a single comment in one repository.** This register had named the gap in a derivation and never in
+a rule. Also recorded: **every check written where two things coincide is blind to the case where
+they do not** — in dark mode the two golds are one value, and five checks asserting that passed over
+seven defects. rev 24 — **the gold-as-text boundary was governing without being owned.**
 Rev 23 said `#e8e8e8` "stays registered". It had **no key in any dict** — fourteen mentions in
 `engine/brand.py` comments and none in the source of truth, so the register published a derivation
 while leaving its input app-owned, and two applications held it locally with nothing to mirror.
@@ -442,6 +449,54 @@ returns the ground you fed it:
 **The gold-as-text ruling stands on the six-job table** — one value passing one job of six against
 another passing five — which is real independent evidence. Raised by the app side, which was right to
 refuse unsafe support for a ruling it agrees with.
+
+### Which gold, on a light ground — ruled 2026-08-31
+
+> **On a light ground, gold as TEXT is `BRAND_DARK_GOLD_DEEP`. Gold as a FILL or an EDGE is
+> `BRAND_DARK_GOLD`.**
+
+**Neither can do the other's job, which is why this is a rule and not a preference.**
+
+| job | `BRAND_DARK_GOLD` `#8c7337` | `BRAND_DARK_GOLD_DEEP` `#7e6529` |
+|---|---|---|
+| text on `#ffffff` | 4.5429 pass | 5.5546 pass |
+| text on `#f5f5f5` | **4.1669 FAIL** | 5.0949 pass |
+| text on `#eeeeee` | **3.9155 FAIL** | 4.7875 pass |
+| text on `#e8e8e8` | **3.7077 FAIL** | 4.5334 pass |
+| border on `#ffffff` | 4.5429 pass | 5.5546 pass |
+| fill, black on it | 4.6225 pass | **3.7806 FAIL** |
+
+**`BRAND_DARK_GOLD` carries text on pure white and nowhere else.** The apps' own surfaces are mostly
+not `#ffffff`, so in practice it carries text almost nowhere. The exclusion runs both ways: the
+derivative fails the fill job at 3.7806.
+
+**This was folk knowledge until today, and that is the finding.** Both values were published,
+checked, mirrored and pinned. **The rule that selects between them lived in one comment in one
+repository** — `'accent_ink': BRAND_DARK_GOLD_DEEP,  # Accent when it carries text`. Two apps got it
+right by copying that key; three got it wrong across seven sites.
+
+**The register named the gap in a *derivation* and never in a *rule*.** An app reading it learned
+that a second gold exists without learning when the second one is mandatory. Publishing a value and
+publishing the condition under which it is required are two different acts, and only the first had
+been done.
+
+### Every check written where two things coincide is blind to the case where they do not
+
+**In dark mode the two golds are the same value.** An application asserting
+
+```python
+assert dark['accent_ink'] == dark['accent']
+```
+
+is asserting something **true, correct, and structurally incapable** of noticing the light case —
+where the two diverge and the divergence is the entire point. Five separate checks passed over seven
+defects for this reason.
+
+**This register has the same exposure, and it is named here rather than closed.**
+`_deep_gold_clears_its_floor()` guards the coupling between the gold and its floor. **Nothing here
+guards which of the two golds an application picks, and nothing here can** — the register cannot see
+an app's stylesheet. That check is app-side by construction. **Publishing the rule is what gives it
+something to check against.**
 
 ### The neutral ramp
 
