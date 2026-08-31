@@ -3,7 +3,10 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-31 (rev 25 — **the two-gold rule is published; it was real, unwritten, and
+Last locked: 2026-08-31 (rev 26 — **the fill half of the two-gold rule is verified across all five
+apps and is clean.** Ten sites, zero failures, nothing drawing black on the deep gold — so the
+failing case the rule names is real arithmetic and not a real occurrence. The unresolved-declaration
+counts are published with it, because zero is a floor. rev 25 — **the two-gold rule is published; it was real, unwritten, and
 broken in three of five apps.** On a light ground, gold as **text** is `BRAND_DARK_GOLD_DEEP` and
 gold as a **fill or edge** is `BRAND_DARK_GOLD` — and neither can do the other's job, so it is a rule
 rather than a preference. Both values were already published; **the rule selecting between them lived
@@ -479,6 +482,25 @@ right by copying that key; three got it wrong across seven sites.
 that a second gold exists without learning when the second one is mandatory. Publishing a value and
 publishing the condition under which it is required are two different acts, and only the first had
 been done.
+
+**The fill half was checked across all five apps on 2026-08-31 and is clean.** Ten sites resolve a
+background to `BRAND_DARK_GOLD_DEEP`: four in `rnv-text-transformer` and four in `rnv-color-picker`
+draw `#ffffff` on it at 5.5547, and two are checkbox indicators carrying no text. **Nothing draws
+black on the deep gold anywhere.**
+
+**So the failing case the rule names is real arithmetic and not a real occurrence** — which is the
+best outcome available for a rule published after the fact, and it means the rule can be enforced
+without a migration.
+
+**The `3.7806` is the figure that makes over-application dangerous**, and it is why the rule is
+stated bidirectionally rather than as *"prefer the deep gold for text"*. A rule phrased as a
+preference invites a sweep that replaces every `BRAND_DARK_GOLD`; six of the sites corrected this
+week are fills and edges that such a sweep would have broken.
+
+**Zero is a floor, as it always is.** The sweep could not resolve the background expression in 113
+declarations in `rnv-icon-builder`, 154 in `rnv-color-mixer`, 66 in `rnv-color-palette-manager`, 52
+in `rnv-color-picker` and 39 in `rnv-text-transformer` — computed expressions and cross-module
+lookups. Six of the ten sites inherit their label from an enclosing rule rather than declaring it.
 
 ### Every check written where two things coincide is blind to the case where they do not
 
