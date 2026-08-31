@@ -283,6 +283,33 @@ def lighten(color: str, step: int) -> str:
 # The register does not rule this yet. Until it does, an app may do either and
 # should say which in a comment. WHAT IT MUST NOT DO IS HAND-WRITE THE VALUE --
 # if it wants a pressed shade, it derives one with lighten().
+# THE DERIVATION'S INPUT, REGISTERED 2026-08-30 BECAUSE IT WAS GOVERNING WITHOUT
+# BEING OWNED. #e8e8e8 is the darkest light ground on which the gold family still
+# carries text, and BRAND_DARK_GOLD_DEEP is derived to clear IT specifically --
+# the walk above marks it "<- binding". It appeared fourteen times in this file's
+# comments and in NO dict, so the register published a derivation while leaving
+# its input app-owned. That is the unpublished-derivation failure inverted: not a
+# step nobody could check, but a CONSTRAINT nobody could mirror.
+#
+# THE APPS COULD NOT MIRROR WHAT HAD NO KEY. rnv-color-picker holds it as light
+# `image_viewer_bg`; rnv-text-transformer as GREY_E8 for two surfaces. They asked
+# whether it was a token meant to be added or prose describing a value the
+# register deliberately does not own. It was neither -- it was a value doing
+# register work with no register entry, which nobody had noticed because the
+# comments read as though it had one.
+#
+# NAMED FOR THE ROLE THAT MAKES IT LOAD-BEARING. It is not a rung of the light
+# surface ladder -- that ladder is not ruled, and this does not pre-empt it. A
+# boundary and a rung are different things: if the ladder later steps over this
+# value, the boundary still holds and still constrains the gold.
+GOLD_TEXT_GROUND_FLOOR = "#e8e8e8"
+"""Darkest light ground on which the gold family carries text.
+
+    Below this, gold does not carry text -- a ruling, not a gap. It is the
+    binding input to BRAND_DARK_GOLD_DEEP below and is asserted against it at
+    import, so the pair cannot drift apart silently.
+    """
+
 BRAND_DARK_GOLD_DEEP = lighten(BRAND_DARK_GOLD, -14)   # -> #7e6529, light-mode TEXT
 BRAND_GOLD_HOVER = lighten(BRAND_GOLD, 13)             # -> #dfc9a0, dark-mode HOVER
 
@@ -994,6 +1021,41 @@ RNV_BRAND = {
 }
 
 # ---------------------------------------------------------------- emitter
+
+def _deep_gold_clears_its_floor():
+    """BRAND_DARK_GOLD_DEEP must clear 4.5:1 on GOLD_TEXT_GROUND_FLOOR.
+
+    THE COUPLING THIS ENFORCES WAS DOCUMENTED AND UNCHECKED FOR A WEEK. The
+    derivative is chosen as the smallest step clearing that ground; the ground is
+    published as the boundary below which gold carries no text. Each is written in
+    terms of the other, and until 2026-08-30 the ground was not even a key -- so a
+    change to either would have left prose describing a relationship that no
+    longer held, with nothing to say so.
+
+    -13 gives 4.4675 here and fails. The margin is 0.0334, which is why this is a
+    check and not a comment: a coupling that tight cannot be maintained by anyone
+    remembering it.
+    """
+    def _lum(hexv):
+        c = [int(hexv.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+        c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+    a, b = _lum(BRAND_DARK_GOLD_DEEP), _lum(GOLD_TEXT_GROUND_FLOOR)
+    hi, lo = max(a, b), min(a, b)
+    ratio = (hi + 0.05) / (lo + 0.05)
+    if ratio < 4.5:
+        raise AssertionError(
+            f"BRAND_DARK_GOLD_DEEP {BRAND_DARK_GOLD_DEEP} reads {ratio:.4f} on "
+            f"GOLD_TEXT_GROUND_FLOOR {GOLD_TEXT_GROUND_FLOOR}, under the 4.5 "
+            f"floor. One of the two moved without the other -- the derivative is "
+            f"defined as the smallest step that clears this ground, so if the "
+            f"ground moved, re-derive; if the step moved, say why here."
+        )
+
+
+_deep_gold_clears_its_floor()
+
 
 def _resolver_covers_permanent():
     """Every PERMANENT colour must be reachable by at least one resolver name.
