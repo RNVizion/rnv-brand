@@ -302,6 +302,52 @@ def lighten(color: str, step: int) -> str:
 # surface ladder -- that ladder is not ruled, and this does not pre-empt it. A
 # boundary and a rung are different things: if the ladder later steps over this
 # value, the boundary still holds and still constrains the gold.
+# WHICH GOLD, ON A LIGHT GROUND -- ruled 2026-08-31, and it was folk knowledge
+# until today. Both values existed and were published; the rule that SELECTS
+# between them lived in one comment in one repository:
+#
+#     'accent_ink': BRAND_DARK_GOLD_DEEP,  # Accent when it carries text
+#
+# Two applications got it right by copying that key. Three got it wrong across
+# seven sites, because the register named the gap in a DERIVATION and never in a
+# RULE -- an app reading it learned that a second gold exists without learning
+# when the second one is mandatory.
+#
+#   ON A LIGHT GROUND:
+#     gold as TEXT             -> BRAND_DARK_GOLD_DEEP
+#     gold as a FILL or EDGE   -> BRAND_DARK_GOLD
+#
+# NEITHER CAN DO THE OTHER'S JOB, which is why this is a rule and not a
+# preference. Measured at the current values:
+#
+#     job                       BRAND_DARK_GOLD   BRAND_DARK_GOLD_DEEP
+#     text on #ffffff           4.5429 pass       5.5546 pass
+#     text on #f5f5f5           4.1669 FAIL       5.0949 pass
+#     text on #eeeeee           3.9155 FAIL       4.7875 pass
+#     text on #e8e8e8           3.7077 FAIL       4.5334 pass
+#     border on #ffffff         4.5429 pass       5.5546 pass
+#     fill, black on it         4.6225 pass       3.7806 FAIL
+#
+# BRAND_DARK_GOLD CARRIES TEXT ON PURE WHITE AND NOWHERE ELSE. The reported
+# framing -- "it fails exactly one job" -- understates it: it fails as text on
+# every light ground except #ffffff, and the apps' own surfaces are mostly not
+# #ffffff. BRAND_DARK_GOLD_DEEP fails the fill job in the other direction at
+# 3.7806, so the exclusion runs both ways.
+#
+# IN DARK MODE THE TWO GOLDS ARE THE SAME VALUE, and that is why five separate
+# checks missed this. An app asserting `dark["accent_ink"] == dark["accent"]` is
+# asserting something true and correct that is STRUCTURALLY INCAPABLE of noticing
+# the light case, where they diverge and the divergence is the whole point.
+#
+#   EVERY CHECK WRITTEN WHERE TWO THINGS COINCIDE IS BLIND TO THE CASE WHERE THEY
+#   DO NOT.
+#
+# THIS REGISTER HAS THE SAME EXPOSURE AND IT IS NAMED RATHER THAN CLOSED.
+# _deep_gold_clears_its_floor() guards the coupling between the gold and its
+# floor. NOTHING HERE GUARDS WHICH OF THE TWO GOLDS AN APPLICATION PICKS, and
+# nothing here can -- the register cannot see an app's stylesheet. That check is
+# app-side by construction; publishing the rule is what gives it something to
+# check against.
 GOLD_TEXT_GROUND_FLOOR = "#e8e8e8"
 """Darkest light ground on which the gold family carries text.
 
