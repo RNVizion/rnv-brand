@@ -3,7 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-08-31 (rev 26 — **the fill half of the two-gold rule is verified across all five
+Last locked: 2026-09-01 (rev 27 — **the light surface ladder is ruled, and it is a proportion rather
+than a step.** Light's rungs take the same *share of light's span* that dark's take of dark's,
+measured logarithmically in contrast. `APP` gains `surface-light`, `surface-light-2` `#fbfbfb`,
+`surface-light-3` and `pressed-light`. **One new value.** Copying dark's step sizes was tried and
+rejected on measurement: it puts a rung one byte from `APP["text"]`, because near white equal
+contrast steps need growing byte steps. **`#f5f5f5` — fifteen keys already in use — lands on rung 3
+at one fifty-seventh of a byte step from ideal**, which is the confirmation nobody planted. Guarded
+at import. rev 26 — **the fill half of the two-gold rule is verified across all five
 apps and is clean.** Ten sites, zero failures, nothing drawing black on the deep gold — so the
 failing case the rule names is real arithmetic and not a real occurrence. The unresolved-declaration
 counts are published with it, because zero is a floor. rev 25 — **the two-gold rule is published; it was real, unwritten, and
@@ -519,6 +526,65 @@ defects for this reason.
 guards which of the two golds an application picks, and nothing here can** — the register cannot see
 an app's stylesheet. That check is app-side by construction. **Publishing the rule is what gives it
 something to check against.**
+
+### The light surface ladder, ruled 2026-09-01 — a proportion, not a step
+
+> **Light's rungs take the same share of light's span that dark's rungs take of dark's span,
+> measured in contrast.**
+
+Shares are **logarithmic**, because contrast ratios compose multiplicatively and equal shares in log
+space are equal perceptual steps.
+
+| # | dark | light | share dark → light | job | keys |
+|---|---|---|---|---|---|
+| 1 | `#0a0a0a` | `#ffffff` | — | card, list row, button face | 43 |
+| 2 | `#1a1a1a` | **`#fbfbfb`** | 0.233 → 0.230 | alternating rows, second tier | 3 |
+| 3 | `#2a2a2a` | `#f5f5f5` | 0.348 → 0.351 | panel, window, statusbar | 17 |
+| 4 | `#3a3a3a` | `#eeeeee` | 0.420 → 0.419 | the hover plate | 14 |
+| — | `#333333` | `#e0e0e0` | **off the ladder** | pressed, tab, scrollbar trough | 10 |
+
+**Pressed comes from the edge family, not the ladder.** Dark's pressed is `#333333`, which is
+`grey(3)`, which is `APP["border"]`. An earlier proposal made `#e0e0e0` the bottom rung — **dark does
+not put an interaction state in its surface ladder and neither does light.**
+
+**The hover → pressed step is the one that had to match**, because it is the one a user sees fire
+under the cursor: **1.1377 in light against 1.1107 in dark.**
+
+**Why proportions and not step sizes.** Copying dark's step sizes down from white gives
+`#ffffff → #f0f0f0 → #dbdbdb → #c4c4c4`. The bottom two land on the ink and edge families —
+`#dbdbdb` is **one byte** from `APP["text"]` `#dddddd`. **Light has less room above the ink than dark
+has below it**, and that is a property of sRGB rather than a choice: near white, equal contrast steps
+need growing byte steps. Light's are 4, 6, 7; dark's are a flat `0x10`.
+
+**The confirmation nobody planted.** `#f5f5f5` already carried fifteen keys across the five
+applications before this rule existed, and it lands on rung 3 at luminance **0.91310** against an
+ideal of **0.91324** — 0.00014 out, where the byte grid puts a candidate every 0.0084. **That is one
+fifty-seventh of a step.** The ladder was two-thirds built at the right positions and only the
+missing rung had to be found.
+
+**`#fbfbfb` is the only new value, and it is what the rule returns** rather than a compromise between
+the strays already in use:
+
+| candidate for rung 2 | shares | worst deviation |
+|---|---|---|
+| `#fdfdfd` | 0.115 / 0.467 / 0.419 | 0.119 |
+| `#fcfcfc` | 0.172 / 0.409 / 0.419 | 0.061 |
+| **`#fbfbfb`** | **0.230 / 0.351 / 0.419** | **0.003** |
+| `#fafafa` | 0.288 / 0.293 / 0.419 | 0.056 |
+| `#f8f8f8` | 0.405 / 0.176 / 0.419 | 0.172 |
+
+Two strays sit either side of it.
+
+**Gold passes on every rung** — 5.5546 / 5.3678 / 5.0949 / 4.7875 for `BRAND_DARK_GOLD_DEEP`.
+`#e0e0e0` reads 4.2078 and is the one light surface gold can never sit on, which is survivable
+because it is a **pressed state rather than a plate**.
+
+**`#e8e8e8` is not retired.** It keeps its role as `GOLD_TEXT_GROUND_FLOOR` and stops being a surface
+any application paints — the right end state for a boundary.
+
+**The ladder is checked, not transcribed.** `_light_ladder_matches_dark_shares()` runs at import and
+fails if either ladder's anchors move without the other being re-derived. Both ends are load-bearing:
+dark is anchored on `BRAND_BLACK`, light on a hover plate that has already moved once.
 
 ### The neutral ramp
 
