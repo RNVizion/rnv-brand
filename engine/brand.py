@@ -668,7 +668,62 @@ APP = {
     # agrees with.
     #
     # DARK NEEDS NOTHING: BRAND_GOLD on the panel-hover rung reads 6.1503.
-    "hover-light": "#eeeeee",   # grey(14)
+    # THE LIGHT SURFACE LADDER, ruled 2026-09-01. Four rungs, and the derivation
+    # is a PROPORTION rather than a step, because light has less room than dark.
+    #
+    #   LIGHT'S RUNGS TAKE THE SAME SHARE OF LIGHT'S SPAN THAT DARK'S RUNGS TAKE
+    #   OF DARK'S SPAN, MEASURED IN CONTRAST.
+    #
+    # Shares are logarithmic -- contrast ratios compose multiplicatively, so equal
+    # shares in log space are equal perceptual steps. Dark runs #0a0a0a -> #3a3a3a
+    # across 1.7405 and divides it 0.233 / 0.348 / 0.420. Light runs #ffffff ->
+    # #eeeeee across 1.1602 and divides it 0.230 / 0.351 / 0.419.
+    #
+    #   #    dark       light      share d -> l    job
+    #   1    #0a0a0a    #ffffff    --             card, list row, button face
+    #   2    #1a1a1a    #fbfbfb    0.233 -> 0.230  alternating rows, second tier
+    #   3    #2a2a2a    #f5f5f5    0.348 -> 0.351  panel, window, statusbar
+    #   4    #3a3a3a    #eeeeee    0.420 -> 0.419  the hover plate
+    #   --   #333333    #e0e0e0    OFF THE LADDER  pressed, tab, scrollbar trough
+    #
+    # PRESSED COMES FROM THE EDGE FAMILY, NOT THE LADDER, and light mirrors that.
+    # Dark's pressed is #333333, which is grey(3), which is APP["border"]. An
+    # earlier proposal made #e0e0e0 the bottom rung; dark does not put an
+    # interaction state in its surface ladder and neither does light.
+    #
+    # THE HOVER -> PRESSED STEP IS THE ONE THAT HAD TO MATCH, because it is the
+    # one a user sees fire under the cursor: 1.1377 in light against 1.1107 in
+    # dark. It does.
+    #
+    # WHY PROPORTIONS AND NOT STEP SIZES. Copying dark's step sizes down from
+    # white gives #ffffff -> #f0f0f0 -> #dbdbdb -> #c4c4c4. The bottom two land on
+    # the ink and edge families -- #dbdbdb is one byte from APP["text"] #dddddd,
+    # and #c4c4c4 is in the light border's neighbourhood. LIGHT HAS LESS ROOM
+    # ABOVE THE INK THAN DARK HAS BELOW IT, and that is a property of sRGB rather
+    # than a choice: near white, equal contrast steps need growing byte steps.
+    # Light's are 4, 6, 7; dark's are a flat 0x10.
+    #
+    # THE CONFIRMATION NOBODY PLANTED. #f5f5f5 already carried fifteen keys across
+    # the five applications before this rule existed, and it lands on rung 3 at
+    # luminance 0.91310 against an ideal of 0.91324 -- 0.00014 out, where the byte
+    # grid puts a candidate every 0.0084. That is 1/57th of a step. The ladder was
+    # two-thirds built at the correct positions and only the missing rung had to
+    # be found.
+    #
+    # #fbfbfb IS THE ONLY NEW VALUE and it is what the rule returns, not a
+    # compromise between the strays already in use. Worst deviation from dark's
+    # shares: #fdfdfd 0.119, #fcfcfc 0.061, #fbfbfb 0.003, #fafafa 0.056,
+    # #f8f8f8 0.172. Two strays sit either side of it.
+    #
+    # GOLD PASSES ON EVERY RUNG -- 5.5546 / 5.3678 / 5.0949 / 4.7875 for
+    # BRAND_DARK_GOLD_DEEP. #e0e0e0 reads 4.2078 and is the one light surface gold
+    # can never sit on, which is survivable because it is a pressed state rather
+    # than a plate.
+    "surface-light": WHITE,
+    "surface-light-2": "#fbfbfb",
+    "surface-light-3": "#f5f5f5",
+    "hover-light": "#eeeeee",   # grey(14), rung 4
+    "pressed-light": "#e0e0e0",   # a STATE, not a rung -- see above
     "accent": BRAND_GOLD,
     "accent-light-mode": BRAND_DARK_GOLD,
     "text-on-gold": TRUE_BLACK,
@@ -1067,6 +1122,49 @@ RNV_BRAND = {
 }
 
 # ---------------------------------------------------------------- emitter
+
+def _light_ladder_matches_dark_shares():
+    """The light rungs must divide light's span as dark divides dark's.
+
+    THE LADDER IS A DERIVATION, SO IT IS CHECKED RATHER THAN TRANSCRIBED. Both
+    ladders are anchored on values that can move -- dark on BRAND_BLACK, light on
+    a hover plate that has already moved once -- and if either end shifts the
+    shares stop matching with nothing to say so. Tolerance 0.02, which is well
+    inside the byte grid's own resolution near white.
+    """
+    import math
+
+    def _lum(hexv):
+        c = [int(hexv.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+        c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+    def _cr(a, b):
+        la, lb = _lum(a), _lum(b)
+        hi, lo = max(la, lb), min(la, lb)
+        return (hi + 0.05) / (lo + 0.05)
+
+    def _shares(rungs):
+        total = math.log(_cr(rungs[0], rungs[-1]))
+        return [math.log(_cr(rungs[i], rungs[i + 1])) / total
+                for i in range(len(rungs) - 1)]
+
+    dark = [APP["canvas"], APP["panel"], APP["card"], APP["panel-hover"]]
+    light = [APP["surface-light"], APP["surface-light-2"],
+             APP["surface-light-3"], APP["hover-light"]]
+    for i, (d, l) in enumerate(zip(_shares(dark), _shares(light)), start=1):
+        if abs(d - l) > 0.02:
+            raise AssertionError(
+                f"light ladder step {i} takes share {l:.3f} of light's span "
+                f"where dark takes {d:.3f} of dark's -- off by {abs(d - l):.3f}. "
+                f"One of the four anchors moved without the ladder being "
+                f"re-derived. The rule is that light mirrors dark's PROPORTIONS, "
+                f"not its step sizes; re-derive rather than nudging a rung."
+            )
+
+
+_light_ladder_matches_dark_shares()
+
 
 def _deep_gold_clears_its_floor():
     """BRAND_DARK_GOLD_DEEP must clear 4.5:1 on GOLD_TEXT_GROUND_FLOOR.
