@@ -3,7 +3,13 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-03 (rev 28 — **the status family is chosen rather than borrowed, and
+Last locked: 2026-09-04 (rev 29 — **the error source is re-dialled inside sRGB and the correction
+runs through the whole chain.** `#ff008f` was a per-channel clip of a coordinate outside the gamut,
+and the clip **moved the hue** — it sat at h 357.2 against the 359 that was dialled, with two
+channels on rails. Corrected by holding L and h and reducing chroma to C 84: **`#fe0f8a`, interior,
+no channel on a rail**, so the coordinate resolves identically in sRGB, P3 and print. The fill moves
+one byte to `#c75b64` and both error text variants are re-derived from it rather than left as
+orphans. Every floor still clears; two improve. rev 28 — **the status family is chosen rather than borrowed, and
 `BRAND_STANDBY_GOLD` is registered.** Bootstrap's amber could not clear a 3:1 fill floor on either
 light ground, and its green and red **collapsed to one olive under deuteranopia** at about 4 apart.
 The RNV family leaves the red-green axis entirely — three sources mixed 50% toward
@@ -620,7 +626,7 @@ be solved inside it.**
 |---|---|---|---|---|
 | success | `#9b59cc` | **`#926c89`** | `#ad85a3` | `#8a6581` |
 | warning | `#b76c40` | **`#a2703c`** | `#bc8752` | `#976633` |
-| error | `#ff008f` | **`#c85b67`** | `#e0707b` | `#b64b58` |
+| error | `#fe0f8a` | **`#c75b64`** | `#dd6f77` | `#b84e58` |
 
 **The derivation:** `50% toward BRAND_DARK_GOLD #8c7337, interpolated in OKLab`. OKLab and not sRGB
 because the ramp must stay perceptually even — an sRGB blend goes muddy through the middle and the
@@ -644,11 +650,42 @@ from `#dc3545`; with that base retired they are **orphans** — values derived f
 in the palette, which is the `#c4a458` failure this programme has already paid for once. **This moves
 values five applications mirror**, and that is the correct cost of moving a base.
 
-**One open correction.** `#ff008f` was dialled at C 90 / h 359, **outside sRGB** — its red sits on 255
-and its green on 0, both rails, which is what a clip looks like. The published source is therefore
-what the clipper chose rather than what was chosen. **Re-dial it inside the gamut before this is
-final**, or it resolves differently the first time anything touches P3 or print. The fill `#c85b67`
-is unaffected today; the provenance is not.
+**The gamut correction, closed 2026-09-04.** The error source was published as `#ff008f`, dialled at
+CIELCh **L 55.3 / C 90 / h 359** — a coordinate outside sRGB, so what shipped was a naive
+per-channel clip.
+
+**The clip moved the hue, which is the part worth knowing.** Measured, `#ff008f` sits at **h 357.2**,
+not the 359 that was dialled. Clipping channels does not preserve hue, so the published "source" was
+a different colour at a different angle — and its red sat on 255 with its green on 0. **Two rails is
+what a clipped value looks like.**
+
+**Proper gamut mapping holds L and h and reduces chroma only**, which is the CSSWG's own
+recommendation for exactly this. At L 55.3 / h 359 the sRGB boundary is C 84.99:
+
+| chroma | | |
+|---|---|---|
+| C 90 | outside | the dialled coordinate |
+| C 85.8 | outside | what was published as the source's chroma |
+| **C 84** | **inside** | **`#fe0f8a` — zero channels on a rail** |
+
+**C 84 is taken rather than the boundary at 84.99.** A value sitting exactly on the gamut edge still
+resolves differently in a wider gamut, because *"the most chroma available"* is relative to the gamut
+asking. `#fe0f8a` is **interior** — no channel at 0 or 255 — so the coordinate is absolute and
+resolves identically in sRGB, P3 and print.
+
+**The cost is one byte in the fill:** `#c85b67` → `#c75b64`. Every floor still clears and two
+improve, because the corrected hue is marginally warmer:
+
+| ground | new | was |
+|---|---|---|
+| `#1a1a1a` | 4.23 | 4.26 |
+| `#2a2a2a` | 3.49 | 3.51 |
+| `#ffffff` | **4.11** | 4.07 |
+| `#f5f5f5` | **3.77** | 3.74 |
+
+**The two error text variants were re-derived rather than kept** — `#e0707b` → `#dd6f77` and
+`#b64b58` → `#b84e58`. A text variant is derived from its fill, so a fill correction that left them
+alone would have orphaned them **one week after the last orphan was cleaned up**.
 
 ### Two cross-family distances this register did not record
 
