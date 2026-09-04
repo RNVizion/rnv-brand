@@ -3,7 +3,15 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-04 (rev 29 — **the error source is re-dialled inside sRGB and the correction
+Last locked: 2026-09-04 (rev 30 — **an "active" label aliases `success-text`, not `success`, and the
+signal family's scope is recorded as an open question.** `rnv-icon-builder` paints
+`STATUS_ACTIVE_COLOR = STATUS_SUCCESS` as **text** on `BRAND_BLACK`, where the floor is 4.5 — the
+alias reads 5.55 under Bootstrap's green and **3.91 under the RNV fill**, so it breaks on adoption
+day. It was safe only by accident: the RNV fills are mid-tones by design. **And the signal family
+describes one subject** — the stream — while a folder watcher is a signal by this register's own test
+with no value here. Not registered: one live paint site in five apps does not earn a brand value. The
+four things a registration would have to settle are enumerated, and the trigger is a second consumer
+rather than a date. rev 29 — **the error source is re-dialled inside sRGB and the correction
 runs through the whole chain.** `#ff008f` was a per-channel clip of a coordinate outside the gamut,
 and the clip **moved the hue** — it sat at h 357.2 against the 359 that was dialled, with two
 channels on rails. Corrected by holding L and h and reducing chroma to C 84: **`#fe0f8a`, interior,
@@ -701,6 +709,49 @@ reasons, and a value with two should not read as though it had one.
 stale for the member: `error-text-light` `#c82131` was **16.19**, published after that note was
 written. **A note recording one distance reads as though all of them were checked**, which is this
 register's own four-channel failure in another family.
+
+### An "active" label aliases `success-text`, not `success` — ruled 2026-09-04
+
+**The alias breaks on the day the apps adopt the new family, and it was safe only by accident.**
+
+`rnv-icon-builder` holds `STATUS_ACTIVE_COLOR = STATUS_SUCCESS` and paints it with `color:` — as
+**text**, on `BRAND_BLACK`. **The floor there is 4.5, not 3.0.**
+
+| | on `#1a1a1a` | |
+|---|---|---|
+| `#28a745` Bootstrap success | **5.55** | passes — which is why nobody noticed |
+| `#926c89` RNV success (fill) | **3.91** | **fails** |
+| `#ad85a3` RNV `success-text` | **5.52** | passes |
+
+**Bootstrap's green happened to be light enough to double as text.** The RNV fills are mid-tones
+**by design** — that is the published ruling that none of the three clears 4.5 as text. An alias onto
+a fill is a fill used as text, and it survived only while the fill was not really a fill.
+
+**One live paint site in the five applications.** `rnv-color-picker` declares `STATUS_ACTIVE_COLOR`,
+exports it in `__all__`, and reads it nowhere.
+
+### Open question: this family describes one subject
+
+**`live` / `standby` / `offline` are the three states of *the stream*.** They are not general-purpose
+*running / partly running / not running* — the ring, fill, halo and breath are all specified against
+that one component.
+
+**A second subject is already asking.** A folder watcher is a signal by this register's own test — *a
+signal is the state of something the brand runs* — and it has no value here.
+
+**It is not registered yet, and the reason is count rather than principle.** One consumer does not
+earn a brand value. **What would have to be decided if it did:**
+
+1. **Two values, not one.** Every value registered this month has needed a light-mode sibling.
+2. **Its counterpart.** An *active* colour implies a not-active one. If active is registered and idle
+   keeps borrowing `text-dim`, that is the asymmetry Bootstrap's missing light variants had.
+3. **The selection rule, published.** Three of five apps got the two-gold rule wrong while it lived in
+   one comment. **A value without the rule that selects it is folk knowledge with a hex attached.**
+4. **Whether this family stops being "the stream."** A watcher is not a fourth state of a broadcast;
+   it is a **second subject** with its own states. Admitting it changes what the family means, which
+   is a larger change than one value and should be made deliberately rather than by addition.
+
+**The trigger is a second consumer, not a date.**
 
 ### The neutral ramp
 
