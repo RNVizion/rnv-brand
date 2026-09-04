@@ -1044,7 +1044,7 @@ STATUS = {
     #   role      source     ->  fill
     #   success   #9b59cc        #926c89
     #   warning   #b76c40        #a2703c
-    #   error     #ff008f        #c85b67
+    #   error     #fe0f8a        #c75b64   <- corrected 2026-09-04, see below
     #
     # OKLab and not sRGB because the ramp must stay perceptually even; an sRGB
     # blend goes muddy through the middle and the midpoint would not be one.
@@ -1061,12 +1061,45 @@ STATUS = {
     # published to make the choice auditable, and the values are then written
     # down. #926c89 is #926c89.
     #
-    # ONE OPEN CORRECTION: #ff008f was dialled at C 90 / h 359, which is OUTSIDE
-    # sRGB -- its R sits on 255 and its G on 0, both rails, which is what a
-    # clip looks like. The published source is therefore what the clipper chose
-    # rather than what was chosen. RE-DIAL IT INSIDE THE GAMUT BEFORE THIS IS
-    # FINAL, or the value resolves differently the first time anything touches
-    # P3 or print. The fill #c85b67 is unaffected today; the provenance is not.
+    # THE GAMUT CORRECTION, CLOSED 2026-09-04. The error source was published as
+    # #ff008f, dialled at CIELCh L 55.3 / C 90 / h 359. That coordinate is
+    # OUTSIDE sRGB and the value shipped was what a naive per-channel clip
+    # produced.
+    #
+    # THE CLIP MOVED THE HUE, WHICH IS THE PART WORTH KNOWING. Measured, #ff008f
+    # sits at h 357.2, not the 359 that was dialled -- clipping channels does not
+    # preserve hue, so the published "source" was a different colour at a
+    # different angle, and its R sat on 255 and its G on 0. Two rails is what a
+    # clipped value looks like.
+    #
+    # PROPER GAMUT MAPPING HOLDS L AND h AND REDUCES C ONLY, which is the CSSWG's
+    # own recommendation. At L 55.3 / h 359 the sRGB boundary is C 84.99:
+    #
+    #     C 90    outside          the dialled coordinate
+    #     C 85.8  outside          what was published as the source's chroma
+    #     C 85    outside
+    #     C 84    INSIDE  #fe0f8a  zero channels on a rail   <- taken
+    #
+    # C 84 IS TAKEN RATHER THAN THE BOUNDARY 84.99. A value sitting exactly on
+    # the gamut edge still resolves differently in a wider gamut, because "the
+    # most chroma available" is relative to the gamut asking. #fe0f8a is
+    # INTERIOR -- no channel at 0 or 255 -- so the coordinate is absolute and
+    # resolves identically in sRGB, P3 and print.
+    #
+    # THE COST IS ONE BYTE IN THE FILL: #c85b67 -> #c75b64. Every floor still
+    # clears and two improve, because the corrected hue is marginally warmer:
+    #
+    #     ground     new    was
+    #     #1a1a1a    4.23   4.26
+    #     #2a2a2a    3.49   3.51
+    #     #ffffff    4.11   4.07
+    #     #f5f5f5    3.77   3.74
+    #
+    # Ink stays TRUE_BLACK at 5.10 against white's 4.11. The two error text
+    # variants were re-derived from the corrected fill by the same rule rather
+    # than kept: #e0707b -> #dd6f77 and #b64b58 -> #b84e58. A text variant is
+    # derived from its fill, so a fill correction that left them alone would
+    # orphan them one week after the last orphan was cleaned up.
     #
     # FILL FLOOR, 3:1 on the four grounds the fleet paints:
     #             #1a1a1a  #2a2a2a  #ffffff  #f5f5f5   worst
@@ -1079,7 +1112,7 @@ STATUS = {
     # 4.44 / 4.26 / 4.07 -- which agrees with the ink rule.
     "success": "#926c89",
     "warning": "#a2703c",
-    "error": "#c85b67",
+    "error": "#c75b64",
 
     # THE SIX TEXT VARIANTS ARE GENUINELY DERIVED, and are the opposite case to
     # the fills above: one deterministic rule, no judgement in it, recomputed
@@ -1136,7 +1169,7 @@ STATUS = {
     # lightness. The tint rules govern the neutral ramps; #dc3545 is a borrowed
     # platform value that never conformed to either register, and a derived
     # variant that conforms while its base does not makes the pair incoherent.
-    "error-text": "#e0707b",
+    "error-text": "#dd6f77",         # card 4.52
     # LIGHT-MODE ERROR TEXT, published 2026-08-24 because three applications had
     # already derived it independently under TWO identifiers -- STATUS_ERROR_LIGHT
     # in the picker and the transformer, STATUS_ERROR_TEXT_LIGHT in the palette
@@ -1160,7 +1193,7 @@ STATUS = {
     # Same uniform per-channel step as every other derivation here, holding hue.
     # Named error-text-light rather than a fourth spelling: it is the light-mode
     # sibling of error-text above, and the pair should read as a pair.
-    "error-text-light": "#b64b58",   # was lighten(#dc3545,-20) -> #c82131; base retired
+    "error-text-light": "#b84e58",   # f5f5f5 4.51; re-derived from the corrected fill
 }
 
 # ------------------------------------------------------- texture + type
