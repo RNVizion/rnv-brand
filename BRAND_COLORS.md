@@ -3,7 +3,16 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-01 (rev 27 — **the light surface ladder is ruled, and it is a proportion rather
+Last locked: 2026-09-03 (rev 28 — **the status family is chosen rather than borrowed, and
+`BRAND_STANDBY_GOLD` is registered.** Bootstrap's amber could not clear a 3:1 fill floor on either
+light ground, and its green and red **collapsed to one olive under deuteranopia** at about 4 apart.
+The RNV family leaves the red-green axis entirely — three sources mixed 50% toward
+`BRAND_DARK_GOLD` in OKLab — clears 3:1 on all four grounds, and publishes six derived text variants,
+which closes an asymmetry where only red had a light sibling. **`error-text` and `error-text-light`
+move with their base rather than being left as orphans.** And `BRAND_STANDBY_GOLD` becomes a literal:
+its formula was anchored on `BRAND_GOLD`, **the accent slot a future app replaces**, so an app
+choosing purple would have dragged a brand-owned signal with it — the coupling wrong in direction.
+Value unchanged. rev 27 — **the light surface ladder is ruled, and it is a proportion rather
 than a step.** Light's rungs take the same *share of light's span* that dark's take of dark's,
 measured logarithmically in contrast. `APP` gains `surface-light`, `surface-light-2` `#fbfbfb`,
 `surface-light-3` and `pressed-light`. **One new value.** Copying dark's step sizes was tried and
@@ -586,6 +595,76 @@ any application paints — the right end state for a boundary.
 fails if either ladder's anchors move without the other being re-derived. Both ends are load-bearing:
 dark is anchored on `BRAND_BLACK`, light on a hover plate that has already moved once.
 
+### The RNV status family, ruled 2026-09-03 — chosen, not borrowed
+
+**The old `success` / `warning` / `error` were Bootstrap 4 defaults.** This register half-said so
+already of the red: *"a borrowed platform value that never conformed to either register."* Two
+measurements made keeping them indefensible.
+
+**The amber could not legally carry a boundary on a light ground.** `#ffc107` reads **1.63** on
+`#ffffff` and **1.49** on `#f5f5f5` against a 3:1 fill floor. Not taste — arithmetic. The green
+failed too, at 2.87 on `#f5f5f5`.
+
+**And `success` and `error` were the same colour to a deuteranope** — roughly 8% of men. They sit
+~74 apart in normal vision and about **4** apart simulated: both collapse to one olive, because
+deuteranopia flattens red and green onto a single axis and what survives is lightness, of which those
+two have almost none between them. **Success and error are the two most consequential colours in any
+interface.**
+
+**A search of the recognisable status hue bands found no triple that both separates under
+deuteranopia and clears 3:1 on all four grounds.** That was true, and the *constraint* was the
+problem: it assumed green / amber / red. **Leaving the red-green axis dissolves a problem that cannot
+be solved inside it.**
+
+| role | source | fill | `-text` (dark) | `-text-light` |
+|---|---|---|---|---|
+| success | `#9b59cc` | **`#926c89`** | `#ad85a3` | `#8a6581` |
+| warning | `#b76c40` | **`#a2703c`** | `#bc8752` | `#976633` |
+| error | `#ff008f` | **`#c85b67`** | `#e0707b` | `#b64b58` |
+
+**The derivation:** `50% toward BRAND_DARK_GOLD #8c7337, interpolated in OKLab`. OKLab and not sRGB
+because the ramp must stay perceptually even — an sRGB blend goes muddy through the middle and the
+midpoint would not be one. **50% is the deepest mix that passes every bar**; at 60% the worst
+colour-blind pair drops to 6.8 and the nearest registered value to 7.4, both under this register's
+own *clearly different* threshold.
+
+**The mix is provenance, not a live formula.** Held as a rule, the ratio becomes an edit anyone can
+make, and retuning it would silently change what *error* looks like — the same argument that
+registered `BRAND_STILL_GOLD` rather than deriving it. The derivation is published so the choice is
+auditable; the values are then written down.
+
+**The three fills are registered. The six text variants are derived** — one deterministic rule, no
+judgement, recomputed rather than re-decided if a fill moves. **None of the three fills clears 4.5 as
+text on any ground**, which is not a fault in the choice but the fill band: anything working as a
+fill on both a dark and a light ground sits at L\* 48–59, and a mid-tone cannot carry text on either
+side.
+
+**`error-text` and `error-text-light` move with their base.** `#e56b77` and `#c82131` were derived
+from `#dc3545`; with that base retired they are **orphans** — values derived from something no longer
+in the palette, which is the `#c4a458` failure this programme has already paid for once. **This moves
+values five applications mirror**, and that is the correct cost of moving a base.
+
+**One open correction.** `#ff008f` was dialled at C 90 / h 359, **outside sRGB** — its red sits on 255
+and its green on 0, both rails, which is what a clip looks like. The published source is therefore
+what the clipper chose rather than what was chosen. **Re-dial it inside the gamut before this is
+final**, or it resolves differently the first time anything touches P3 or print. The fill `#c85b67`
+is unaffected today; the provenance is not.
+
+### Two cross-family distances this register did not record
+
+**`signal-standby` `#ffd166` against the old `STATUS.warning` `#ffc107` read CIEDE2000 6.83** — the
+closest cross-family pair in the whole matrix, and **below this register's own threshold for a
+distinguishable colour**, since `BRAND_STANDBY_GOLD`'s published walk calls 8.40 *"perceptible at a
+glance"* and would not take it. Two ambers, one meaning *running but not the main event* and one
+meaning *warning*. **The new family closes it** — but the amber moved for two independent measured
+reasons, and a value with two should not read as though it had one.
+
+**And `signal-live`'s nearest status neighbour was not `error`.** The note recording 18.22 against
+`STATUS.error` says *"the error red was always this value's nearest neighbour"* — true of the family,
+stale for the member: `error-text-light` `#c82131` was **16.19**, published after that note was
+written. **A note recording one distance reads as though all of them were checked**, which is this
+register's own four-channel failure in another family.
+
 ### The neutral ramp
 
 Every neutral in all five desktop apps — twenty-three distinct values from `#000000` to
@@ -762,7 +841,7 @@ variant that does.
 
 `#4ade80` was Tailwind's green, printed on the site with no entry in any source. It is retired.
 In its place, `engine/brand.py` carries a three-value **signal** set, distinct from `STATUS`:
-`#a5034e` live, `#5a5a72` offline, `#ffd166` down.
+`#a5034e` live, `#5a5a72` offline, `#ffd166` standby. *(This line read "down" until 2026-09-03, three weeks after the rename — one line that did not get the memo, and a rename is not complete when the identifiers move.)*
 
 **`signal-live` changed on 2026-08-14, from `#8b2c3b` to `#a5034e`.** Hue moved 350.5° to 332.2°
 and saturation 52% to 96%. **It was decided on the check that mattered rather than on taste:** a
