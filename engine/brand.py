@@ -874,6 +874,42 @@ WEB = {
     # never the only signal here. Keeping the name "live" because it is the
     # brand's own word for this (rnv-live, "RNVizion · live"), not because it is
     # the narrower reading.
+    # OPEN QUESTION, RECORDED 2026-09-04: THIS FAMILY DESCRIBES ONE SUBJECT.
+    #
+    # live / standby / offline are the three states of THE STREAM. They are not
+    # general-purpose "running / partly running / not running" -- they are that
+    # broadcast, and the ring, fill, halo and breath below are all specified
+    # against that one component.
+    #
+    # A SECOND SUBJECT IS ALREADY ASKING. rnv-icon-builder paints a folder-watcher
+    # label from STATUS_ACTIVE_COLOR, and this file's own test -- "status is the
+    # result of a user's action; a signal is the state of something the BRAND
+    # RUNS" -- makes a watcher a signal, not a status. It has no value here.
+    #
+    # IT IS NOT REGISTERED YET AND THE REASON IS COUNT, NOT PRINCIPLE. There is
+    # exactly ONE live paint site in the five applications: rnv-icon-builder's
+    # settings dialog. rnv-color-picker declares STATUS_ACTIVE_COLOR, exports it
+    # in __all__, and reads it nowhere. One consumer does not earn a brand value.
+    #
+    # WHAT WOULD HAVE TO BE DECIDED IF IT DID, enumerated so the decision is not
+    # made piecemeal later:
+    #
+    #   1. TWO VALUES, NOT ONE. Every value registered this month has needed a
+    #      light-mode sibling. Assume the same.
+    #   2. ITS COUNTERPART. An "active" colour implies a not-active one. If active
+    #      is registered and idle keeps borrowing text-dim, that is the same
+    #      asymmetry Bootstrap's missing light variants had.
+    #   3. THE SELECTION RULE, PUBLISHED. Three of five applications got the
+    #      two-gold rule wrong while it lived in one comment. A value without the
+    #      rule that selects it is folk knowledge with a hex attached.
+    #   4. WHETHER THIS FAMILY STOPS BEING "THE STREAM". A watcher is not a fourth
+    #      state of a broadcast; it is a second subject with its own states.
+    #      Admitting it changes what the family means, which is a larger change
+    #      than one value and should be made deliberately rather than by addition.
+    #
+    # THE TRIGGER IS A SECOND CONSUMER, NOT A DATE. When a second application
+    # grows a process indicator, this earns registration. Until then the question
+    # is recorded so it is not rediscovered.
     "signal-live": "#a5034e",      # on air / open / present
     "signal-offline": "#5a5a72",   # receding by design; the absent state
     # THE RING IS NOW A SIGNAL CHANNEL, not unconditional chrome. It was gold in
@@ -1140,7 +1176,24 @@ STATUS = {
     # THIS MOVES VALUES FIVE APPLICATIONS MIRROR. That is the cost of moving a
     # base, and it is the correct cost: the alternative is a text colour that no
     # longer belongs to its fill.
-    "success-text": "#ad85a3",          # card 4.55
+    # ALIAS TARGET FOR AN "ACTIVE" LABEL. rnv-icon-builder holds
+    # STATUS_ACTIVE_COLOR = STATUS_SUCCESS and paints it with `color:` -- as TEXT,
+    # on BRAND_BLACK. THE FLOOR THERE IS 4.5, NOT 3.0, AND THE ALIAS BREAKS ON THE
+    # DAY THE APPS ADOPT THIS FAMILY:
+    #
+    #     #28a745  Bootstrap success   5.55 on #1a1a1a   passes
+    #     #926c89  RNV success (fill)  3.91 on #1a1a1a   FAILS
+    #     #ad85a3  RNV success-text    5.52 on #1a1a1a   passes
+    #
+    # THE OLD ALIAS WAS SAFE BY ACCIDENT. Bootstrap's green happened to be light
+    # enough to double as text; the RNV fills are mid-tones BY DESIGN, which is
+    # the published ruling that none of the three clears 4.5 as text. An alias
+    # onto a fill is a fill used as text, and it survived only while the fill was
+    # not really a fill.
+    #
+    # AN "ACTIVE" LABEL ALIASES success-text, NOT success -- until the open
+    # question above is settled and it gets a value of its own.
+    "success-text": "#ad85a3",          # card 4.55, BRAND_BLACK 5.52
     "warning-text": "#bc8752",          # card 4.59
     "success-text-light": "#8a6581",    # f5f5f5 4.52
     "warning-text-light": "#976633",
