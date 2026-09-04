@@ -426,7 +426,33 @@ BRAND_STILL_GOLD = "#9b907a"   # stillness: not-live, dead, absence of life
 # EVERY FIGURE HERE IS rnv-color-mcp's. An earlier hand-computed walk used dE76
 # and inflated these by three to four points, which would have put -30 on the
 # table as "clearly different" when the instrument calls it perceptible only.
-BRAND_STANDBY_GOLD = lighten(BRAND_GOLD, -36)          # -> #ae986f, the standby ring
+# REGISTERED 2026-09-03, WAS lighten(BRAND_GOLD, -36). The value does not move.
+# The formula does, because it pointed the wrong way.
+#
+# BRAND_GOLD IS THE ACCENT SLOT -- the value a future RNV application replaces
+# with a purple or a green when it claims its own accent. Under a formula
+# anchored on it, an app choosing purple would drag the standby ring with it.
+#
+# BUT SIGNALS ARE NOT THE ACCENT. This file rules it forty lines down: signals
+# are "the state of a THING the brand runs ... different job, different
+# lifecycle, different owner". An application choosing purple is not the brand
+# deciding what STANDBY looks like. The formula made a brand-owned signal follow
+# an app-owned choice -- the coupling wrong in DIRECTION rather than magnitude,
+# which is precisely what BRAND_STILL_GOLD was registered to avoid.
+#
+# ITS TWO NEIGHBOURS ARE CORRECT AS DERIVED, checked rather than assumed:
+#   BRAND_GOLD_HOVER      SHOULD follow an accent swap -- it is a STATE of the accent
+#   BRAND_DARK_GOLD_DEEP  SHOULD follow -- no meaning without the gold it is taken from
+#   BRAND_STANDBY_GOLD    MUST NOT -- its meaning is brand-owned
+# One value on the wrong side of a line this file drew, not a problem with the
+# derivations.
+#
+# THE WALK ABOVE IS UNCHANGED AND BECOMES WHAT IT ALWAYS WAS IN SUBSTANCE:
+# provenance. The CIEDE2000 steps, the ordering ruling that rejected -36's
+# alternatives, the note that every figure is rnv-color-mcp's -- all stand.
+# signal-ring-standby still REFERENCES this constant rather than copying it, and
+# registering it does not disturb that.
+BRAND_STANDBY_GOLD = "#ae986f"          # the standby ring -- registered, see above
 
 # RENAMED FROM BRAND_DOWN_GOLD ON 2026-08-23, VALUE UNCHANGED. `down` and
 # `degraded` both assert that something is WRONG. Standby does not, and the state
@@ -802,6 +828,29 @@ WEB = {
     # that mattered rather than on taste: a move toward magenta could have
     # narrowed the gap to STATUS.error and instead widened it. Hue measured
     # 350.5 -> 332.2; published as 333 in one handoff and corrected to 332.
+    # TWO CROSS-FAMILY DISTANCES, recorded 2026-09-03 because the register held
+    # one and read as though it held all of them.
+    #
+    # THE 18.22 BELOW IS STALE FOR THE MEMBER, not the family. It says "the error
+    # red was always this value's nearest neighbour" -- true of STATUS.error when
+    # written, and error-text-light #c82131 was published on 2026-08-24 at
+    # CIEDE2000 16.19. Closer. A note recording one distance reads as though all
+    # of them were checked, which is this file's own four-channel failure:
+    # A TABLE THAT OMITS A CHANNEL DOES NOT LOOK INCOMPLETE, IT LOOKS SETTLED.
+    #
+    # AND THE CLOSEST CROSS-FAMILY PAIR IN THE WHOLE MATRIX WAS NEVER RECORDED:
+    # signal-standby #ffd166 against the old STATUS.warning #ffc107 read
+    # CIEDE2000 6.83 -- BELOW this register's own threshold for a distinguishable
+    # colour, since BRAND_STANDBY_GOLD's published walk calls 8.40 "perceptible at
+    # a glance" and would not take it. Two ambers, one meaning "running but not
+    # the main event" and one meaning "warning".
+    #
+    # THE RNV STATUS FAMILY CLOSES IT. The new warning #a2703c sits far from
+    # signal-standby, so the pair that was 6.83 is no longer a pair. It is
+    # recorded anyway, because the reason the amber moved was measured twice --
+    # once as a light-ground fill failure and once as this collision -- and a
+    # value with two independent reasons to move should not read as though it had
+    # one.
     # CIEDE2000 18.22
     # against the error red where the wine was 17.40, and 25.92 against
     # error-text. The error red was always this value's nearest neighbour.
@@ -961,9 +1010,107 @@ RECORDS = {
 #            or lighten it for a text variant and record the lift here.
 #   #28a745  4.58:1 on APP card -- passes as text, with little margin.
 STATUS = {
-    "success": "#28a745",
-    "warning": "#ffc107",
-    "error": "#dc3545",
+    # ================================================================
+    # THE RNV STATUS FAMILY, ruled 2026-09-03. Chris chose the three sources;
+    # everything else here is measurement.
+    #
+    # WHAT IT REPLACES AND WHY. The old values were Bootstrap 4 defaults --
+    # borrowed, not chosen. This file half-said so already of the red: "a
+    # borrowed platform value that never conformed to either register." Two
+    # measurements made keeping them indefensible:
+    #
+    #   THE AMBER COULD NOT LEGALLY CARRY A BOUNDARY ON A LIGHT GROUND.
+    #   #ffc107 reads 1.63 on #ffffff and 1.49 on #f5f5f5 against a 3:1 fill
+    #   floor. Not taste -- arithmetic. The green failed too, at 2.87 on #f5f5f5.
+    #
+    #   SUCCESS AND ERROR WERE THE SAME COLOUR TO A DEUTERANOPE. #28a745 and
+    #   #dc3545 sit CIEDE2000 74 apart in normal vision and about 4 apart
+    #   simulated -- both collapse to one olive, because deuteranopia flattens
+    #   red and green onto one axis and what survives is lightness, of which
+    #   those two have almost none between them. Roughly 8% of men. Success and
+    #   error are the two most consequential colours in any interface.
+    #
+    # A SEARCH OF THE RECOGNISABLE STATUS HUE BANDS -- green 138-160, amber
+    # 26-46, red 350-10 -- found NO triple that both separates under
+    # deuteranopia and clears 3:1 on all four grounds. That was true, and the
+    # constraint was the problem: it assumed green/amber/red. LEAVING THE
+    # RED-GREEN AXIS DISSOLVES A PROBLEM THAT CANNOT BE SOLVED INSIDE IT.
+    #
+    # THE DERIVATION, published so nobody re-derives it by hand and gets a
+    # fourth value:
+    #
+    #     50% toward BRAND_DARK_GOLD #8c7337, interpolated in OKLab
+    #
+    #   role      source     ->  fill
+    #   success   #9b59cc        #926c89
+    #   warning   #b76c40        #a2703c
+    #   error     #ff008f        #c85b67
+    #
+    # OKLab and not sRGB because the ramp must stay perceptually even; an sRGB
+    # blend goes muddy through the middle and the midpoint would not be one.
+    # 50% is the DEEPEST mix that passes every bar -- at 60% the worst
+    # colour-blind pair drops to 6.8 and the nearest registered value to 7.4,
+    # both under the register's own "clearly different" threshold. It passes by
+    # 0.3 on one bar and 0.7 on the other, and that thinness is deliberate: the
+    # gold has to read in all three.
+    #
+    # THE MIX IS PROVENANCE, NOT A LIVE FORMULA, and the difference matters.
+    # Held as a rule, the ratio becomes an edit anyone can make, and retuning it
+    # would silently change what ERROR looks like -- the same argument that
+    # registered BRAND_STILL_GOLD rather than deriving it. So the derivation is
+    # published to make the choice auditable, and the values are then written
+    # down. #926c89 is #926c89.
+    #
+    # ONE OPEN CORRECTION: #ff008f was dialled at C 90 / h 359, which is OUTSIDE
+    # sRGB -- its R sits on 255 and its G on 0, both rails, which is what a
+    # clip looks like. The published source is therefore what the clipper chose
+    # rather than what was chosen. RE-DIAL IT INSIDE THE GAMUT BEFORE THIS IS
+    # FINAL, or the value resolves differently the first time anything touches
+    # P3 or print. The fill #c85b67 is unaffected today; the provenance is not.
+    #
+    # FILL FLOOR, 3:1 on the four grounds the fleet paints:
+    #             #1a1a1a  #2a2a2a  #ffffff  #f5f5f5   worst
+    #   success      3.91     3.23     4.44     4.07    3.23
+    #   warning      4.07     3.36     4.26     3.91    3.36
+    #   error        4.26     3.51     4.07     3.74    3.51
+    # All three clear on all four, which Bootstrap's green and amber did not.
+    #
+    # INK IS TRUE_BLACK on all three -- 4.72 / 4.91 / 5.14 against white's
+    # 4.44 / 4.26 / 4.07 -- which agrees with the ink rule.
+    "success": "#926c89",
+    "warning": "#a2703c",
+    "error": "#c85b67",
+
+    # THE SIX TEXT VARIANTS ARE GENUINELY DERIVED, and are the opposite case to
+    # the fills above: one deterministic rule, no judgement in it, recomputed
+    # rather than re-decided if a fill ever moves.
+    #
+    # NONE OF THE THREE FILLS CLEARS 4.5 AS TEXT ON ANY GROUND, and that is not
+    # a fault in the choice -- it is the fill band. Anything working as a fill on
+    # BOTH a dark and a light ground sits at L* 48-59 by arithmetic, and a
+    # mid-tone cannot carry text on either side. This file already knew it for
+    # red and spent error-text / error-text-light on it; the other two had no
+    # light sibling only because #28a745 and #ffc107 had nowhere to go.
+    #
+    # RULE: hold hue and chroma, move lightness only, take the first step that
+    # clears 4.5 on the worst ground -- APP card #2a2a2a for dark, #f5f5f5 for
+    # light. Same walk that produced error-text.
+    # THE TWO EXISTING error-text KEYS MOVE WITH THEIR BASE. #e56b77 and #c82131
+    # were derived from Bootstrap's #dc3545. With the base retired they are
+    # ORPHANS -- values derived from something no longer in the palette, which is
+    # exactly the #c4a458 failure this programme has already paid for once. They
+    # are replaced, not kept alongside.
+    #
+    #   error-text        #e56b77 -> #e0707b   (was from #dc3545)
+    #   error-text-light  #c82131 -> #b64b58   (was from #dc3545)
+    #
+    # THIS MOVES VALUES FIVE APPLICATIONS MIRROR. That is the cost of moving a
+    # base, and it is the correct cost: the alternative is a text colour that no
+    # longer belongs to its fill.
+    "success-text": "#ad85a3",          # card 4.55
+    "warning-text": "#bc8752",          # card 4.59
+    "success-text-light": "#8a6581",    # f5f5f5 4.52
+    "warning-text-light": "#976633",
     # DERIVED, and the steps are published because a consumer that has to guess
     # will guess differently. Same discipline as the two tint censuses in
     # BRAND_COLORS.md: a derived value is publishable without being permanent,
@@ -989,7 +1136,7 @@ STATUS = {
     # lightness. The tint rules govern the neutral ramps; #dc3545 is a borrowed
     # platform value that never conformed to either register, and a derived
     # variant that conforms while its base does not makes the pair incoherent.
-    "error-text": "#e56b77",
+    "error-text": "#e0707b",
     # LIGHT-MODE ERROR TEXT, published 2026-08-24 because three applications had
     # already derived it independently under TWO identifiers -- STATUS_ERROR_LIGHT
     # in the picker and the transformer, STATUS_ERROR_TEXT_LIGHT in the palette
@@ -1013,7 +1160,7 @@ STATUS = {
     # Same uniform per-channel step as every other derivation here, holding hue.
     # Named error-text-light rather than a fourth spelling: it is the light-mode
     # sibling of error-text above, and the pair should read as a pair.
-    "error-text-light": lighten("#dc3545", -20),   # -> #c82131
+    "error-text-light": "#b64b58",   # was lighten(#dc3545,-20) -> #c82131; base retired
 }
 
 # ------------------------------------------------------- texture + type
