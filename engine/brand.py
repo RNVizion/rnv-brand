@@ -1193,10 +1193,66 @@ STATUS = {
     #
     # AN "ACTIVE" LABEL ALIASES success-text, NOT success -- until the open
     # question above is settled and it gets a value of its own.
-    "success-text": "#ad85a3",          # card 4.55, BRAND_BLACK 5.52
+    # OPEN, RAISED HERE 2026-09-04: THE DARK THREE HAVE THE SAME FAULT AND IT IS
+    # NOT FIXED IN THIS CHANGE.
+    #
+    # These were derived against APP card #2a2a2a as "the worst dark ground". rev
+    # 29 registered panel-hover #3a3a3a, which is LIGHTER and therefore worse for
+    # light-on-dark text. Measured:
+    #
+    #                      #1a1a1a  #2a2a2a  #333333  #3a3a3a
+    #     success-text       5.52p    4.55p    4.00F    3.60F
+    #     warning-text       5.57p    4.59p    4.04F    3.64F
+    #     error-text         5.48p    4.52p    3.97F    3.58F
+    #
+    # SO THE DARK TEXT FLOOR IS #2a2a2a WHILE BRAND_GOLD CLEARS EVERY DARK
+    # SURFACE INCLUDING panel-hover at 6.15. Two boundaries on dark, which is the
+    # asymmetry the light re-walk just removed on the other side.
+    #
+    # NOT FIXED HERE BECAUSE THE FIX IS NOT SYMMETRIC. On light the worst surface
+    # is a PRESSED plate, and ruling that running text is not carried on a
+    # transient state is defensible. On dark the worst surface is a HOVER, which
+    # a label can sit under for as long as a cursor rests there. Walking the dark
+    # three to clear #3a3a3a costs dE76 6.53-7.06 -- still inside the 8.40 bar,
+    # but more than double the light move, and it lightens all three toward the
+    # ink ramp. THAT IS A RULING, NOT A RECOMPUTATION, and it wants deciding
+    # rather than landing inside a change made for the light side.
+    "success-text": "#ad85a3",          # card 4.55, BRAND_BLACK 5.52; see open note above
     "warning-text": "#bc8752",          # card 4.59
-    "success-text-light": "#8a6581",    # f5f5f5 4.52
-    "warning-text-light": "#976633",
+    # THE THREE LIGHT VARIANTS ARE RE-WALKED AGAINST #e8e8e8, ruled 2026-09-04.
+    #
+    # THEY WERE DERIVED AGAINST #f5f5f5 AS "THE WORST GROUND" AND THAT STOPPED
+    # BEING TRUE. rev 27 registered hover-light #eeeeee and pressed-light #e0e0e0
+    # BELOW it, and rev 24 registered GOLD_TEXT_GROUND_FLOOR #e8e8e8 between
+    # them. THE DERIVATION'S WORST-GROUND ASSUMPTION WAS INVALIDATED BY A LATER
+    # RULING AND NOTHING RE-RAN IT -- a derived value whose INPUT moved, which is
+    # the same class as an orphan except the value still resolves and reads fine.
+    #
+    # THE FLOOR IS #e8e8e8 AND THE REASON IS ONE BOUNDARY, NOT TWO. Walking to
+    # #e0e0e0 would cover the pressed plate but would put the status text floor at
+    # #e0e0e0 while BRAND_DARK_GOLD_DEEP's stays at #e8e8e8 -- two different
+    # boundaries for text on light, and an author would have to remember which
+    # family they were in. Re-walked to #e8e8e8 the two coincide:
+    #
+    #     BRAND_DARK_GOLD_DEEP   #e8e8e8 4.53 pass   #e0e0e0 4.20 FAIL
+    #     the re-walked three    #e8e8e8 4.52 pass   #e0e0e0 4.19 FAIL
+    #
+    # BELOW #e8e8e8 NO BRAND TEXT OF ANY FAMILY IS CARRIED. The pressed plate
+    # carries no running text, consistently, in both families.
+    #
+    # THE MOVE IS SMALL AND THEY STAY THE SAME THREE COLOURS: dE76 3.20 / 3.27 /
+    # 3.28 against this register's own 8.40 "clearly different" bar. The
+    # colour-blind separation is unharmed -- worst simulated pair 17.06.
+    #
+    # THE SENTENCE THAT PROMPTED THIS WAS ALSO WRONG AND IS CORRECTED BELOW. The
+    # error-text-light entry recorded "on #e8e8e8 4.6100 pass" and the ruling
+    # "below #e8e8e8 red does not carry text". THAT WAS #c82131'S MEASUREMENT.
+    # #b84e58 reads 4.0150 there. THE RETIRED VALUE REACHED TWO RUNGS FURTHER
+    # DOWN THAN ITS REPLACEMENT, AND THE SENTENCE RECORDING WHERE THE BOUNDARY
+    # SAT DID NOT MOVE WITH THE VALUE -- the register published a coverage claim
+    # its own values no longer met. Raised by the app side.
+    "success-text-light": "#825d79",    # e8e8e8 4.52
+    "warning-text-light": "#8e5e2b",    # e8e8e8 4.53
     # DERIVED, and the steps are published because a consumer that has to guess
     # will guess differently. Same discipline as the two tint censuses in
     # BRAND_COLORS.md: a derived value is publishable without being permanent,
@@ -1236,17 +1292,25 @@ STATUS = {
     # apps followed the Book. Three sources, three answers -- practices doc
     # section 5.5.0, and the measurement settles it.
     #
-    #   error #dc3545 as TEXT on #f5f5f5   4.1528  FAIL, it is a fill colour
-    #   error-text #e56b77 on #f5f5f5      2.8745  FAIL, it is a DARK-theme value
-    #   this value on #f5f5f5              5.1810  pass
-    #                on #ffffff            5.6485  pass
-    #                on #eeeeee            4.8684  pass
-    #                on #e8e8e8            4.6100  pass
+    # THE FIGURES BELOW WERE #c82131'S AND ARE MARKED AS HISTORY, not as this
+    # value's coverage. That distinction is the whole finding: the sentence
+    # recording where the boundary sat did not move when the value did, so the
+    # register published a coverage claim its own values no longer met.
     #
-    # Same uniform per-channel step as every other derivation here, holding hue.
+    #   HISTORICAL, #c82131 (retired 2026-09-03 with its base #dc3545):
+    #     on #f5f5f5  5.1810   on #ffffff  5.6485
+    #     on #eeeeee  4.8684   on #e8e8e8  4.6100
+    #
+    #   CURRENT, #ae4650 after the 2026-09-04 re-walk:
+    #     on #f5f5f5  5.08     on #ffffff  5.54
+    #     on #eeeeee  4.77     on #e8e8e8  4.52   <- the floor, and it holds
+    #
+    # THE INTERMEDIATE #b84e58 IS WHY THIS WAS FOUND. It read 4.0150 on #e8e8e8 --
+    # the retired value reached two rungs further down than its replacement, and
+    # for one day the register asserted a boundary neither of them held to.
     # Named error-text-light rather than a fourth spelling: it is the light-mode
     # sibling of error-text above, and the pair should read as a pair.
-    "error-text-light": "#b84e58",   # f5f5f5 4.51; re-derived from the corrected fill
+    "error-text-light": "#ae4650",   # e8e8e8 4.52; re-walked, see above
 }
 
 # ------------------------------------------------------- texture + type
