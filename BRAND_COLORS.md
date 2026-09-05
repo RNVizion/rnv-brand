@@ -3,7 +3,15 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-04 (rev 30 — **an "active" label aliases `success-text`, not `success`, and the
+Last locked: 2026-09-04 (rev 31 — **the three light text variants are re-walked against `#e8e8e8`,
+and a coverage sentence that outlived its value is corrected.** They had been derived against
+`#f5f5f5` as the worst ground; rev 27 then registered two rungs below it and rev 24 a third, so a
+later ruling invalidated the derivation's input and nothing re-ran it. The floor is `#e8e8e8` rather
+than `#e0e0e0` **so that status text and gold text share one boundary instead of two.** And the
+`error-text-light` entry was still publishing `#c82131`'s 4.6100 as its own coverage — the retired
+value reached two rungs further than its replacement, which read 4.0150 there. **The dark three have
+the same fault and are recorded as open**, because on dark the worst surface is a hover rather than a
+transient pressed state, and that is a ruling rather than a recomputation. rev 30 — **an "active" label aliases `success-text`, not `success`, and the
 signal family's scope is recorded as an open question.** `rnv-icon-builder` paints
 `STATUS_ACTIVE_COLOR = STATUS_SUCCESS` as **text** on `BRAND_BLACK`, where the floor is 4.5 — the
 alias reads 5.55 under Bootstrap's green and **3.91 under the RNV fill**, so it breaks on adoption
@@ -632,9 +640,9 @@ be solved inside it.**
 
 | role | source | fill | `-text` (dark) | `-text-light` |
 |---|---|---|---|---|
-| success | `#9b59cc` | **`#926c89`** | `#ad85a3` | `#8a6581` |
-| warning | `#b76c40` | **`#a2703c`** | `#bc8752` | `#976633` |
-| error | `#fe0f8a` | **`#c75b64`** | `#dd6f77` | `#b84e58` |
+| success | `#9b59cc` | **`#926c89`** | `#ad85a3` | `#825d79` |
+| warning | `#b76c40` | **`#a2703c`** | `#bc8752` | `#8e5e2b` |
+| error | `#fe0f8a` | **`#c75b64`** | `#dd6f77` | `#ae4650` |
 
 **The derivation:** `50% toward BRAND_DARK_GOLD #8c7337, interpolated in OKLab`. OKLab and not sRGB
 because the ramp must stay perceptually even — an sRGB blend goes muddy through the middle and the
@@ -752,6 +760,68 @@ earn a brand value. **What would have to be decided if it did:**
    is a larger change than one value and should be made deliberately rather than by addition.
 
 **The trigger is a second consumer, not a date.**
+
+### The light text variants are re-walked against `#e8e8e8` — ruled 2026-09-04
+
+**They were derived against `#f5f5f5` as "the worst ground", and that stopped being true.** rev 27
+registered `hover-light` `#eeeeee` and `pressed-light` `#e0e0e0` **below** it, and rev 24 registered
+`GOLD_TEXT_GROUND_FLOOR` `#e8e8e8` between them. **A later ruling invalidated the derivation's input
+and nothing re-ran it** — a derived value whose input moved, which is the orphan class except the
+value still resolves and reads fine.
+
+| | was | now | ΔE76 |
+|---|---|---|---|
+| `success-text-light` | `#8a6581` | **`#825d79`** | 3.20 |
+| `warning-text-light` | `#976633` | **`#8e5e2b`** | 3.27 |
+| `error-text-light` | `#b84e58` | **`#ae4650`** | 3.28 |
+
+**All three move well under this register's own 8.40 *clearly different* bar**, so they stay the same
+three colours to look at, and the colour-blind separation is unharmed — worst simulated pair 17.06.
+
+**The floor is `#e8e8e8` and the reason is one boundary rather than two.** Walking to `#e0e0e0` would
+cover the pressed plate but would put the status text floor there while `BRAND_DARK_GOLD_DEEP`'s
+stays at `#e8e8e8` — two different boundaries for text on light, and an author would have to remember
+which family they were in. Re-walked, the two coincide:
+
+| | `#e8e8e8` | `#e0e0e0` |
+|---|---|---|
+| `BRAND_DARK_GOLD_DEEP` | 4.53 pass | 4.20 fail |
+| the re-walked three | 4.52 pass | 4.19 fail |
+
+**Below `#e8e8e8` no brand text of any family is carried.** The pressed plate carries no running
+text, consistently, in both families.
+
+### The sentence that recorded the boundary did not move with the value
+
+The `error-text-light` entry read *"on `#e8e8e8` 4.6100 pass"* and ruled *"below `#e8e8e8` red does
+not carry text."* **That was `#c82131`'s measurement** — a value retired on 2026-09-03 with its base.
+`#b84e58` reads **4.0150** there.
+
+**The retired value reached two rungs further down than its replacement**, and for one day this
+register published a coverage claim that neither of them held to. The figures are now marked as
+history rather than as current coverage.
+
+### Open: the dark three have the same fault
+
+**Not fixed here, because the fix is not symmetric.** The dark variants were derived against APP card
+`#2a2a2a`; rev 29 registered `panel-hover` `#3a3a3a`, which is lighter and therefore worse for
+light-on-dark text.
+
+| | `#1a1a1a` | `#2a2a2a` | `#333333` | `#3a3a3a` |
+|---|---|---|---|---|
+| `success-text` | 5.52 | 4.55 | **4.00 fail** | **3.60 fail** |
+| `warning-text` | 5.57 | 4.59 | **4.04 fail** | **3.64 fail** |
+| `error-text` | 5.48 | 4.52 | **3.97 fail** | **3.58 fail** |
+
+So the dark text floor is `#2a2a2a` while `BRAND_GOLD` clears **every** dark surface including
+`panel-hover` at 6.15 — the same two-boundary asymmetry the light re-walk just removed on the other
+side.
+
+**On light the worst surface is a *pressed* plate, and ruling that running text is not carried on a
+transient state is defensible. On dark the worst surface is a *hover*, which a label can sit under
+for as long as a cursor rests there.** Walking the dark three to clear `#3a3a3a` costs ΔE76
+6.53–7.06 — inside the 8.40 bar, but more than double the light move, and it lightens all three
+toward the ink ramp. **That is a ruling, not a recomputation.**
 
 ### The neutral ramp
 
