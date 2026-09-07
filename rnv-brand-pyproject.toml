@@ -1,0 +1,38 @@
+# Drop this at the root of RNVizion/rnv-brand, beside engine/.
+#
+# It makes the register pip-installable, which is the only thing standing
+# between the five applications and 22 tests that currently skip. Nothing
+# about engine/brand.py has to change: it is 1569 lines with ZERO imports,
+# pure data and pure functions, and it parses on 3.10, 3.11 and 3.12.
+#
+# After this lands, each application pins it in requirements-dev.txt as
+#
+#     rnv-brand @ git+https://github.com/RNVizion/rnv-brand@<sha>
+#
+# and the pinned sha becomes a written statement of which revision that
+# application mirrors -- visible in a diff when it changes, which is exactly
+# what a hand-maintained PINNED dict cannot give you.
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rnv-brand"
+version = "31.0.0"          # the register revision, so `pip show` answers "which rev?"
+description = "The RNVizion brand register: the colours, and the rules that derive them."
+requires-python = ">=3.10"
+dependencies = []           # deliberately none -- see the note above
+license = { file = "LICENSE" }
+
+[project.urls]
+Homepage = "https://github.com/RNVizion/rnv-brand"
+
+[tool.setuptools]
+packages = ["engine"]
+
+[tool.setuptools.package-data]
+# The applications read the published values, not the markdown. These are
+# included so an installed copy can still answer "what does the book say",
+# which is useful when a check fails and the reason is in prose.
+engine = ["py.typed"]
