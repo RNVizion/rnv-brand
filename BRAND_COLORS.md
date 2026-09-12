@@ -3,7 +3,7 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-12 (rev 32 — **the register gains a second hue.** `BRAND_BLUE` `#6f94bc`
+Last locked: 2026-09-12 (rev 33 — **registration and emission are ruled as two different acts.** `tokens()` walks surfaces, not `PERMANENT`, by design — a token reaching a stylesheet is a change to another repository and is a decision, not a side-effect. The two blues emit nothing and that is declared in `_PERMANENT_NOT_EMITTED` with a guard armed both ways. rev 32 — **the register gains a second hue.** `BRAND_BLUE` `#6f94bc`
 and `BRAND_DARK_BLUE` `#456c91` are permanent, mixed in `paint` mode from the web violet, a steel
 blue, brand gold and `STATUS["success"]`, and placed at the status family's own two lightnesses.
 **They enter as a pair because no single value can carry text on both grounds** — 4.5:1 on
@@ -903,6 +903,30 @@ transient state is defensible. On dark the worst surface is a *hover*, which a l
 for as long as a cursor rests there.** Walking the dark three to clear `#3a3a3a` costs ΔE76
 6.53–7.06 — inside the 8.40 bar, but more than double the light move, and it lightens all three
 toward the ink ramp. **That is a ruling, not a recomputation.**
+
+### Registration and emission are two different acts — ruled 2026-09-12
+
+**`tokens()` walks the surface palettes, not `PERMANENT`, by design.**
+
+A **permanent** colour is one the brand owns. An **emitted** token is one a surface consumes. A
+colour reaches a stylesheet when a surface palette adopts it under that surface's own key — **never
+as a side-effect of being registered**, because a token arriving in `tokens.css` is a change to a
+consumer in another repository, and that is a decision someone makes rather than something that
+happens because a dict grew.
+
+**The eighth and ninth permanents — `blue` and `dark-blue` — therefore emit nothing today.** The site
+is all-dark and gold-only, and a `--rnv-blue` arriving on the next deploy is a change nobody asked
+for. `still-gold` sat in exactly this position from 2026-08-23 until `signal-ring-still` adopted it.
+**That is the path, and it is the only path.**
+
+**But "permanent and not emitted" is a declared state, not an accident.** The two lists can diverge,
+so the divergence is written down in `_PERMANENT_NOT_EMITTED` with a reason per colour, and
+`_permanent_emission_is_declared()` runs at import. It fails in **both** directions — a permanent that
+is neither emitted nor declared is an undeclared gap; a declared one that some surface has since
+adopted is a stale exemption. Armed both ways.
+
+Same completeness shape as `_resolver_covers_permanent()`, for the same reason: **two lists of one
+thing, one grows, nothing compared them.**
 
 ### The neutral ramp
 
