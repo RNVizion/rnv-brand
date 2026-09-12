@@ -497,6 +497,128 @@ BRAND_STANDBY_GOLD = "#ae986f"          # the standby ring -- registered, see ab
 # distinction that made the sweep unsafe in the first place.
 BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 
+# ------------------------------------------------------------------- blue
+# RNV-BRAND-BLUE, 2026-09-12.
+# THE SECOND BRAND HUE, ruled 2026-09-12. Chris chose it; everything below is
+# measurement. It is the first colour in this register that is not gold, black
+# or white.
+#
+# HOW IT WAS MADE, and by what. Mixed through rnv-color-mcp's `mix_colors` in
+# `paint` mode -- Kubelka-Munk pigment physics, not a digital average -- from
+#
+#     2 parts  #b794ff   WEB["accent-violet"], a colour this register already
+#                        publishes, though see the note on its permanence below
+#     6 parts  #4682b4   CSS steelblue. The register had no blue; this is the
+#                        one ingredient brought in from outside
+#     1 part   #d2bc93   BRAND_GOLD
+#     2 parts  #926c89   STATUS["success"]
+#
+# giving #5c82a9, which is then placed at the two lightnesses below.
+#
+# `lab` MODE WAS TRIED FIRST AND IS RECORDED BECAUSE IT FAILED. An equal-weight
+# lab blend of the same four ingredients gives #968e9b -- a grey-mauve sitting
+# dE 2.5 from STATUS["success-text"] under deuteranopia, which is to say the
+# same colour. Averaging in a perceptual space moves toward the centroid and
+# the centroid of four hues is grey. Pigment mixing keeps the chroma. The
+# ingredient list did not change between those two results; only the model did.
+#
+# VIOLET ALONE WAS ALSO TRIED. accent-violet + gold + purple with no blue gives
+# #a885ae, dE 6.5 from STATUS["success-text"] -- too near the status purple to
+# separate from it. The blue is doing the work; the violet is why the blue has
+# a trace of red in it rather than reading as steel.
+#
+# THE PURPLE EARNS ITS PLACE, MEASURED. Without it the mix lands at a = -10.12
+# and dE 17.2 from success-text under deuteranopia; with it, a = -2.35 and dE
+# 19.4. It pushes b further negative, and b is the axis that SURVIVES
+# deuteranopia -- so the ingredient chosen on taste also improved the one
+# number a red-green viewer depends on. Recorded because the reverse was the
+# expectation.
+#
+# ------------------------------------------------------------------------
+# WHY THIS IS A PAIR AND NOT A VALUE. There is no single colour that carries
+# text on both of this brand's grounds, and that is arithmetic rather than a
+# search that gave up:
+#
+#     APP["panel"]           #1a1a1a   relative luminance 0.010330
+#     APP["surface-light-3"] #f5f5f5   relative luminance 0.913099
+#
+#     4.5:1 on the dark ground requires   Y >= 0.221484
+#     4.5:1 on the light ground requires  Y <= 0.164022
+#
+# The two intervals do not meet. Setting the two ratios equal gives
+# (Y + 0.05)^2 = 0.060330 * 0.963099, so the best ANY colour can do on both at
+# once is 3.9954:1 -- short of the floor, for every colour that exists. The
+# gold family already answers this with two values and so does STATUS; the blue
+# is the third family to do it, and the first to have the reason written down
+# here rather than rediscovered.
+#
+# THE PAIR IS ONE COLOUR AT TWO LIGHTNESSES, which is the family's own
+# construction rule read off the values that already shipped:
+#
+#     #ad85a3   L* 60.16   a 20.38   b -9.99    success-text
+#     #825d79   L* 44.17   a 19.97   b -9.77    success-text-light
+#
+# Same a, same b, L* moved by 16. The blue is built the same way: one hue,
+# placed at L* 60.06 and L* 44.28, holding hue to within 0.9 degrees. Asserted
+# at import by _blue_pair_holds_its_grounds() below, because a pair maintained
+# by remembering is a pair that drifts.
+#
+# ------------------------------------------------------------------------
+# COVERAGE, TRUNCATED NOT ROUNDED, and the failures are published with the
+# passes because a table that only lists what works is a permission slip.
+#
+#   BRAND_BLUE as TEXT, 4.5 floor
+#     on #000000  APP window        6.6380  pass
+#     on #0a0a0f  WEB_BLACK         6.2433  pass
+#     on #0a0a0a  APP canvas        6.2581  pass
+#     on #1a1a1a  APP panel         5.5014  pass   <- the job
+#     on #2a2a2a  APP card          4.5370  pass   <- the floor, and it is close
+#     on #3a3a3a  APP panel-hover   3.5954  FAIL
+#
+#   BRAND_DARK_BLUE as TEXT, 4.5 floor
+#     on #ffffff  WHITE             5.5162  pass
+#     on #fbfbfb  surface-light-2   5.3307  pass
+#     on #f5f5f5  surface-light-3   5.0597  pass   <- the job
+#     on #eeeeee  hover-light       4.7544  pass
+#     on #e8e8e8  ground floor      4.5020  pass   <- see the warning below
+#     on #e0e0e0  pressed-light     4.1787  FAIL
+#
+# THE #e8e8e8 FIGURE IS NOT A PERMISSION. It clears by 0.0020 -- two parts in
+# ten thousand, inside the byte grid's own resolution -- and this register has
+# already retired one value (#b19145) for resting a permission on a margin that
+# thin. GOLD_TEXT_GROUND_FLOOR is named for the gold family and stays that way;
+# the blue's guarded floor is APP["surface-light-3"], where it has room. Read
+# the 4.5020 as "it happens to reach" and never as "it is ruled to".
+#
+# AS A FILL, black reads 6.6380 on BRAND_BLUE and white 3.1635, so text on the
+# blue fill is BLACK in dark mode. On BRAND_DARK_BLUE white reads 5.5162 and
+# black 3.8069, so it is WHITE there. That is the opposite arrangement to the
+# golds, where black wins on both -- do not carry the gold rule across.
+#
+# ------------------------------------------------------------------------
+# IT IS PERMANENT BECAUSE THE BRAND ADOPTED IT, WHICH IS NOT THE SAME TRIGGER
+# AS A ROLE COLOUR. This register recorded on 2026-09-04 that the trigger for
+# registering a ROLE is a SECOND consumer, not a date. That rule is about
+# roles -- `running` as distinct from `succeeded` -- and it does not govern
+# here: a permanent colour is one the brand commits to, and gold did not wait
+# for a second consumer either. Stated so the next reader does not read this as
+# the rule being broken.
+#
+# AND IT IS NOT A PLATFORM BLUE. BRAND_COLORS.md excludes #0078d4 by name as a
+# platform convention. The distinction is not the hue, it is the provenance:
+# #0078d4 is Windows' selection colour, adopted because it was there, and this
+# one is mixed from two colours this register already owns plus one ingredient
+# named above. A borrowed value and a derived one can sit a few degrees apart
+# on the wheel and still belong to different categories.
+#
+# #b794ff'S OWN PERMANENCE IS STILL OPEN and this does not settle it.
+# BRAND_COLORS.md carries "open [confirm/fill]" against the two web secondary
+# accents. A mixture's ingredient does not inherit the mixture's status, and
+# nothing here should be read as having confirmed the violet by using it.
+BRAND_BLUE = "#6f94bc"       # dark-surface blue; text on panel and above
+BRAND_DARK_BLUE = "#456c91"  # light-surface blue -- darker BECAUSE the ground
+                             # is lighter, exactly as BRAND_DARK_GOLD is
+
 # ------------------------------------------------- the rest of the register
 # Named because they are permanent, not because a palette happened to use
 # them. TRUE_BLACK and WHITE were already in APP and in every light theme as
@@ -505,8 +627,16 @@ TRUE_BLACK = "#000000"   # app window ground; text on gold, on either surface
 WHITE = "#ffffff"        # light-surface cards and inputs; the ramp's far anchor
 WEB_BLACK = "#0a0a0f"    # rnvizion.dev ground; social and OG base
 
-# The six the brand commits to. Gold on dark, dark gold on light; dark gold is
-# additionally gold's shade on dark, where full gold is too loud.
+# The nine the brand commits to. Gold on dark, dark gold on light; dark gold is
+# additionally gold's shade on dark, where full gold is too loud. Blue on dark,
+# dark blue on light, by the same rule and for the same reason.
+#
+# THIS COMMENT SAID "six" UNTIL 2026-09-12 WHILE THE DICT HELD SEVEN. The
+# seventh was added on 2026-08-23 and announced itself in the comment three
+# lines below -- so the file both stated the count and corrected it, four lines
+# apart, for twenty days. Nothing compares a number written in prose to the
+# length of the thing it describes, which is the same gap as "nothing checks
+# prose against prose" and the reason the count is now spelled once.
 PERMANENT = {
     "gold": BRAND_GOLD,
     "dark-gold": BRAND_DARK_GOLD,
@@ -514,6 +644,11 @@ PERMANENT = {
     # MEANING rather than a role. See BRAND_STILL_GOLD above for why it is
     # registered and not derived.
     "still-gold": BRAND_STILL_GOLD,
+    # EIGHTH AND NINTH, added 2026-09-12 -- the first permanent colours that are
+    # not gold, black or white. They enter as a PAIR because no single value
+    # carries text on both grounds; see the derivation above BRAND_BLUE.
+    "blue": BRAND_BLUE,
+    "dark-blue": BRAND_DARK_BLUE,
     "charcoal": BRAND_BLACK,
     "black": TRUE_BLACK,
     "web-black": WEB_BLACK,
@@ -1411,6 +1546,21 @@ RNV_BRAND = {
     "stillness": BRAND_STILL_GOLD,
     "standby gold": BRAND_STANDBY_GOLD,
     "standby-gold": BRAND_STANDBY_GOLD,
+    # THE BLUE PAIR, 2026-09-12. Added in the SAME change that put them in
+    # PERMANENT, which is what _resolver_covers_permanent() exists to insist
+    # on -- still-gold went a day unreachable because the two lists were
+    # updated separately, and the guard below is the whole reason that cannot
+    # happen twice.
+    #
+    # "light-mode blue" is spelled the way "light-mode gold" is, because the
+    # confusion is identical: the light-mode value is the DARKER one, and
+    # someone asking out loud will say "the light one" meaning the mode.
+    "blue": BRAND_BLUE,
+    "brand blue": BRAND_BLUE,
+    "rnv blue": BRAND_BLUE,
+    "dark blue": BRAND_DARK_BLUE,
+    "blue dark": BRAND_DARK_BLUE,
+    "light-mode blue": BRAND_DARK_BLUE,
     "black": TRUE_BLACK,
     "true black": TRUE_BLACK,
     "white": WHITE,
@@ -1496,6 +1646,92 @@ def _deep_gold_clears_its_floor():
 
 
 _deep_gold_clears_its_floor()
+
+
+def _blue_pair_holds_its_grounds():
+    """The blue pair must clear 4.5:1 on its own ground, and stay ONE COLOUR.
+
+    TWO COUPLINGS, AND NEITHER SURVIVES BEING REMEMBERED. BRAND_BLUE is
+    defined as the value that carries text on APP["panel"]; BRAND_DARK_BLUE as
+    the value that carries it on APP["surface-light-3"]. Each is written in
+    terms of a ground that has moved before -- the light ladder moved twice in
+    one fortnight -- so a change at either end leaves a claim here that no
+    longer holds, with nothing to say so.
+
+    AND THE PAIR IS THE POINT. The two values are one hue placed at two
+    lightnesses; that is what makes them a pair rather than two blues. Hue is
+    held to within 1.0 degree (measured 0.9) and the lightness step to
+    16 +/- 1 (measured 15.78). Change one and the assertion fires, which is the
+    only way a relationship between two literals stays true.
+
+    THE FLOOR IS surface-light-3 AND NOT GOLD_TEXT_GROUND_FLOOR. The blue
+    reaches #e8e8e8 at 4.5020, a margin of two parts in ten thousand. This
+    register retired #b19145 for exactly that -- a permission resting on a
+    figure too close to its threshold to be real -- so the margin is recorded
+    beside the value and is not guarded as though it were a rule.
+    """
+    def _lum(hexv):
+        c = [int(hexv.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+        c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+    def _cr(a, b):
+        la, lb = _lum(a), _lum(b)
+        hi, lo = max(la, lb), min(la, lb)
+        return (hi + 0.05) / (lo + 0.05)
+
+    def _lab(hexv):
+        import math
+        c = [int(hexv.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+        c = [x / 12.92 if x <= 0.04045 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+        m = ((0.4124564, 0.3575761, 0.1804375),
+             (0.2126729, 0.7151522, 0.0721750),
+             (0.0193339, 0.1191920, 0.9503041))
+        xyz = [sum(row[i] * v for i, v in enumerate(c)) for row in m]
+        f = []
+        for v, w in zip(xyz, (0.95047, 1.0, 1.08883)):
+            v /= w
+            f.append(v ** (1 / 3) if v > 0.008856 else 7.787 * v + 16 / 116)
+        return (116 * f[1] - 16, 500 * (f[0] - f[1]), 200 * (f[1] - f[2]))
+
+    for value, ground, name, gname in (
+            (BRAND_BLUE, APP["panel"], "BRAND_BLUE", 'APP["panel"]'),
+            (BRAND_DARK_BLUE, APP["surface-light-3"], "BRAND_DARK_BLUE",
+             'APP["surface-light-3"]')):
+        ratio = _cr(value, ground)
+        if ratio < 4.5:
+            raise AssertionError(
+                f"{name} {value} reads {ratio:.4f} on {gname} {ground}, under "
+                f"the 4.5 text floor. One of the two moved without the other. "
+                f"The blue is DEFINED as the value that carries text on this "
+                f"ground, so if the ground moved, re-walk the value; if the "
+                f"value moved, say here what it is for now."
+            )
+
+    import math
+    la, aa, ba = _lab(BRAND_BLUE)
+    lb, ab, bb = _lab(BRAND_DARK_BLUE)
+    hue = abs((math.degrees(math.atan2(ba, aa))
+               - math.degrees(math.atan2(bb, ab)) + 180) % 360 - 180)
+    if hue > 1.0:
+        raise AssertionError(
+            f"BRAND_BLUE and BRAND_DARK_BLUE are {hue:.2f} degrees apart in "
+            f"hue, over the 1.0 ceiling. They are meant to be ONE colour at "
+            f"two lightnesses -- the mode picks which, and a viewer moving "
+            f"between modes should see the same blue get darker, not a "
+            f"different blue. Re-place the light value on the dark one's hue."
+        )
+    step = la - lb
+    if not 15.0 <= step <= 17.0:
+        raise AssertionError(
+            f"BRAND_BLUE sits {step:.2f} L* above BRAND_DARK_BLUE, outside the "
+            f"16 +/- 1 the status text family uses between its own pairs. The "
+            f"step is the family's, not this colour's; if it needs to change, "
+            f"change it for the family and say so here."
+        )
+
+
+_blue_pair_holds_its_grounds()
 
 
 def _resolver_covers_permanent():
