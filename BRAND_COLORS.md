@@ -3,7 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-04 (rev 31 — **the three light text variants are re-walked against `#e8e8e8`,
+Last locked: 2026-09-12 (rev 32 — **the register gains a second hue.** `BRAND_BLUE` `#6f94bc`
+and `BRAND_DARK_BLUE` `#456c91` are permanent, mixed in `paint` mode from the web violet, a steel
+blue, brand gold and `STATUS["success"]`, and placed at the status family's own two lightnesses.
+**They enter as a pair because no single value can carry text on both grounds** — 4.5:1 on
+`#1a1a1a` needs Y ≥ 0.221484 and on `#f5f5f5` needs Y ≤ 0.164022, and the best any colour manages
+on both at once is 3.9954:1. **Four statements in this file were publishing the retired `#b19145`
+as current**, including the resolver contract table, and are corrected in the same change; the
+value moved in rev 16 and the prose did not follow. rev 31 — **the three light text variants are re-walked against `#e8e8e8`,
 and a coverage sentence that outlived its value is corrected.** They had been derived against
 `#f5f5f5` as the worst ground; rev 27 then registered two rungs below it and rev 24 a third, so a
 later ruling invalidated the derivation's input and nothing re-ran it. The floor is `#e8e8e8` rather
@@ -221,10 +228,17 @@ tool primitives, or one product's call.
 | Brand gold | `#d2bc93` | 210, 188, 147 | **The accent on black and dark surfaces.** Site, social, OG cards, wordmark, every app's dark theme |
 | Brand dark gold | `#8c7337` | 140, 115, 55 | **The accent on light surfaces.** Every app's light theme; also gold's shade on dark, where full gold is too loud. Was `#b19145` until 2026-08-17 (`1003a6c`) — the contrast table below records why it moved and what it cost |
 
-**The split is confirmed by the code, not just declared.** `#b19145` appears zero times on
-rnvizion.dev and zero times in the corpus Space — both all-dark surfaces, both gold-only.
-In the apps, the dark theme's accent is `#d2bc93` and the light theme's is `#b19145`,
-without exception across all five.
+**The split is confirmed by the code, not just declared.** In the apps, the dark theme's accent
+is `#d2bc93` and the light theme's is `#8c7337`, without exception across all five; `#b19145`
+survives in them only inside the `RETIRED` tables that name it, which is mention and not use.
+Neither gold appears on rnvizion.dev's light surfaces because it has none — the site is all-dark
+and gold-only.
+
+**Corrected 2026-09-12 (rev 32).** This paragraph read `#b19145` as the apps' current light accent
+for twenty-six days after rev 16 moved the value, and offered "`#b19145` appears zero times on
+rnvizion.dev" as evidence for the split — a sentence that became **unfalsifiable** the moment the
+value was retired, since a retired value appears zero times everywhere. It was true and it had
+stopped meaning anything, which is harder to notice than being wrong.
 
 **Dark gold's second job, which the split doesn't cover.** On dark surfaces it also serves as
 gold's shade — `accent_dark` in the dark theme drives borders, hairlines, and pressed fills
@@ -236,6 +250,73 @@ and dark gold is additionally the darker of the pair wherever gold needs one.
 `#dcc9a3` (three apps) sits on the gold axis extended past brand gold by about 30%;
 `#c4ab7e` (corpus button hover) and `#c4a458` (three apps) sit near it, hand-picked. A
 surface that needs a lighter or darker gold derives it; it doesn't mint one.
+
+### Blue — the second hue, ruled 2026-09-12
+
+**There are two blues, for the same reason there are two golds.**
+
+| Color | Hex | RGB | Canonical use |
+|---|---|---|---|
+| Brand blue | `#6f94bc` | 111, 148, 188 | **On black and dark surfaces.** Carries text down to `#2a2a2a` |
+| Brand dark blue | `#456c91` | 69, 108, 145 | **On light surfaces.** Carries text down to `#eeeeee` |
+
+**It is mixed, not picked.** Through `rnv-color-mcp`'s `mix_colors` in **`paint`** mode —
+Kubelka-Munk pigment physics — from 2 parts `#b794ff` (the web violet), 6 parts CSS `steelblue`,
+1 part brand gold, 2 parts `STATUS["success"]`. That gives `#5c82a9`, which is then placed at
+L\* 60.06 and L\* 44.28 holding hue.
+
+**`lab` mode was tried first and failed, and the failure is the interesting half.** An equal-weight
+`lab` blend of the same four ingredients gives `#968e9b` — a grey-mauve sitting ΔE 2.5 from
+`success-text` under deuteranopia, which is to say the same colour. Averaging in a perceptual space
+walks toward the centroid, and the centroid of four hues is grey. **The ingredient list did not
+change between those two results; only the model did.**
+
+**The purple earns its place, measured.** Without it the mix lands at a = −10.12 and ΔE 17.2 from
+`success-text` under deuteranopia; with it, a = −2.35 and ΔE 19.4. It pushes b further negative,
+and b is the axis that *survives* deuteranopia — so the ingredient chosen on taste improved the one
+number a red-green viewer depends on. Recorded because the opposite was expected.
+
+**Why a pair and not a value.** 4.5:1 on `#1a1a1a` requires relative luminance ≥ 0.221484; on
+`#f5f5f5` it requires ≤ 0.164022. The intervals do not meet, and the best any single colour manages
+on both at once is **3.9954:1**. This is arithmetic, not a search that gave up. The gold family and
+`STATUS` already answer it with two values each; the blue is the third, and the first to have the
+reason written down here rather than rediscovered.
+
+**Coverage, truncated not rounded, failures published with the passes:**
+
+| Usage | Floor | `#6f94bc` | `#456c91` |
+|---|---|---|---|
+| as text on `#000000` | 4.5 | 6.6380 | — |
+| as text on `#1a1a1a` (the job) | 4.5 | **5.5014** | — |
+| as text on `#2a2a2a` | 4.5 | 4.5370 | — |
+| as text on `#3a3a3a` | 4.5 | **3.5954 FAIL** | — |
+| as text on `#ffffff` | 4.5 | — | 5.5162 |
+| as text on `#f5f5f5` (the job) | 4.5 | — | **5.0597** |
+| as text on `#eeeeee` | 4.5 | — | 4.7544 |
+| as text on `#e8e8e8` | 4.5 | — | 4.5020 |
+| as text on `#e0e0e0` | 4.5 | — | **4.1787 FAIL** |
+| black on it, as a fill | 4.5 | 6.6380 | 3.8069 |
+| white on it, as a fill | 4.5 | 3.1635 | 5.5162 |
+
+**`4.5020` on `#e8e8e8` is not a permission.** It clears by two parts in ten thousand, inside the
+byte grid's own resolution. This register retired `#b19145` for resting a permission on exactly
+that kind of margin. `GOLD_TEXT_GROUND_FLOOR` stays named for the gold family; the blue's guarded
+floor is `#f5f5f5`, where it has room.
+
+**Text on a blue fill is black in dark mode and white in light** — 6.6380 and 5.5162 respectively.
+**That is the opposite arrangement to the golds**, where black wins on both. Do not carry the gold
+rule across.
+
+**It is permanent because the brand adopted it.** The rule recorded on 2026-09-04 — that a *role*
+colour is registered on a second consumer rather than a date — governs roles, not permanence. Gold
+did not wait for a second consumer either. **And it is not a platform blue:** this file excludes
+`#0078d4` by name, and the distinction is provenance rather than hue. `#0078d4` is Windows'
+selection colour, adopted because it was there; this one is mixed from colours the register already
+owns. Two values can sit a few degrees apart on the wheel and belong to different categories.
+
+**`#b794ff`'s own permanence remains open** and this does not settle it — see "Canonical usage"
+below, which still carries `[confirm/fill]` against the two web secondary accents. A mixture's
+ingredient does not inherit the mixture's status.
 
 ### Black — the ground
 
@@ -1376,10 +1457,13 @@ document, faithfully followed. **A wrong figure with a citation outranks a right
 they must be.** A surface layers as its medium requires.
 
 **Apps, dark:** window `#000000` · raised `#1a1a1a` · card `#2a2a2a` · accent `#d2bc93` ·
-shade and borders `#b19145` · text on gold `#000000`, with neutral ramp steps between.
+shade and borders `#8c7337` · text on gold `#000000`, with neutral ramp steps between.
 
-**Apps, light:** ground and cards between `#f5f5f5` and `#ffffff` · accent `#b19145` · text
+**Apps, light:** ground and cards between `#f5f5f5` and `#ffffff` · accent `#8c7337` · text
 `#000000` · text on gold `#000000`, with ramp steps between. Shipping in all five apps.
+
+*(Both lines said `#b19145` until 2026-09-12. The value was retired in rev 16 on 2026-08-17 and
+this section was not swept with it.)*
 
 **Website:** base `#0a0a0f` with the cool ramp above it; accent `#d2bc93`, no dark gold
 anywhere. Secondary accents `#b794ff` and `#ffd166` appear sparingly — **open
@@ -1442,9 +1526,23 @@ brand gold, not CSS gold); use `css:gold` to force the universal one.
 
 | You say | Resolves to |
 |---|---|
-| near-black, brand black, rnv black | `#1a1a1a` |
+| near-black, near black, brand black, rnv black, charcoal | `#1a1a1a` |
 | gold, brand gold, rnv gold | `#d2bc93` |
-| dark gold, gold dark, light-mode gold | `#b19145` |
+| dark gold, gold dark, light-mode gold | `#8c7337` |
+| blue, brand blue, rnv blue | `#6f94bc` |
+| dark blue, blue dark, light-mode blue | `#456c91` |
+| still gold, still-gold, stillness | `#9b907a` |
+| standby gold, standby-gold | `#ae986f` |
+| black, true black | `#000000` |
+| white, brand white | `#ffffff` |
+| web black | `#0a0a0f` |
+
+**This table published `#b19145` for the dark-gold row until 2026-09-12**, twenty-six days after
+rev 16 moved the value to `#8c7337`. The row is a *contract* — it states what the colour server
+answers — so for that period the register's own document and the register's own source gave
+different answers to `dark gold`. Nothing compared them. The table was also short by six rows
+against `RNV_BRAND`, which is why the omission of a whole colour would not have shown either;
+it is now complete, and completeness is what makes the next divergence visible.
 
 **"near-black" resolves to charcoal `#1a1a1a`, not to the web ground.** The web ground is
 `web black`. Both readings were in circulation — this file called `#0a0a0f` "web near-black"
