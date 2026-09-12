@@ -1762,8 +1762,43 @@ def _resolver_covers_permanent():
 _resolver_covers_permanent()
 
 
+# ==================================================================== ruling
+# REGISTRATION AND EMISSION ARE TWO DIFFERENT ACTS, ruled 2026-09-12, and
+# tokens() walks surfaces rather than PERMANENT BY DESIGN.
+#
+# A PERMANENT colour is one the brand OWNS. An EMITTED token is one a surface
+# CONSUMES. A colour reaches a stylesheet when a surface palette adopts it under
+# that surface's key -- never as a side-effect of being registered, because a
+# token arriving in tokens.css is a change to a consumer in ANOTHER REPOSITORY,
+# and that is a decision someone makes rather than something that happens
+# because a dict grew.
+#
+# The eighth and ninth permanents -- blue and dark-blue -- therefore emit
+# nothing today. The site is all-dark and gold-only, and a --rnv-blue arriving
+# on the next deploy is a change nobody asked for. still-gold sat in exactly
+# this position from 2026-08-23 until signal-ring-still adopted it; that is the
+# path, and it is the only path.
+#
+# BUT "PERMANENT AND NOT EMITTED" IS A DECLARED STATE, NOT AN ACCIDENT. The two
+# lists can diverge, so the divergence is written down and checked:
+# _permanent_emission_is_declared() below fails if a permanent is neither
+# emitted nor listed here with a reason, AND fails the other way if a listed
+# one starts being emitted while still listed as not. Same completeness shape
+# as _resolver_covers_permanent(), for the same reason -- two lists of one
+# thing, one grows, nothing compared them.
+_PERMANENT_NOT_EMITTED = {
+    "blue": "no surface consumes it yet; registered 2026-09-12 for future work",
+    "dark-blue": "no surface consumes it yet; registered 2026-09-12 for future work",
+}
+
+
 def tokens(surface: str = "web") -> dict[str, str]:
-    """Flat token map for one surface; the emitter's source of truth."""
+    """Flat token map for one surface; the emitter's source of truth.
+
+    WALKS THE SURFACE PALETTES, NOT PERMANENT. See the ruling above: a permanent
+    colour reaches a stylesheet only when a surface adopts it, under that
+    surface's own key.
+    """
     palettes = {"web": WEB, "app": APP, "records": RECORDS}
     if surface not in palettes:
         raise ValueError("surface must be 'web', 'app', or 'records'")
@@ -1785,6 +1820,42 @@ def tokens(surface: str = "web") -> dict[str, str]:
         # four roles that already existed; `mark` is new.
         **{f"font-{role}": f'"{spec["family"]}"' for role, spec in TYPE.items()},
     }
+
+
+def _permanent_emission_is_declared():
+    """Every PERMANENT colour is either emitted by some surface or declared not.
+
+    Two lists of one thing -- PERMANENT and the union of what tokens() emits --
+    that can diverge silently in both directions. A permanent that reaches no
+    stylesheet and is not listed in _PERMANENT_NOT_EMITTED is an undeclared gap;
+    a listed one that some surface has since adopted is a stale declaration. Both
+    fail here, at import, so the divergence is always written down and never
+    merely true.
+    """
+    emitted = set()
+    for surf in ("web", "app", "records"):
+        emitted |= {v for v in tokens(surf).values() if isinstance(v, str) and v.startswith("#")}
+    for key, value in PERMANENT.items():
+        if key.startswith("_"):
+            continue
+        reaches = value in emitted
+        declared = key in _PERMANENT_NOT_EMITTED
+        if not reaches and not declared:
+            raise AssertionError(
+                f"PERMANENT[{key!r}] {value} is emitted by no surface and is not "
+                f"declared in _PERMANENT_NOT_EMITTED. Either a surface adopts it "
+                f"under its own key, or it is listed there with a reason."
+            )
+        if reaches and declared:
+            raise AssertionError(
+                f"PERMANENT[{key!r}] {value} is listed in _PERMANENT_NOT_EMITTED "
+                f"but some surface now emits it. Remove the declaration in the "
+                f"same change that adopted the colour -- a stale exemption is a "
+                f"licence waiting for a defect."
+            )
+
+
+_permanent_emission_is_declared()
 
 
 def emit_css(surface: str = "web", prefix: str = "rnv") -> str:
