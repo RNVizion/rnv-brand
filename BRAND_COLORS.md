@@ -3,7 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-12 (rev 34 — **three corrections from the same reader on the day rev 33 shipped.**
+Last locked: 2026-09-12 (rev 35 — **`web-code` `#00b0a0` is registered and inline code stops
+borrowing the accent.** Tenth permanent, on the `web-black` precedent — `PERMANENT` names the colour,
+`WEB["code"]` names the role, `--rnv-code` is emitted, four resolver keys. Mixed in **paint** mode
+from `BRAND_BLUE` and `BRAND_GOLD`, both stages byte-identical against this register's own mixer. The
+gold it replaces reads 9.3098 on the chip against this value's 6.3277 — **a step down in contrast
+bought for 21.56 of separation from the accent** at the worst of five vision models. **And a metric
+slip is corrected**: a comment compared ΔE76 figures against the 8.40 CIEDE2000 bar. It survived by
+luck; the same slip elsewhere flipped a verdict. rev 34 — **three corrections from the same reader on the day rev 33 shipped.**
 The emission guard could not see a dead exemption — an entry for a key `PERMANENT` does not hold —
 because it walked `PERMANENT`; closed, both cases fail by name. `pyproject.toml` said 32 for rev 33
 and nothing compared them; now `verify_rev_matches_version` does, and both files are in this
@@ -971,6 +978,95 @@ diluted.
 
 **Two endpoints and a parameter want OKLab. Four pigments and a ratio want Kubelka-Munk.** The status
 family got the first right; the blue needed the second.
+
+### `web-code` `#00b0a0` — inline code stops borrowing the accent
+
+**Registered 2026-09-12 for a new type style, on the `web-black` precedent**: `PERMANENT` names the
+colour, `WEB` names the role, and the emitted token is `--rnv-code`.
+
+```
+mix_colors(["#6f94bc", "#00ffa3"], mode="paint", weights=[6, 5])  ->  #00aaae
+mix_colors(["#00aaae", "#d2bc93"], mode="paint", weights=[8, 6])  ->  #00b0a0
+```
+
+`BRAND_BLUE` into a mint neon, then `BRAND_GOLD` into that. **Kubelka-Munk, both stages
+byte-identical against this register's own paint mode**, so the recipe reproduces rather than
+approximates. Chosen by eye against the live post; the arithmetic is published so nobody has to take
+that on trust. **Paint and not lab, per rev 34** — a mixture is a physical-model question.
+
+**One ground, and it is the only one.** `article code` sets `background: var(--bg-3)`, so inline code
+is always chipped and `#1a1a26` is the only ground it sits on. The chip is opaque, so the page's
+noise layer sits behind it and does not tint it.
+
+| ground | | |
+|---|---|---|
+| `bg-3` `#1a1a26` — the chip | **6.3277** | AA; AAA 7.0 not met |
+| `bg-2` `#11111a` | 6.8974 | |
+| `bg` `#0a0a0f` | 7.2588 | |
+
+**At `0.88em` of 17px it is 14.96px — normal text, so the floor is 4.5 and not 3.0.** A couple of
+pixels larger and the feasible region would widen; the size is doing as much work as the colour.
+
+**`BRAND_GOLD` reads 9.3098 on the same chip, so this is a step down in contrast, bought
+deliberately.** On a typical post `strong`, every link, the drop cap and the heading italic are all
+`var(--accent)` — until now the only things separating code from bold were the chip and the mono
+face. Worst of normal vision plus four simulations:
+
+| neighbour | | worst | under |
+|---|---|---|---|
+| `text` `#e8e8f0` | | 30.97 | tritanopia |
+| `accent-warm` `#ffd166` | | 26.60 | achromatopsia |
+| **`accent` gold `#d2bc93`** | | **21.56** | achromatopsia |
+| `accent-violet` `#b794ff` | | 16.47 | achromatopsia |
+| `text-dim` `#9a9ab0` | | 12.32 | achromatopsia |
+| `text-faint` `#5a5a72` | | 11.12 | achromatopsia |
+
+**Nothing on the web surface is under 8.40.** The closest is `signal-ring-still` `#9b907a` at
+**8.45** under achromatopsia — over the bar by 0.05, thin enough to write down rather than leave
+implied. It is a ring; inline code is prose; they share a page and never a line.
+
+**Ten registered values elsewhere come within 8.40**, all under achromatopsia except one, where every
+colour collapses to luma. `#00b0a0` is grey 121. **All forty-six distinct registered hexes were
+checked — complete, not a sample**, because this register's own recorded failure is a note that gave
+one distance and read as though all of them had been checked.
+
+| | | | surface |
+|---|---|---|---|
+| `STATUS.warning` | `#a2703c` | **0.00** | app dialogs |
+| `STATUS.success` | `#926c89` | 0.39 | app dialogs |
+| `STATUS.error` | `#c75b64` | 1.18 | app dialogs |
+| `BRAND_DARK_GOLD` | `#8c7337` | 2.39 | app, light mode |
+| `RECORDS.ink-faint` | `#6f6c64` | 5.54 | records |
+| `STATUS.success-text-light` | `#825d79` | 5.54 | app, light mode |
+| `BRAND_DARK_BLUE` | `#456c91` | 7.10 | **protanopia** — paints nothing |
+| `BRAND_BLUE` | `#6f94bc` | 7.42 | paints nothing |
+| `STATUS.warning-text-light` | `#8e5e2b` | 7.45 | app, light mode |
+| `STATUS.error-text-light` | `#ae4650` | 7.45 | app, light mode |
+
+**The two blues are exempt because they paint nothing, and that exemption has an expiry.**
+`_PERMANENT_NOT_EMITTED` declares both reach no stylesheet, so 7.42 is a distance between a value
+that paints and one that paints nothing — **and `BRAND_BLUE` is an ingredient of this colour**, which
+is what makes it worth recording rather than dismissing. **The day a surface adopts either blue, this
+pair wants re-measuring before it ships.**
+
+**Not promoted to a third brand hue today.** That needs a `_LIGHT` partner — no single value clears
+4.5 on both `#1a1a1a` and `#f5f5f5`, the ceiling being 3.9954 — and that derivation has not been
+done.
+
+### Every separation figure in this register is CIEDE2000 unless it says otherwise
+
+**The 8.40 bar is CIEDE2000** — `BRAND_STANDBY_GOLD`'s walk defines it that way in as many words —
+and a comment in `engine/brand.py` was comparing **ΔE76** figures against it. Corrected 2026-09-12.
+
+**The two are not interchangeable at this scale.** `BRAND_GOLD` to `#b49e75`, the pair that *sets*
+the bar, reads **8.4035 in CIEDE2000 and 11.0877 in ΔE76**.
+
+**The conclusion survived by luck, which is why this earns a rule rather than an edit.** ΔE76
+overstates on those pairs, so a figure clearing the bar in the wrong metric cleared it in the right
+one too. The app side made the same substitution in the same week and it went the other way — **10.43
+in ΔE76 against a true 8.08**, over the bar in the wrong metric and under it in the right one, with
+two values approved on that arithmetic. **Same slip, opposite verdict. A figure that happens to
+survive the wrong metric is not evidence the metric does not matter.**
 
 ### The neutral ramp
 
