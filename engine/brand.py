@@ -615,6 +615,83 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 # BRAND_COLORS.md carries "open [confirm/fill]" against the two web secondary
 # accents. A mixture's ingredient does not inherit the mixture's status, and
 # nothing here should be read as having confirmed the violet by using it.
+# INLINE CODE STOPS BORROWING THE ACCENT. Registered 2026-09-12 for a new type
+# style. Named web-code on the web-black precedent: PERMANENT names the colour,
+# WEB names the role, and the emitted token is --rnv-code.
+#
+#   mix_colors(["#6f94bc", "#00ffa3"], mode="paint", weights=[6, 5]) -> #00aaae
+#   mix_colors(["#00aaae", "#d2bc93"], mode="paint", weights=[8, 6]) -> #00b0a0
+#
+# BRAND_BLUE into a mint neon, then BRAND_GOLD into that. Kubelka-Munk, single
+# constant, truncating -- both stages check byte-identical against this
+# register's own paint mode, so the recipe reproduces rather than approximates.
+# Chosen by eye against the live post; the arithmetic is here so nobody has to
+# take that on trust. PAINT AND NOT LAB, per rev 34: two endpoints and a
+# parameter want a perceptual space, a mixture wants a physical model.
+#
+# ONE GROUND, AND IT IS THE ONLY ONE. `article code` sets background: var(--bg-3),
+# so inline code is ALWAYS chipped and #1a1a26 is the only ground it sits on. The
+# chip is opaque, so the page's noise layer sits behind it and does not tint it.
+#
+#   on bg-3 #1a1a26, the chip   6.3277   AA; AAA 7.0 not met
+#   on bg-2 #11111a             6.8974
+#   on bg   #0a0a0f             7.2588
+#
+# AT 0.88em OF 17px IT IS 14.96px -- NORMAL TEXT, so the floor is 4.5 and not
+# 3.0. A couple of pixels larger and the feasible region would widen. Worth
+# writing down because the size is doing as much work as the colour.
+#
+# BRAND_GOLD reads 9.3098 on the same chip, SO THIS IS A STEP DOWN IN CONTRAST,
+# bought deliberately. On a typical post `strong`, every link, the drop cap and
+# the heading italic are all var(--accent); the bold line sits in the paragraph
+# before the code line, and until now the only things separating code from bold
+# were the chip and the mono face. Worst of normal vision plus four simulations:
+#
+#   text          #e8e8f0   30.97 tritanopia
+#   accent-warm   #ffd166   26.60 achromatopsia
+#   accent gold   #d2bc93   21.56 achromatopsia   <- the one the rule is about
+#   accent-violet #b794ff   16.47 achromatopsia
+#   text-dim      #9a9ab0   12.32 achromatopsia
+#   text-faint    #5a5a72   11.12 achromatopsia
+#
+# NOTHING ON THE WEB SURFACE IS UNDER 8.40. The closest is signal-ring-still
+# #9b907a at 8.45 under achromatopsia -- over the bar by 0.05, thin enough to
+# write down rather than leave implied. It is a ring; inline code is prose; they
+# share a page and never a line.
+#
+# TEN REGISTERED VALUES ELSEWHERE COME WITHIN 8.40, all under achromatopsia
+# except one, where every colour collapses to luma and any two of similar
+# lightness read alike. #00b0a0 is grey 121. All forty-six distinct registered
+# hexes were checked -- the list is complete, not a sample, because this
+# register's own recorded failure is a note that gave one distance and read as
+# though all of them had been checked.
+#
+#   STATUS.warning            #a2703c   0.00   app dialogs
+#   STATUS.success            #926c89   0.39   app dialogs
+#   STATUS.error              #c75b64   1.18   app dialogs
+#   BRAND_DARK_GOLD           #8c7337   2.39   app, light mode
+#   RECORDS.ink-faint         #6f6c64   5.54   records
+#   STATUS.success-text-light #825d79   5.54   app, light mode
+#   BRAND_DARK_BLUE           #456c91   7.10   PROTANOPIA -- nothing paints it
+#   BRAND_BLUE                #6f94bc   7.42   nothing paints it
+#   STATUS.warning-text-light #8e5e2b   7.45   app, light mode
+#   STATUS.error-text-light   #ae4650   7.45   app, light mode
+#
+# THE TWO BLUES ARE EXEMPT BECAUSE THEY PAINT NOTHING, AND THAT EXEMPTION HAS AN
+# EXPIRY. _PERMANENT_NOT_EMITTED declares both reach no stylesheet, so 7.42 is a
+# distance between a value that paints and a value that paints nothing -- and
+# BRAND_BLUE is an INGREDIENT of this colour, which is what makes it worth
+# recording rather than dismissing. THE DAY A SURFACE ADOPTS EITHER BLUE, THIS
+# PAIR WANTS RE-MEASURING BEFORE IT SHIPS. BRAND_DARK_BLUE at 7.10 is the only
+# one of the ten binding under a DICHROMACY rather than achromatopsia, so it
+# would survive a decision to stop counting monochromacy.
+#
+# NOT PROMOTED TO A THIRD BRAND HUE TODAY. That would need a _LIGHT partner --
+# no single value clears 4.5 on both #1a1a1a and #f5f5f5, the ceiling for any
+# colour on both being 3.9954 -- and that derivation has not been done. A web
+# decision today; promotion is a round of its own.
+BRAND_WEB_CODE = "#00b0a0"   # inline code on the web chip; see above
+
 BRAND_BLUE = "#6f94bc"       # dark-surface blue; text on panel and above
 BRAND_DARK_BLUE = "#456c91"  # light-surface blue -- darker BECAUSE the ground
                              # is lighter, exactly as BRAND_DARK_GOLD is
@@ -652,6 +729,7 @@ PERMANENT = {
     "charcoal": BRAND_BLACK,
     "black": TRUE_BLACK,
     "web-black": WEB_BLACK,
+    "web-code": BRAND_WEB_CODE,
     "white": WHITE,
 }
 
@@ -906,6 +984,7 @@ WEB = {
     "text-dim": "#9a9ab0",
     "text-faint": "#5a5a72",
     "accent": BRAND_GOLD,
+    "code": BRAND_WEB_CODE,     # inline code; emits --rnv-code
     "accent-violet": "#b794ff",  # secondary, sparing
     "accent-warm": "#ffd166",    # secondary, sparing
     # ---- signals ---------------------------------------------------------
@@ -1348,7 +1427,24 @@ STATUS = {
     # is a PRESSED plate, and ruling that running text is not carried on a
     # transient state is defensible. On dark the worst surface is a HOVER, which
     # a label can sit under for as long as a cursor rests there. Walking the dark
-    # three to clear #3a3a3a costs dE76 6.53-7.06 -- still inside the 8.40 bar,
+    # three to clear #3a3a3a costs CIEDE2000 5.76-6.05 -- still inside the 8.40
+    # bar, and the figures here were WRONG WHEN WRITTEN: they were dE76 6.53-7.06
+    # compared against a bar that is CIEDE2000. Corrected 2026-09-12.
+    #
+    # EVERY SEPARATION FIGURE IN THIS FILE IS CIEDE2000 UNLESS IT SAYS OTHERWISE,
+    # and the 8.40 bar is CIEDE2000 -- BRAND_STANDBY_GOLD's walk defines it that
+    # way in as many words. The two metrics are not interchangeable at this
+    # scale: BRAND_GOLD to #b49e75, the pair that SETS the bar, reads 8.4035 in
+    # CIEDE2000 and 11.0877 in dE76.
+    #
+    # THE CONCLUSION SURVIVED BY LUCK, WHICH IS WHY THIS IS WORTH A COMMENT. dE76
+    # overstates on these pairs, so a figure that cleared the bar in the wrong
+    # metric clears it in the right one too. The app side made the same
+    # substitution the same week and it went the other way: 10.43 in dE76 against
+    # a true 8.08 -- OVER the bar in the wrong metric, UNDER it in the right one,
+    # and two values were approved on that arithmetic. SAME SLIP, OPPOSITE
+    # VERDICT. A figure that happens to survive the wrong metric is not evidence
+    # the metric does not matter.
     # but more than double the light move, and it lightens all three toward the
     # ink ramp. THAT IS A RULING, NOT A RECOMPUTATION, and it wants deciding
     # rather than landing inside a change made for the light side.
@@ -1541,6 +1637,11 @@ RNV_BRAND = {
     #
     # Guarded below by _resolver_covers_permanent(), which is the completeness
     # check that should have existed before the gap did.
+    # inline code on the web chip -- registered 2026-09-12
+    "code": BRAND_WEB_CODE,
+    "web code": BRAND_WEB_CODE,
+    "web-code": BRAND_WEB_CODE,
+    "code teal": BRAND_WEB_CODE,
     "still gold": BRAND_STILL_GOLD,
     "still-gold": BRAND_STILL_GOLD,
     "stillness": BRAND_STILL_GOLD,
