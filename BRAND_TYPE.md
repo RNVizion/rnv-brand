@@ -3,7 +3,15 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-09-12 (rev 8 — **the consumption item closes within the hour it was opened, and
+Last locked: 2026-09-12 (rev 9 — **the prose-link item closes, and rev 8's count of what remained
+was wrong in both directions.** `bio/index.html` had four prose links rather than one and needed
+no new selector, its prose being inside `<article>` like every post; `aiii/index.html` was never
+failing at all, its links already carrying a `border-bottom` at rest. **The method is the
+finding:** the count came from a pattern that could not see a link appearing later in a
+paragraph, and **an enumeration that undercounts reports success rather than failure** — fewer
+hits look like a smaller problem, and nothing in the output says the method was wrong. The
+conclusion then travelled further than the count: *needs its own selectors* was inferred from a
+bad number instead of read off the page. rev 8 — **the consumption item closes within the hour it was opened, and
 the gap it recorded is worth more than the fix.** Rev 7 shipped saying no surface consumed
 `web-code`; the site mirrored it the same afternoon. Closed with evidence and its date kept,
 because **a value can be registered, measured against forty-six others and argued through two
@@ -375,12 +383,31 @@ this is 1.517:1. Present in every post and in the template. The fix is a rest-st
 to prose links, leaving nav, footer and post-footer alone, since those are link regions rather than
 links embedded in running text.
 
-**Partly closed 2026-09-12.** `article p a`, `article li a` and `.bio a` are underlined at rest in
-the template and all six posts. **Two pages and three links remain**, named rather than rounded off:
-`bio/index.html` carries one prose link and `aiii/index.html` two, both outside `<article>` and
-outside `.bio`, so the scoped selector does not reach them. They need their own selectors and were
-left rather than guessed at. `resume/`, `index.html` and `blog/index.html` have none — every link on
-them sits in a region.
+**CLOSED 2026-09-12.** `article p a`, `article li a` and `.bio a` are underlined at rest in the
+template, all six posts, and `bio/index.html`. Every link on `resume/`, `index.html` and
+`blog/index.html` sits in a region, and `aiii/index.html` was never failing: its `.byline a` and
+`footer.foot a` carry `border-bottom: 1px solid var(--hair)`, a non-colour cue at rest, and it holds
+no links inside `<article>` at all.
+
+**Rev 8 said something different and it was wrong in both directions.** It recorded *two pages and
+three links remaining*, with `bio/index.html` at one prose link, `aiii/index.html` at two, and both
+said to need their own selectors. `bio/index.html` has **four**, needed **no** new selector — its
+prose is inside `<article>` like every post, so the existing rule reaches it, and the page was simply
+absent from the file list. `aiii/` needed nothing.
+
+**The method is the finding, not the number.** The count came from a pattern matching `<p...>`
+followed immediately by `<a `, which cannot see a link appearing later in the same paragraph. Three
+of bio's four sit mid-sentence and were invisible to it.
+
+> **An enumeration that undercounts reports success, not failure.** A search that misses returns
+> fewer hits, which looks exactly like a smaller problem — nothing in the output says the method
+> was wrong. A guard that false-fails announces itself; a guard that false-passes does not.
+
+**And the conclusion travelled further than the count.** "Needs its own selectors" was inferred from
+the bad number rather than read off the page, so a wrong figure became a wrong plan, and the plan
+read as though someone had looked. **Verify the consumer, not the declaration** applies to a count
+as much as to a flag: the question was never *how many did the pattern find*, it was *what does the
+page contain*.
 
 **[confirm/fill] The token has never rendered on a published page.** Verified across all six live
 posts 2026-09-12: none defines `article code`, none uses `<code>`. Everything above is ruled from
