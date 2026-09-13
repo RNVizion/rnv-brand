@@ -15,10 +15,28 @@ Usage:
     from engine.brand import RNV_BRAND, WEB, APP, RECORDS, STATUS, emit_css
 
 Register discipline (BRAND_COLORS.md rev 8, 2026-08-10). PERMANENT holds the
-six values the brand commits to on any medium, print included. Everything else
-here is a ramp step, a tint, an alpha, or a platform convenience — real values
-that consumers need, but not brand claims. Adding to PERMANENT is a decision;
-adding a ramp step is not.
+the values the brand commits to on any medium, print included -- the count is
+not spelled here, and _permanent_count_is_not_spelled() below enforces that.
+THE LINE IS BASE VERSUS DERIVED, NOT IDENTITY-WIDE VERSUS
+SURFACE-SPECIFIC. A brand colour is one the brand REUSES, DERIVES OTHERS FROM,
+OR BUILDS RAMPS OUT OF. It enters when it takes a role on a brand surface and is
+added to the register; from then it is permanent -- it will not be deleted, its
+value may change, and the entry stays as a legacy colour if it does. A FIRST
+ROLE DOES NOT CONFINE A COLOUR TO THAT SURFACE: web-code was registered for
+inline code and web-black for a page ground, and both are base colours the whole
+system may draw on.
+
+Everything else here is a ramp step, a tint or an alpha -- DERIVED from a base,
+and correctly excluded on that ground. Adding to PERMANENT is a decision; adding
+a ramp step is not.
+
+"platform convenience" USED TO APPEAR IN THAT EXCLUSION LIST AND WAS REMOVED
+2026-09-13. It described the wrong axis: a base colour whose first role happens
+to be one surface is a brand claim, which is exactly what web-code is and what
+web-black was before it. Left as written, the sentence excluded from PERMANENT
+the precise category of value that had just been added to it -- and unlike a
+wrong count, that is invisible, because it is the sentence a new reader consults
+to learn what the set MEANS.
 
 Consumers mirror, they do not import. Each repo carries its own copy of the
 values it needs, sourced from here and corrected when drift is detected, so a
@@ -686,10 +704,19 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 # one of the ten binding under a DICHROMACY rather than achromatopsia, so it
 # would survive a decision to stop counting monochromacy.
 #
-# NOT PROMOTED TO A THIRD BRAND HUE TODAY. That would need a _LIGHT partner --
-# no single value clears 4.5 on both #1a1a1a and #f5f5f5, the ceiling for any
-# colour on both being 3.9954 -- and that derivation has not been done. A web
-# decision today; promotion is a round of its own.
+# IT IS A BRAND COLOUR, AND WHAT IT LACKS IS A LIGHT-SURFACE PARTNER. No teal
+# value clears 4.5 on both #1a1a1a and #f5f5f5 -- the ceiling for any colour on
+# both is 3.9954 -- so it cannot anchor a ramp on both grounds the way gold and
+# blue do, and that derivation has not been done.
+#
+# THIS SENTENCE PREVIOUSLY READ "not promoted to a third brand hue today", and a
+# careful reader with the file open took it as a MEMBERSHIP statement about the
+# colour rather than a COMPLETENESS statement about the hue -- concluding the
+# register had put a non-brand value into PERMANENT, and drafting that as a
+# definitional contradiction before the owner corrected it. The note was unsent;
+# the cost was a rewrite rather than a propagation. A SENTENCE A CAREFUL READER
+# GETS BACKWARDS IS WORTH TEN WORDS OF DISAMBIGUATION, so it now says what the
+# colour lacks rather than what it was not granted.
 BRAND_WEB_CODE = "#00b0a0"   # inline code on the web chip; see above
 
 BRAND_BLUE = "#6f94bc"       # dark-surface blue; text on panel and above
@@ -704,7 +731,8 @@ TRUE_BLACK = "#000000"   # app window ground; text on gold, on either surface
 WHITE = "#ffffff"        # light-surface cards and inputs; the ramp's far anchor
 WEB_BLACK = "#0a0a0f"    # rnvizion.dev ground; social and OG base
 
-# The nine the brand commits to. Gold on dark, dark gold on light; dark gold is
+# The values the brand commits to. THE COUNT IS NOT SPELLED -- see below.
+# Gold on dark, dark gold on light; dark gold is
 # additionally gold's shade on dark, where full gold is too loud. Blue on dark,
 # dark blue on light, by the same rule and for the same reason.
 #
@@ -714,6 +742,23 @@ WEB_BLACK = "#0a0a0f"    # rnvizion.dev ground; social and OG base
 # apart, for twenty days. Nothing compares a number written in prose to the
 # length of the thing it describes, which is the same gap as "nothing checks
 # prose against prose" and the reason the count is now spelled once.
+#
+# IT WAS NOT SPELLED ONCE. IT WAS SPELLED TWICE, and this paragraph sat directly
+# above one of them. On 2026-09-13 the module docstring said SIX, this comment
+# said NINE, and the dict held TEN. Stale by three registrations and by hours
+# respectively -- two prose numbers and one dict, in one file, in three states.
+#
+# THAT IS A SHARPER CASE THAN THE ONE ABOVE. The earlier failure was a count
+# nobody compared. This was A STATED FIX THAT WAS NEVER CARRIED OUT, recorded at
+# the definition, in the right place, in a paragraph specifically about this
+# failure -- and the file it was recorded in still contained two copies of the
+# number. A remedy written down is not a remedy applied, and prose cannot tell
+# the difference.
+#
+# SO IT IS NOW SPELLED IN NEITHER PLACE AND DERIVED WHERE NEEDED. The rule is
+# machine-enforced by _permanent_count_is_not_spelled(), because "spell it once"
+# is a discipline and disciplines are what this file keeps discovering it does
+# not have.
 PERMANENT = {
     "gold": BRAND_GOLD,
     "dark-gold": BRAND_DARK_GOLD,
@@ -1921,6 +1966,69 @@ def tokens(surface: str = "web") -> dict[str, str]:
         # four roles that already existed; `mark` is new.
         **{f"font-{role}": f'"{spec["family"]}"' for role, spec in TYPE.items()},
     }
+
+
+_COUNT_WORDS = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7,
+    "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12,
+}
+
+
+def _permanent_count_is_not_spelled():
+    """No prose in this file may state how many colours PERMANENT holds.
+
+    "SPELL IT ONCE" WAS THE REMEDY RECORDED ON 2026-09-12 AND IT WAS NOT CARRIED
+    OUT. The count was spelled twice -- module docstring and the comment above
+    the dict, four hundred lines apart -- and on 2026-09-13 they read SIX and
+    NINE against a dict of TEN. Stale by three registrations and by hours.
+
+    A remedy written in prose is not a remedy applied, and prose cannot tell the
+    difference. So the rule is mechanical: the count appears nowhere in the
+    source, and anyone who needs it writes len(PERMANENT).
+
+    Scans this module's own text for a spelled number immediately preceding a
+    PERMANENT-commitment phrase. It cannot catch every English sentence, and it
+    is not trying to -- it catches the two shapes that have actually occurred
+    here, which is the standard every guard in this file is held to.
+    """
+    import re
+    import pathlib
+
+    # READS ITS OWN SOURCE, AND FAILS IF IT CANNOT. The first draft of this guard
+    # caught the exception and returned -- and because brand.py imports no
+    # pathlib at module scope, it hit NameError on every run and reported clean.
+    # A check that cannot run must fail, never fall back to a default; that rule
+    # is in this file twice and this guard broke it on its first draft.
+    try:
+        src = pathlib.Path(__file__).read_text(encoding="utf-8")
+    except OSError as exc:
+        raise AssertionError(
+            f"_permanent_count_is_not_spelled() cannot read its own source "
+            f"({exc}). It verifies nothing in that state, so it fails rather "
+            f"than passing quietly."
+        ) from exc
+    pattern = re.compile(
+        # "the N (values) the brand commits to" -- a COUNT. Deliberately not
+        # \bone\b on its own: "a permanent colour is ONE the brand commits to"
+        # uses it as a pronoun, and that sentence is in this file at line ~621.
+        # The use/mention distinction, arriving inside the guard written to
+        # enforce a prose rule. "one" is only a count here when "the" precedes
+        # it, which a pronoun never has.
+        r"\bthe\s+(" + "|".join(_COUNT_WORDS) + r"|\d+)\s+"
+        r"(?:values?\s+)?the brand commits to",
+        re.IGNORECASE,
+    )
+    found = [m.group(0).strip() for m in pattern.finditer(src)]
+    if found:
+        raise AssertionError(
+            f"the PERMANENT count is spelled in this file: {found}. It holds "
+            f"{len([k for k in PERMANENT if not k.startswith('_')])}. Spell it "
+            f"nowhere and write len(PERMANENT) -- 'spell it once' was tried, "
+            f"recorded as the fix, and left two copies disagreeing for a day."
+        )
+
+
+_permanent_count_is_not_spelled()
 
 
 def _permanent_emission_is_declared():
