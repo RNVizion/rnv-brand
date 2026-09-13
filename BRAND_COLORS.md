@@ -3,7 +3,13 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-12 (rev 33 — **registration and emission are ruled as two different acts.** `tokens()` walks surfaces, not `PERMANENT`, by design — a token reaching a stylesheet is a change to another repository and is a decision, not a side-effect. The two blues emit nothing and that is declared in `_PERMANENT_NOT_EMITTED` with a guard armed both ways. rev 32 — **the register gains a second hue.** `BRAND_BLUE` `#6f94bc`
+Last locked: 2026-09-12 (rev 34 — **three corrections from the same reader on the day rev 33 shipped.**
+The emission guard could not see a dead exemption — an entry for a key `PERMANENT` does not hold —
+because it walked `PERMANENT`; closed, both cases fail by name. `pyproject.toml` said 32 for rev 33
+and nothing compared them; now `verify_rev_matches_version` does, and both files are in this
+repository so it can see both sides. And the blue's lab-mode failure is restated correctly: **not the
+space, the averaging** — interpolation is a perceptual-space question, mixture is a physical-model
+question. rev 33 — **registration and emission are ruled as two different acts.** `tokens()` walks surfaces, not `PERMANENT`, by design — a token reaching a stylesheet is a change to another repository and is a decision, not a side-effect. The two blues emit nothing and that is declared in `_PERMANENT_NOT_EMITTED` with a guard armed both ways. rev 32 — **the register gains a second hue.** `BRAND_BLUE` `#6f94bc`
 and `BRAND_DARK_BLUE` `#456c91` are permanent, mixed in `paint` mode from the web violet, a steel
 blue, brand gold and `STATUS["success"]`, and placed at the status family's own two lightnesses.
 **They enter as a pair because no single value can carry text on both grounds** — 4.5:1 on
@@ -927,6 +933,44 @@ adopted is a stale exemption. Armed both ways.
 
 Same completeness shape as `_resolver_covers_permanent()`, for the same reason: **two lists of one
 thing, one grows, nothing compared them.**
+
+**And the guard had a gap on the day it shipped, found by the app side.** The loop walks
+`PERMANENT`, so an entry in `_PERMANENT_NOT_EMITTED` whose key `PERMANENT` does not hold was never
+visited — a `"ghost"` entry imported clean and passed. Two ways it bites: a **typo** in the exemption
+key, which reads as protection and protects nothing; and a **rename** in `PERMANENT`, which leaves a
+dead entry behind looking deliberate. **The construct-with-no-consumer failure, inside the guard
+written to catch a sibling of it** — a table only the thing it describes can reach cannot report its
+own dead rows. Closed 2026-09-12; both cases now fail by name.
+
+**A caution from arming it, worth carrying:** two guards standing in line means the second is easy to
+believe you have tested when you have only tested the first. Adding a bare colour to `PERMANENT`
+trips `_resolver_covers_permanent()` before the emission guard gets a turn — the tamper has to give
+the colour a resolver key too.
+
+### The version *is* the rev, and for one day it was not
+
+`pyproject.toml`'s comment reads *"the register revision, so `pip show` answers which rev."* Rev 33
+shipped with it still at **32.0.0**. Rev 32 bumped it correctly, so this was a miss rather than a
+policy — but two writings of one number in two files with nothing comparing them is the shape of
+everything else this month.
+
+**Unlike the mirror case, both files are in this repository, so a check can see both sides.**
+`verify_rev_matches_version` now runs in the facts pass, parses `Last locked: … (rev N` against the
+version's major, and fails loud on a mismatch **or on either header shape moving** — a check that
+cannot find the rev line has not verified anything. The apps are unaffected either way: they pin and
+compare **commits**, which is exact regardless of the version string.
+
+### Interpolation is a perceptual-space question; mixture is a physical-model question
+
+The lab-mode failure that produced `#968e9b` was not the space — it was **averaging**. A two-colour
+ramp interpolates between two points, and the space's uniformity is exactly what is wanted. A
+four-colour mix takes a centroid, and **a centroid has no direction**; with four hues around the wheel
+it lands near the achromatic axis in any space. Kubelka-Munk did better because it is not an average
+at all — a subtractive absorption model, where the strongest absorber dominates rather than being
+diluted.
+
+**Two endpoints and a parameter want OKLab. Four pigments and a ratio want Kubelka-Munk.** The status
+family got the first right; the blue needed the second.
 
 ### The neutral ramp
 
