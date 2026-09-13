@@ -3,7 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-13 (rev 36 — **the definition of a brand colour is corrected, and the count is
+Last locked: 2026-09-13 (rev 37 — **`BRAND_WEB_CODE` is renamed `BRAND_TEAL`, one day old, and the
+`PERMANENT` key follows it to `teal`.** The value, the emitted token and every resolver key are
+unchanged — `web-code` still answers. **The original name came off the `web-black` precedent, which
+matched structurally and not semantically:** `web-black` is blue-lifted where app neutrals are pure
+grey, so it genuinely is a black *for the web*; this is a base that can anchor a ramp, and rev 36's
+own ruling says a first role does not confine a colour to a surface. **A constant naming a role reads
+as off-limits elsewhere no matter what the comment says**, and the fashion app consumes this resolver.
+rev 36 — **the definition of a brand colour is corrected, and the count is
 now spelled nowhere.** Brand and permanent mean the same thing; the line is **base versus derived**,
 not identity-wide versus surface-specific, so *"platform convenience"* leaves the exclusion list — it
 excluded the exact category `web-code` belongs to. **The count was spelled twice, at six and nine
@@ -986,10 +993,27 @@ diluted.
 **Two endpoints and a parameter want OKLab. Four pigments and a ratio want Kubelka-Munk.** The status
 family got the first right; the blue needed the second.
 
-### `web-code` `#00b0a0` — inline code stops borrowing the accent
+### `BRAND_TEAL` `#00b0a0` — a brand teal; inline code is its first role
 
-**Registered 2026-09-12 for a new type style, on the `web-black` precedent**: `PERMANENT` names the
-colour, `WEB` names the role, and the emitted token is `--rnv-code`.
+**Renamed from `BRAND_WEB_CODE` on 2026-09-13, one day after it shipped.** The value does not move,
+the emitted token does not move, and every resolver key still answers — `web-code` included.
+
+**`PERMANENT["teal"]` names the colour, `WEB["code"]` names the role, and `--rnv-code` is emitted.**
+
+**The original name came off the `web-black` precedent, which matched structurally and not
+semantically.** `web-black` earns its surface-encoded name: `#0a0a0f` is blue-lifted, and app
+neutrals are pure grey `R = G = B` without exception, so it is a black *for the web* and can never be
+anything else. **This value is a base** — mixed from `BRAND_BLUE` and `BRAND_GOLD`, able to anchor a
+ramp — and the ruling of 2026-09-13 says **a first role does not confine a colour to that surface**.
+`BRAND_WEB_CODE` stated in the constant the precise thing that ruling says is not true.
+
+**And a name is not undone by documentation.** The fashion app consumes this same resolver; a
+constant called `BRAND_WEB_CODE` reads as off-limits in a garment palette however carefully the
+comment explains otherwise. Raised by `rnv-color-mcp`, whose mirror takes all of `RNV_BRAND`
+regardless of role — which makes the name load-bearing rather than cosmetic.
+
+**The resolver keys did not change**, so downstream currency checks stayed green through the rename:
+`teal`, `brand teal`, `code`, `code teal`, `web code` and `web-code` all resolve.
 
 ```
 mix_colors(["#6f94bc", "#00ffa3"], mode="paint", weights=[6, 5])  ->  #00aaae
