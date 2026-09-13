@@ -1136,6 +1136,49 @@ def verify_expiring(cfg, rep, workdir: Path):
     rep.checks += 1
 
 
+def verify_rev_matches_version(cfg, rep, workdir: Path):
+    """BRAND_COLORS.md's `rev N` and pyproject.toml's major must be one number.
+
+    THE VERSION AND THE REV ARE TWO WRITINGS OF ONE NUMBER IN TWO FILES, and for
+    one day nothing compared them: rev 33 shipped with pyproject.toml still
+    saying 32.0.0, so `pip show rnv-brand` -- whose comment calls itself "the
+    register revision" -- answered the previous revision. Found by the app side.
+
+    UNLIKE THE MIRROR CASE, BOTH FILES ARE IN THIS REPOSITORY, so the check can
+    see both sides. It reads them from HERE rather than from the fetched tree
+    because this is a fact about the register's own consistency, not about a
+    surface it audits.
+
+    Both parses fail loud rather than skip: a check that cannot find the rev
+    line has not verified anything, and an absent threshold must fail rather
+    than fall back to a default.
+    """
+    rep.checks += 1
+    colors = HERE.parent / "BRAND_COLORS.md"
+    pyproject = HERE.parent / "pyproject.toml"
+    if not colors.exists() or not pyproject.exists():
+        rep.fail("rev-version", "rnv-brand",
+                 "BRAND_COLORS.md or pyproject.toml not found beside the checker; "
+                 "this check reads the register's own tree and cannot run without both")
+        return
+    m_rev = re.search(r"Last locked: \d{4}-\d{2}-\d{2} \(rev (\d+)", colors.read_text(encoding="utf-8"))
+    m_ver = re.search(r'^version\s*=\s*"(\d+)\.(\d+)\.(\d+)"', pyproject.read_text(encoding="utf-8"), re.M)
+    if not m_rev:
+        rep.fail("rev-version", "BRAND_COLORS.md",
+                 "no 'Last locked: YYYY-MM-DD (rev N' line found; the header shape moved and this check is blind")
+        return
+    if not m_ver:
+        rep.fail("rev-version", "pyproject.toml",
+                 "no 'version = \"N.N.N\"' line found; cannot compare the register revision")
+        return
+    rev, major = int(m_rev.group(1)), int(m_ver.group(1))
+    if rev != major:
+        rep.fail("rev-version", "pyproject.toml",
+                 f"version major is {major} but BRAND_COLORS.md is at rev {rev}. "
+                 f"The version IS the register revision by its own comment; bump it "
+                 f"in the same change that bumps the rev, or `pip show` lies")
+
+
 def verify_threshold_prose(cfg, rep, workdir: Path):
     """The eval gates as PRINTED on the resume page, against the manifest.
 
@@ -1803,6 +1846,7 @@ def main():
             verify_type(cfg, rep, Path(tmp))
             verify_threshold_prose(cfg, rep, Path(tmp))
             verify_expiring(cfg, rep, Path(tmp))
+            verify_rev_matches_version(cfg, rep, Path(tmp))
         scanned.append("manifest")
 
     if args.root:
