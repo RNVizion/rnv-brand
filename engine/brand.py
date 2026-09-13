@@ -633,9 +633,31 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 # BRAND_COLORS.md carries "open [confirm/fill]" against the two web secondary
 # accents. A mixture's ingredient does not inherit the mixture's status, and
 # nothing here should be read as having confirmed the violet by using it.
-# INLINE CODE STOPS BORROWING THE ACCENT. Registered 2026-09-12 for a new type
-# style. Named web-code on the web-black precedent: PERMANENT names the colour,
-# WEB names the role, and the emitted token is --rnv-code.
+# A BRAND TEAL. Registered 2026-09-12 for a new type style; inline code is its
+# FIRST ROLE, not its scope. PERMANENT names the colour, WEB names the role, and
+# the emitted token is --rnv-code.
+#
+# IT SHIPPED AS BRAND_WEB_CODE FOR ONE DAY AND WAS RENAMED 2026-09-13. The
+# original name came off the web-black precedent, which matched STRUCTURALLY --
+# a PERMANENT entry with a WEB key pointing at it -- and was carried across on
+# the NAMING half too, where it does not hold.
+#
+# WEB_BLACK EARNS ITS SURFACE-ENCODED NAME AND THIS DOES NOT. #0a0a0f is
+# blue-lifted, and app neutrals are pure grey R = G = B without exception, so
+# web-black is a black FOR THE WEB and can never be anything else. Encoding the
+# surface there is accurate. This value is a BASE -- mixed from BRAND_BLUE and
+# BRAND_GOLD, able to anchor a ramp -- and the ruling of 2026-09-13 says a first
+# role does not confine a colour to that surface. BRAND_WEB_CODE stated in the
+# constant the precise thing the ruling says is not true.
+#
+# AND A NAME IS NOT UNDONE BY DOCUMENTATION. The fashion app consumes this same
+# resolver; a constant called BRAND_WEB_CODE reads as off-limits in a garment
+# palette however carefully the comment explains otherwise. Raised by
+# rnv-color-mcp, whose mirror takes all of RNV_BRAND regardless of role, which
+# makes this load-bearing rather than cosmetic.
+#
+# THE RESOLVER KEYS DID NOT CHANGE, so downstream currency checks stayed green
+# through the rename, and "web-code" still answers.
 #
 #   mix_colors(["#6f94bc", "#00ffa3"], mode="paint", weights=[6, 5]) -> #00aaae
 #   mix_colors(["#00aaae", "#d2bc93"], mode="paint", weights=[8, 6]) -> #00b0a0
@@ -717,7 +739,7 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 # the cost was a rewrite rather than a propagation. A SENTENCE A CAREFUL READER
 # GETS BACKWARDS IS WORTH TEN WORDS OF DISAMBIGUATION, so it now says what the
 # colour lacks rather than what it was not granted.
-BRAND_WEB_CODE = "#00b0a0"   # inline code on the web chip; see above
+BRAND_TEAL = "#00b0a0"   # inline code on the web chip; see above
 
 BRAND_BLUE = "#6f94bc"       # dark-surface blue; text on panel and above
 BRAND_DARK_BLUE = "#456c91"  # light-surface blue -- darker BECAUSE the ground
@@ -774,7 +796,7 @@ PERMANENT = {
     "charcoal": BRAND_BLACK,
     "black": TRUE_BLACK,
     "web-black": WEB_BLACK,
-    "web-code": BRAND_WEB_CODE,
+    "teal": BRAND_TEAL,
     "white": WHITE,
 }
 
@@ -1029,7 +1051,7 @@ WEB = {
     "text-dim": "#9a9ab0",
     "text-faint": "#5a5a72",
     "accent": BRAND_GOLD,
-    "code": BRAND_WEB_CODE,     # inline code; emits --rnv-code
+    "code": BRAND_TEAL,     # inline code; emits --rnv-code
     "accent-violet": "#b794ff",  # secondary, sparing
     "accent-warm": "#ffd166",    # secondary, sparing
     # ---- signals ---------------------------------------------------------
@@ -1682,11 +1704,14 @@ RNV_BRAND = {
     #
     # Guarded below by _resolver_covers_permanent(), which is the completeness
     # check that should have existed before the gap did.
-    # inline code on the web chip -- registered 2026-09-12
-    "code": BRAND_WEB_CODE,
-    "web code": BRAND_WEB_CODE,
-    "web-code": BRAND_WEB_CODE,
-    "code teal": BRAND_WEB_CODE,
+    # THE COLOUR IS A TEAL; INLINE CODE IS ITS FIRST ROLE. "web-code" is kept as
+    # a resolver alias so the name it shipped under on 2026-09-12 still answers.
+    "teal": BRAND_TEAL,
+    "brand teal": BRAND_TEAL,
+    "code": BRAND_TEAL,
+    "web code": BRAND_TEAL,
+    "web-code": BRAND_TEAL,
+    "code teal": BRAND_TEAL,
     "still gold": BRAND_STILL_GOLD,
     "still-gold": BRAND_STILL_GOLD,
     "stillness": BRAND_STILL_GOLD,
