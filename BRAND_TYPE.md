@@ -3,7 +3,17 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-08-16 (rev 6 — **the coverage boundary rev 5 stated has moved, and a register
+Last locked: 2026-09-12 (rev 7 — **inline code is ruled, it has left gold, and a box nobody had
+looked at turns out to be half dead.** The token existed byte-identical in the post template and
+a draft and was documented nowhere — decision #19's shape, a convention enforced by files
+agreeing and nothing else. It has **never rendered on a live page.** The chip reads 1.147:1 and
+the border does not at 1.049:1, which is this rev's transferable half — **a contrast ratio
+measures a relationship, not a visibility**, and this project called the whole box dead from
+arithmetic before rendering it. Gold carried three jobs in prose; **the shared-hue rule made
+that askable and the answer was for code to leave**, taking `web-code` #00b0a0, so gold is down
+to links and `strong` separated by weight alone. Checking that turned up **prose links failing
+WCAG 1.4.1 at 1.517:1**, which predates the code token by months and surfaced only because a
+third gold role made someone ask how the roles separate. rev 6 — **the coverage boundary rev 5 stated has moved, and a register
 that understates its own guard misleads exactly as much as one that overstates it.** `verify_type`
 now asserts all three axes of the mark: face, **weight** and **tracking**. Weight was one value with
 no variation. Tracking turned out not to need the ruling this document said it needed first — the
@@ -96,7 +106,7 @@ recorded where they appear because they describe the degraded state, not the int
 | **Mark** | **Montserrat** | **900 (Black)** | The RNVizion mark at every size and in every medium; initiative lockup letterforms; IG aphorism cards and carousels |
 | Display | Bricolage Grotesque | variable, 300–800 | Site headings, blog titles, OG share titles, the name block on résumé cards |
 | Emphasis | Instrument Serif | italic **and roman** | Pull lines, deks, the italicised signature phrases, the card back — **and the blog drop cap, which is roman** |
-| Labels, kickers, long form | JetBrains Mono | 400 / 500 / 600 / 700 | The tracked long form beneath a mark, uppercase tracked kickers, footers, captions |
+| Labels, kickers, long form | JetBrains Mono | 400 / 500 / 600 / 700 | The tracked long form beneath a mark, uppercase tracked kickers, footers, captions, **and inline code in prose — see below** |
 | Body | Inter | 400 / 500 / 600 | Running text |
 
 **The JetBrains Mono row no longer claims wordmarks and no longer claims the nav.** It was
@@ -270,6 +280,90 @@ describes a class**, because the artifact is checkable.
 **The mark gets its own token so it cannot move by accident.** Without `--font-mark`, the mark
 borrows `--font-mono` or `--font-display` and shifts whenever someone retunes a face it was only
 ever sharing a variable with — drift with no edit to the mark at all.
+
+---
+
+## Inline code in prose
+
+**Ruled 2026-09-12.** Inline `<code>` inside `article` is JetBrains Mono at `0.88em`, **web-code
+teal `#00b0a0`**, on a `--bg-3` chip with 4px corners and `1px 6px` of padding. The rule lives in
+`_templates/post-template.html` and is inherited by every post built from it.
+
+**`0.88em` is a correction, not a shrink.** Mono carries a larger x-height than Inter at the same
+point size, so setting it at parity makes code look bigger than the text around it. At 17px body
+this computes to **14.96px — normal text** for WCAG, so the floor is 4.5 rather than 3.0. Written
+down because the size is doing as much work as the colour: a couple of pixels larger and the
+feasible region for the colour would have widened.
+
+### The chip carries it. The border does not.
+
+| | measured |
+|---|---|
+| chip against the page | **1.147:1** |
+| border against the chip | **1.049:1** |
+
+**Both are low ratios and only one of them is invisible.** Rendered at 4x against the real faces,
+the chip reads plainly as a distinct object; the bordered and unbordered versions are
+indistinguishable. **Remove the border.** It costs a declaration, reads as nothing, and looks
+load-bearing to anyone reading the rule rather than the render.
+
+**The rule that generalises, bought by getting this wrong first:**
+
+> **A contrast ratio measures a relationship, not a visibility.** Area and stroke width change what
+> a given ratio buys: a filled shape can read clearly at a ratio where a hairline of the same value
+> disappears. A ratio decides whether a thing *passes*; only a render decides whether it *shows*.
+
+This project computed both figures, called the box dead as a unit, and was half wrong in the half it
+stated most confidently. **Measure to rule; render to see.**
+
+### The chip costs AAA, and that is the trade
+
+`#00b0a0` reads **7.2588** on the page and clears AAA; on its own chip it reads **6.3277** and does
+not. **The chip buys separation and spends 0.93 of contrast for it.** Recorded because the binding
+figure is the chipped one — inline code is always chipped, so `--bg-3` is the only ground it ever
+sits on — and a later reader finding the unchipped figure could reasonably conclude AAA is met.
+
+### Code left gold, and that is the shared-hue rule working
+
+Until 2026-09-12 gold carried three jobs in prose, separated by face and weight rather than colour.
+Code has taken its own hue, the strongest channel available, and gold is left with two:
+
+| | weight | face | hue | box |
+|---|---|---|---|---|
+| `a` | 400 | Inter | gold | — |
+| `strong` | 600 | Inter | gold | — |
+| `code` | 400 | **JetBrains Mono** | **web-code** | chip |
+
+> **Gold in body copy is a shared hue. Any element that takes it must declare which channel
+> separates it — face, weight, or box — and that channel must be perceptible without colour.**
+
+The rule did not stop code taking gold. It made the question askable, and the answer was to leave.
+**`strong` now separates by weight alone**, which is thin but real, and it is the last element
+sharing gold with links.
+
+CIEDE2000 from `#00b0a0` at normal vision: **31.27** from gold, and clear of the whole signal set —
+the closest is stillness gold at 26.82. The binding figure is `engine/brand.py`'s worst-of-four
+simulation, and it lives there rather than here.
+
+---
+
+## Open
+
+**[confirm/fill] No surface consumes the value yet.** `article code` still sets
+`color: var(--accent)`, and the site mirrors brand values into its own unprefixed `:root`, which
+carries no code token at all. **The value is registered and the page is still painting code gold.**
+Until the site mirrors it, everything above describes an intent rather than a surface.
+
+**[confirm/fill] Prose links separate by colour alone and fail WCAG 1.4.1.** `article a` and `.bio a`
+are gold at `text-decoration: none`, underlined on hover only — and hover does not exist on touch
+and is absent while a page is being read. Colour-alone requires **3:1 against surrounding text**;
+this is 1.517:1. Present in every post and in the template. The fix is a rest-state underline scoped
+to prose links, leaving nav, footer and post-footer alone, since those are link regions rather than
+links embedded in running text. Raised 2026-09-12; the change belongs to the site, not this register.
+
+**[confirm/fill] The token has never rendered on a published page.** Verified across all six live
+posts 2026-09-12: none defines `article code`, none uses `<code>`. Everything above is ruled from
+measurement and specimens. Confirm against a real post the first time one ships with code in it.
 
 ---
 
