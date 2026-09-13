@@ -1832,6 +1832,22 @@ def _permanent_emission_is_declared():
     fail here, at import, so the divergence is always written down and never
     merely true.
     """
+    # AN EXEMPTION FOR A KEY PERMANENT DOES NOT HOLD IS INVISIBLE TO THE LOOP
+    # BELOW, which walks PERMANENT and so never visits it. Found by the app side
+    # on the day this guard shipped: a "ghost" entry imported clean and passed.
+    # Two ways it bites -- a typo in the exemption key, which reads as protection
+    # and protects nothing; and a rename in PERMANENT, which leaves a dead entry
+    # behind looking deliberate while the renamed colour becomes an undeclared
+    # gap. The construct-with-no-consumer failure, inside the guard written to
+    # catch a sibling of it: a table only the thing it describes can reach cannot
+    # report its own dead rows.
+    orphaned = sorted(set(_PERMANENT_NOT_EMITTED) - set(PERMANENT))
+    if orphaned:
+        raise AssertionError(
+            f"_PERMANENT_NOT_EMITTED declares {orphaned}, which PERMANENT does "
+            f"not hold -- a typo, or a key that was renamed and left a dead "
+            f"exemption behind. An entry nothing walks is not a declaration."
+        )
     emitted = set()
     for surf in ("web", "app", "records"):
         emitted |= {v for v in tokens(surf).values() if isinstance(v, str) and v.startswith("#")}
