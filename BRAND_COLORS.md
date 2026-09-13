@@ -3,7 +3,14 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-12 (rev 35 — **`web-code` `#00b0a0` is registered and inline code stops
+Last locked: 2026-09-13 (rev 36 — **the definition of a brand colour is corrected, and the count is
+now spelled nowhere.** Brand and permanent mean the same thing; the line is **base versus derived**,
+not identity-wide versus surface-specific, so *"platform convenience"* leaves the exclusion list — it
+excluded the exact category `web-code` belongs to. **The count was spelled twice, at six and nine
+against a dict of ten**, four hundred lines apart, with the remedy *"spell it once"* recorded four
+lines above one of them. A remedy in prose is not a remedy applied:
+`_permanent_count_is_not_spelled()` now enforces it, and two failures in building that guard are
+recorded at it. rev 35 — **`web-code` `#00b0a0` is registered and inline code stops
 borrowing the accent.** Tenth permanent, on the `web-black` precedent — `PERMANENT` names the colour,
 `WEB["code"]` names the role, `--rnv-code` is emitted, four resolver keys. Mixed in **paint** mode
 from `BRAND_BLUE` and `BRAND_GOLD`, both stages byte-identical against this register's own mixer. The
@@ -1067,6 +1074,58 @@ one too. The app side made the same substitution in the same week and it went th
 in ΔE76 against a true 8.08**, over the bar in the wrong metric and under it in the right one, with
 two values approved on that arithmetic. **Same slip, opposite verdict. A figure that happens to
 survive the wrong metric is not evidence the metric does not matter.**
+
+### What a brand colour is — the definition corrected 2026-09-13
+
+> **Brand and permanent mean the same thing.** A colour enters when it takes a role on a brand
+> surface and is added to this register. From then it is permanent: it will not be deleted, its value
+> may change, and the entry remains as a legacy colour. **Brand colours are the base colours the
+> brand reuses, derives others from, or builds ramps out of. A first role does not confine a colour
+> to that surface.**
+
+Ruled by Chris as owner.
+
+**The line is base versus derived, not identity-wide versus surface-specific.** `engine/brand.py`'s
+carve-out listed *"platform convenience"* among the things excluded from `PERMANENT` — which
+described the wrong axis. **A base colour whose first role happens to be one surface is a brand
+claim**, which is exactly what `web-code` is and what `web-black` was before it. Left as written, the
+sentence excluded from `PERMANENT` the precise category of value that had just been added to it.
+
+**Unlike a wrong count that is the invisible failure**, because it is the sentence a new reader
+consults to learn what the set *means*. Ramp steps, tints and alphas stay excluded — they are derived
+from a base, and that is the actual ground.
+
+### The count is now spelled nowhere, because "spell it once" was tried and failed
+
+On 2026-09-13 the module docstring said **six**, the comment above the dict said **nine**, and the
+dict held **ten** — stale by three registrations and by hours respectively.
+
+**The sharp part is that the remedy was already recorded, four lines above one of the offenders.**
+The 2026-09-12 entry documenting the previous instance closes with *"…the reason the count is now
+spelled once."* **It was spelled twice.** A remedy written in prose is not a remedy applied, and
+prose cannot tell the difference.
+
+**So it is spelled in neither place and derived where needed**, enforced by
+`_permanent_count_is_not_spelled()` — the guard scans this module's own source and fails on any
+spelled count, armed on both shapes that actually occurred.
+
+**Two things went wrong while building that guard, and both are recorded at it.** Its first draft
+caught its own exception and returned — and because `brand.py` imports no `pathlib` at module scope
+it hit `NameError` on every run and **reported clean**, which is the rule about checks that cannot
+run, broken inside a guard. And its pattern then flagged *"a permanent colour is **one** the brand
+commits to"* — **the use/mention distinction, arriving inside the guard written to enforce a prose
+rule.**
+
+### `web-code`'s note said what it was not granted; it now says what it lacks
+
+The teal's comment read *"not promoted to a third brand hue today."* A careful reader with the file
+open took that as a **membership** statement about the colour rather than a **completeness**
+statement about the hue, concluded the register had put a non-brand value into `PERMANENT`, and
+drafted that as a definitional contradiction before it was corrected.
+
+**A sentence a careful reader gets backwards is worth ten words of disambiguation.** It now says the
+colour lacks a light-surface partner — no teal clears 4.5 on both `#1a1a1a` and `#f5f5f5`, ceiling
+3.9954 — rather than that it was withheld from anything.
 
 ### The neutral ramp
 
