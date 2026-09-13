@@ -3,7 +3,16 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-09-12 (rev 9 — **the prose-link item closes, and rev 8's count of what remained
+Last locked: 2026-09-12 (rev 10 — **rev 9 closed the prose-link item on a count of six posts and
+there are eight.** `honest-and-wrong` and `the-margin-not-the-price` were live and carried no
+rule; the pass that should have reached them used a hardcoded list built in August, and two posts
+shipped after it. **Second consecutive revision to close this item on a bad enumeration, by a
+different method each time** — rev 8 undercounted links with a blind pattern, rev 9 recorded the
+rule that earned and then undercounted posts from a stale list. **Recording a rule did not
+prevent the next instance, because the rule named the symptom and the habit had two forms.** The
+fix walks and reports its total before editing. Also retires a comment inside the code rule that
+still read *existing tokens only; no new colours or faces*, false since `--code` arrived in the
+very pass that left it standing. rev 9 — **the prose-link item closes, and rev 8's count of what remained
 was wrong in both directions.** `bio/index.html` had four prose links rather than one and needed
 no new selector, its prose being inside `<article>` like every post; `aiii/index.html` was never
 failing at all, its links already carrying a `border-bottom` at rest. **The method is the
@@ -383,8 +392,30 @@ this is 1.517:1. Present in every post and in the template. The fix is a rest-st
 to prose links, leaving nav, footer and post-footer alone, since those are link regions rather than
 links embedded in running text.
 
-**CLOSED 2026-09-12.** `article p a`, `article li a` and `.bio a` are underlined at rest in the
-template, all six posts, and `bio/index.html`. Every link on `resume/`, `index.html` and
+**CLOSED 2026-09-12, on the second attempt.** `article p a`, `article li a` and `.bio a` are
+underlined at rest in the template, `bio/index.html`, and **all eight posts** — verified by globbing
+`blog/*/index.html` rather than by consulting a list.
+
+**Rev 9 closed this on a count of six, and there were eight.**
+`blog/honest-and-wrong/` and `blog/the-margin-not-the-price/` were live on `main`, linked from the
+blog index, and carried no rule. The pass that was supposed to reach every post carried a hardcoded
+list built from a blog-index scrape in August; two posts shipped after it, and a list cannot know
+that.
+
+**This is the second consecutive revision to close this item on a bad enumeration, by a different
+method each time.** Rev 8 undercounted *links* with a pattern that could not see past a tag. Rev 9
+corrected that, wrote down the rule it earned, and then undercounted *posts* from a stale list — so
+rev 9's own sentence applies to rev 9. Recording the rule did not prevent the next instance, because
+the rule named the symptom and the habit had two forms.
+
+> **A list of what exists is a snapshot, and it stops being true without changing.** A count can be
+> re-derived and checked; a list cannot be distinguished from a correct one by looking at it.
+> **Enumerate by walking the surface, and let the number be whatever it is** — which is Domain 1's
+> standing rule, written in August about the nav dot and set aside a month later by the project that
+> wrote it.
+
+The fix walks. It reports the total it found before it edits anything, so a future gap shows up as a
+number that moved rather than as silence. Every link on `resume/`, `index.html` and
 `blog/index.html` sits in a region, and `aiii/index.html` was never failing: its `.byline a` and
 `footer.foot a` carry `border-bottom: 1px solid var(--hair)`, a non-colour cue at rest, and it holds
 no links inside `<article>` at all.
