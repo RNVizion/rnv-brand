@@ -576,10 +576,38 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 #     #ad85a3   L* 60.16   a 20.38   b -9.99    success-text
 #     #825d79   L* 44.17   a 19.97   b -9.77    success-text-light
 #
-# Same a, same b, L* moved by 16. The blue is built the same way: one hue,
-# placed at L* 60.06 and L* 44.28, holding hue to within 0.9 degrees. Asserted
-# at import by _blue_pair_holds_its_grounds() below, because a pair maintained
-# by remembering is a pair that drifts.
+# SHARED a AND b TO WITHIN THE QUANTISATION OF 8-BIT HEX, L* moved by 16. Those
+# figures differ by 0.4091 and 0.2275 -- small, unavoidable, and NOT "same".
+# This comment read "Same a, same b" until 2026-09-14, three lines under a table
+# that contradicted it. THE SPREAD IS THE FORMAT, NOT THE METHOD: a pair built by
+# holding a and b EXACTLY still comes back about 0.35 apart on both axes once it
+# is 8-bit hex. The rule is sound; only the precision language overstated it.
+#
+# THE BLUE IS BUILT THE SAME WAY: one hue, #5c82a9, PLACED AT L* 60.16 AND
+# L* 44.17 -- the status family's own rungs above -- holding hue to within 0.9
+# degrees. Asserted at import by _blue_pair_holds_its_grounds() below, because a
+# pair maintained by remembering is a pair that drifts.
+#
+# THOSE ARE THE REQUESTED LIGHTNESSES. This comment published 60.06 and 44.28
+# until 2026-09-14, which are what the finished hexes MEASURE -- and re-deriving
+# from them misses:
+#
+#     placed at L* 60.06  ->  #6f94bc   matches
+#     placed at L* 44.28  ->  #456c92   SHIPPED IS #456c91
+#     placed at L* 60.16  ->  #6f94bc   matches
+#     placed at L* 44.17  ->  #456c91   matches
+#
+# One hex digit on one channel, so no surface moves. What moves is whether the
+# recipe is a recipe: the line below says this is published so nobody re-derives
+# it by hand and gets a different answer, and re-deriving by hand from the
+# published numbers got a different answer on one of the two.
+#
+# PUBLISH WHAT WAS REQUESTED. THE ACHIEVED VALUE IS A MEASUREMENT OF THE RESULT,
+# NOT A STEP IN THE RECIPE. Placing a colour at an L* and then measuring the
+# result gives back a DIFFERENT L*, because 8-bit hex cannot hold the coordinate
+# -- 60.16 in, 60.0588 out. Recording the output as the input silently swaps a
+# reproducible instruction for an unreproducible observation, and it reads
+# identically either way. Found by rnv-color-mcp.
 #
 # ------------------------------------------------------------------------
 # COVERAGE, TRUNCATED NOT ROUNDED, and the failures are published with the
