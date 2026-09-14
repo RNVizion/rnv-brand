@@ -3,7 +3,12 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-13 (rev 37 — **`BRAND_WEB_CODE` is renamed `BRAND_TEAL`, one day old, and the
+Last locked: 2026-09-14 (rev 38 — **the published blue derivation did not reproduce the published
+blue.** It recorded the lightnesses the finished hexes *measure* rather than the ones requested, and
+re-deriving from them returns `#456c92` against a shipped `#456c91`. **Publish what was requested;
+the achieved value is a measurement of the result, not a step in the recipe.** Corrected to L\* 60.16
+and 44.17. **And *"Same a, same b"* is corrected to *within the quantisation of 8-bit hex*** — it sat
+three lines under a table showing those figures differing by 0.41 and 0.23. No value moves. rev 37 — **`BRAND_WEB_CODE` is renamed `BRAND_TEAL`, one day old, and the
 `PERMANENT` key follows it to `teal`.** The value, the emitted token and every resolver key are
 unchanged — `web-code` still answers. **The original name came off the `web-black` precedent, which
 matched structurally and not semantically:** `web-black` is blue-lifted where app neutrals are pure
@@ -1150,6 +1155,44 @@ drafted that as a definitional contradiction before it was corrected.
 **A sentence a careful reader gets backwards is worth ten words of disambiguation.** It now says the
 colour lacks a light-surface partner — no teal clears 4.5 on both `#1a1a1a` and `#f5f5f5`, ceiling
 3.9954 — rather than that it was withheld from anything.
+
+### Publish what was requested, not what was achieved — 2026-09-14
+
+**The blue derivation published the lightnesses the finished hexes *measure*, not the ones that were
+*asked for*.** Re-deriving from the published figures misses:
+
+| placed at | gives | shipped |
+|---|---|---|
+| L\* 60.06 | `#6f94bc` | `#6f94bc` |
+| L\* 44.28 | **`#456c92`** | `#456c91` |
+| L\* 60.16 | `#6f94bc` | `#6f94bc` |
+| L\* 44.17 | `#456c91` | `#456c91` |
+
+**One hex digit on one channel, so no surface moves.** What moves is whether the recipe is a recipe.
+The block's own sentence says it is published *so nobody re-derives it by hand and gets a different
+answer* — and re-deriving by hand from the published numbers got a different answer on one of the two.
+
+> **Publish what was requested. The achieved value is a measurement of the result, not a step in the
+> recipe.**
+
+**Placing a colour at an L\* and then measuring the result gives back a different L\***, because
+8-bit hex cannot hold the coordinate — 60.16 in, 60.0588 out. **Recording the output as the input
+silently swaps a reproducible instruction for an unreproducible observation, and it reads identically
+either way.** The corrected figures are 60.16 and 44.17, which are the status family's own rungs.
+
+### "Same a, same b" overstated a claim its own table contradicted
+
+The comment read *"Same a, same b"* three lines under a table showing **a 20.38 / 19.97** and
+**b −9.99 / −9.77** — differing by 0.4091 and 0.2275.
+
+**The spread is the format, not the method.** A pair built by holding `a` and `b` *exactly* still
+comes back about 0.35 apart on both axes once it is 8-bit hex. **The rule is sound; only the
+precision language overstated it.** Corrected to *shared `a` and `b` to within the quantisation of
+8-bit hex*.
+
+**The app side found the same sentence in their own document and corrected it there** while the
+register — the artefact that governs — carried it unchanged. A downstream copy fixed ahead of its
+source is the inverse of the usual failure and worth the same attention.
 
 ### The neutral ramp
 
