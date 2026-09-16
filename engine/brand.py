@@ -1473,6 +1473,72 @@ STATUS = {
     # RULE: hold hue and chroma, move lightness only, take the first step that
     # clears 4.5 on the worst ground -- APP card #2a2a2a for dark, #f5f5f5 for
     # light. Same walk that produced error-text.
+    #
+    # THIS RULE PRODUCES ISO-LIGHTNESS BY CONSTRUCTION, AND SAYING SO IS NOT
+    # OPTIONAL. Every value walked against the same ground arrives at the same
+    # lightness, because L* is set by the GROUND and not by the hue. The six
+    # status text values sit inside 0.50 L* on dark and 0.04 on light. That is
+    # the rule working correctly and it will keep surprising whoever next builds
+    # a set from it.
+    #
+    # WHICH MEANS THE FAMILY CANNOT RANK, AND IS NOT MEANT TO. Success, warning
+    # and error are CATEGORICAL -- three semantic states, no league table -- and
+    # this file already rules them so. Under achromatopsia, where hue is gone and
+    # only lightness survives, the four values a rating scale drew from them read
+    # as #919191, #919191, #929292 and #909090. THE SCALE RANKS IN WORDS AND DOES
+    # NOT RANK IN COLOUR.
+    #
+    # RULED 2026-09-16, AND THE ANSWER IS NEITHER RE-WALK NOR NEW VALUES:
+    #
+    #   AN ORDINAL SET IS ONE REGISTERED HUE AT N LIGHTNESSES, ASSIGNED FROM
+    #   RANK. LIGHTNESS CARRIES THE ORDER; HUE CARRIES THE IDENTITY AND DOES NOT
+    #   VARY WITHIN THE SET.
+    #
+    # THE STATUS FAMILY DOES NOT MOVE. Re-walking three categorical values onto a
+    # lightness ramp would impose an order that does not exist and make them READ
+    # as ranked across five applications -- a semantic error introduced to serve
+    # one widget. And no new registered values are needed, so #5.3's "prefer
+    # fewer values over tidier ones" is not spent.
+    #
+    # THE CONSTRUCTION ALREADY EXISTS IN THIS FILE and had simply never been
+    # named for this case: BRAND_BLUE and BRAND_DARK_BLUE are one hue at two
+    # lightnesses; the light surface ladder is shares of a span; the ink grid is
+    # grey(n). An ordinal ramp is that same construction with N = the number of
+    # tiers. Nothing here is new machinery.
+    #
+    # THE TWO CONSTRAINTS THAT BIND, both measured rather than assumed:
+    #
+    #   THE RAMP RUNS AWAY FROM THE CONTRAST FLOOR, NOT THROUGH IT. On dark the
+    #   floor is L* 59.82 against APP card, with 40.18 points above it; on light
+    #   the ceiling is 44.30 against #e8e8e8, with 44.30 below. Moving away from
+    #   the bound costs nothing -- dark text gets MORE legible as it lightens.
+    #   A four-tier ramp needs about 31 points dark and 25 light at the 8.40
+    #   separation floor, so it fits with room.
+    #
+    #   CHROMA FOLLOWS THE GAMUT; ONLY HUE IS HELD. A saturated hue runs out of
+    #   sRGB near white, so an iso-CHROMA ramp is not available -- L* 88 at
+    #   BRAND_BLUE's chroma is outside the gamut. Cap chroma at what the gamut
+    #   allows and the ramp is a tint ramp, which is what a tint ramp already is.
+    #   Worked, from BRAND_BLUE's hue at h 264.6:
+    #
+    #     tier        L*     C    hex      on #2a2a2a   achromatopsia
+    #     poor        60  24.9  #6f94bc        4.54      #919191
+    #     fair        70  24.9  #8aaed8        6.24      #ababab
+    #     good        80  24.9  #a5caf4        8.44      #c6c6c6
+    #     excellent   90  14.0  #d1e4fd       11.09      #e2e2e2
+    #
+    #   Every tier clears the floor, every tier is in gamut, and the greys are
+    #   strictly ordered BECAUSE LIGHTNESS IS THE RANK.
+    #
+    # WHICH HUE IS THE CONSUMER'S CHOICE from the registered set, and the register
+    # does not rule it -- a rating scale, a difficulty ladder and an intensity
+    # meter are different products and want different identities. What the
+    # register rules is the CONSTRUCTION, which is the part that would otherwise
+    # be re-derived wrongly each time.
+    #
+    # HUE MUST NOT CARRY RANK. Nobody looks at purple beside orange and concludes
+    # purple is higher; darker-to-lighter reads as a scale without instruction.
+    # A set that must rank, ranks in lightness.
     # THE TWO EXISTING error-text KEYS MOVE WITH THEIR BASE. #e56b77 and #c82131
     # were derived from Bootstrap's #dc3545. With the base retired they are
     # ORPHANS -- values derived from something no longer in the palette, which is
