@@ -3,7 +3,15 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-16 (rev 39 — **an ordinal set is one hue at N lightnesses, assigned from rank.**
+Last locked: 2026-09-16 (rev 40 — **the span figure in rev 39's ordinal rule was wrong and this
+register put it there.** *"About 31 points dark and 25 light"* came from a note, was transcribed
+rather than re-derived, and was produced by multiplying one step by three — but **`SL` makes the same
+Δ`L*` worth less as lightness rises**, so the true spans are ~35 and ~33. The rule is now the sizing
+method rather than a number: **size each gap against the bar at its own lightness.** Two further
+corrections: **measure the separation on the simulated greys, not the colours** — the worked example
+reads 8.64 on its top gap in colour and **6.58** in grey, so measuring the colours flatters it — and
+**the serial-reading argument for a thinner ramp inverts**, since identification from memory needs
+more separation than side-by-side discrimination. The achromatopsia model is named. rev 39 — **an ordinal set is one hue at N lightnesses, assigned from rank.**
 The status text rule produces iso-lightness by construction — `L*` is set by the ground, not the hue —
 and now says so; six values sit inside 0.50 `L*` on dark. **A four-tier scale built from them ranked
 in words and not in colour**, reading as one grey under achromatopsia. **Neither a re-walk nor new
@@ -1240,6 +1248,54 @@ h 264.6:
 | fair | 70 | 24.9 | `#8aaed8` | 6.24 | `#ababab` |
 | good | 80 | 24.9 | `#a5caf4` | 8.44 | `#c6c6c6` |
 | excellent | 90 | 14.0 | `#d1e4fd` | 11.09 | `#e2e2e2` |
+
+### The span figure was wrong, and it was this register's to check
+
+**The rule read *"about 31 points dark and 25 light."* That figure came from a note, was carried here
+without re-deriving it, and became the register's by transcription.** It was produced by measuring
+one step at one end and multiplying by three. **CIEDE2000's `SL` term makes the same Δ`L*` worth less
+as lightness rises**, so the gaps must grow:
+
+```
+dark,  up from L* 59.82:   ~10.2,  ~11.6,  ~13.2     span ~35
+light, down from  44.30:   ~9.6,   ~11.0,  ~12.5     span ~33
+```
+
+> **Size each gap against the bar at its own lightness. Do not multiply one step by N.**
+
+**The figures are a bound, not a point** — two CIEDE2000 implementations measuring the same greys put
+the dark span between 35.0 and 36.0. **The rule is the sizing method, which does not depend on whose
+arithmetic you use.** It still fits: about 40 points available on dark, 44 on light.
+
+**And measure the separation on the simulated greys, not the colours.** The ramp's whole claim is
+that it ranks when hue is gone, so achromatopsia is the binding case. The worked example reads
+8.12 / 7.42 / 8.64 colour-to-colour and **8.06 / 7.24 / 6.58 grey-to-grey** — so no gap clears 8.40
+where it matters, and the top gap is the **worst** rather than the best. **Measuring the colours
+flatters the ramp.**
+
+### The ramp is sized for co-visible tiers, and the serial argument supports that
+
+It was put that a rating label shows one tier at a time, so adjacent tiers never sit side by side and
+a thinner ramp would do. **That inverts the perception.**
+
+**Telling two greys apart with both in view is discrimination against a present stimulus. Naming
+which tier you are looking at with the others absent is identification against memory — and
+identification needs more separation, not less.** A ramp read serially is the harder case.
+
+So the rule sizes for the harder of the two and the other comes free. **A construction that works
+when tiers are co-visible works when they are not; one tuned for serial reading fails a legend, a
+chart key or a difficulty meter**, which show every tier at once.
+
+### The achromatopsia model is named, because two of them disagree
+
+The greys published here are **gamma-correct relative luminance**. `rnv-color-picker`'s own simulator
+uses 601 luma with `int()` truncation and gets `#8d8d8d` / `#a8a8a8` / `#c3c3c3` / `#e1e1e1` against
+this register's `#919191` / `#ababab` / `#c6c6c6` / `#e2e2e2`.
+
+**Both are strictly ordered, so the ruling is safe under either, and neither is canonical.** This
+register names its model so its figures reproduce; **an application pins its guard to the simulator
+that draws its pixels.** A guard asserting the register's greys inside an app asserts a model the app
+does not use.
 
 **Which hue is the consumer's choice** from the registered set, and this register does not rule it —
 a rating scale, a difficulty ladder and an intensity meter are different products wanting different
