@@ -3,7 +3,13 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-14 (rev 38 — **the published blue derivation did not reproduce the published
+Last locked: 2026-09-16 (rev 39 — **an ordinal set is one hue at N lightnesses, assigned from rank.**
+The status text rule produces iso-lightness by construction — `L*` is set by the ground, not the hue —
+and now says so; six values sit inside 0.50 `L*` on dark. **A four-tier scale built from them ranked
+in words and not in colour**, reading as one grey under achromatopsia. **Neither a re-walk nor new
+values:** the status family is categorical and forcing it onto a ramp would impose an order that does
+not exist, and the construction already exists here unnamed. Chroma follows the gamut; only hue is
+held. rev 38 — **the published blue derivation did not reproduce the published
 blue.** It recorded the lightnesses the finished hexes *measure* rather than the ones requested, and
 re-deriving from them returns `#456c92` against a shipped `#456c91`. **Publish what was requested;
 the achieved value is a measurement of the result, not a step in the recipe.** Corrected to L\* 60.16
@@ -1193,6 +1199,55 @@ precision language overstated it.** Corrected to *shared `a` and `b` to within t
 **The app side found the same sentence in their own document and corrected it there** while the
 register — the artefact that governs — carried it unchanged. A downstream copy fixed ahead of its
 source is the inverse of the usual failure and worth the same attention.
+
+### An ordinal set is one hue at N lightnesses — ruled 2026-09-16
+
+**The status text rule produces iso-lightness by construction and now says so.** Every value walked
+against the same ground arrives at the same lightness, because `L*` is set by the **ground** and not
+by the hue. The six status text values sit inside **0.50 `L*`** on dark and **0.04** on light.
+
+**Which means the family cannot rank, and is not meant to.** Success, warning and error are
+**categorical** — three semantic states, no league table. A four-tier rating scale drawn from them
+read `#919191`, `#919191`, `#929292`, `#909090` under achromatopsia. **It ranked in words and did not
+rank in colour.**
+
+> **An ordinal set is one registered hue at N lightnesses, assigned from rank. Lightness carries the
+> order; hue carries the identity and does not vary within the set.**
+
+**The status family does not move.** Re-walking three categorical values onto a lightness ramp would
+impose an order that does not exist and make them *read* as ranked across five applications — a
+semantic error introduced to serve one widget.
+
+**And no new registered values are needed**, so §5.3's *prefer fewer values over tidier ones* is not
+spent. **The construction already exists here** and had never been named for this case: `BRAND_BLUE`
+and `BRAND_DARK_BLUE` are one hue at two lightnesses, the light surface ladder is shares of a span,
+the ink grid is `grey(n)`. An ordinal ramp is that construction with N tiers.
+
+**Two constraints bind, both measured:**
+
+**The ramp runs away from the contrast floor, not through it.** Dark floors at `L*` 59.82 against APP
+card with 40.18 points above; light ceilings at 44.30 against `#e8e8e8` with 44.30 below. **Moving
+away from the bound costs nothing** — dark text gets more legible as it lightens. Four tiers need
+about 31 points dark and 25 light at the 8.40 separation floor.
+
+**Chroma follows the gamut; only hue is held.** A saturated hue runs out of sRGB near white, so an
+iso-*chroma* ramp is not available — `L*` 88 at `BRAND_BLUE`'s chroma is outside it. Worked from
+h 264.6:
+
+| tier | `L*` | C | | on `#2a2a2a` | achromatopsia |
+|---|---|---|---|---|---|
+| poor | 60 | 24.9 | `#6f94bc` | 4.54 | `#919191` |
+| fair | 70 | 24.9 | `#8aaed8` | 6.24 | `#ababab` |
+| good | 80 | 24.9 | `#a5caf4` | 8.44 | `#c6c6c6` |
+| excellent | 90 | 14.0 | `#d1e4fd` | 11.09 | `#e2e2e2` |
+
+**Which hue is the consumer's choice** from the registered set, and this register does not rule it —
+a rating scale, a difficulty ladder and an intensity meter are different products wanting different
+identities. **What is ruled is the construction**, which is the part that would otherwise be
+re-derived wrongly each time.
+
+**Hue must not carry rank.** Nobody looks at purple beside orange and concludes purple is higher;
+darker-to-lighter reads as a scale without instruction. **A set that must rank, ranks in lightness.**
 
 ### The neutral ramp
 
