@@ -1512,8 +1512,31 @@ STATUS = {
     #   floor is L* 59.82 against APP card, with 40.18 points above it; on light
     #   the ceiling is 44.30 against #e8e8e8, with 44.30 below. Moving away from
     #   the bound costs nothing -- dark text gets MORE legible as it lightens.
-    #   A four-tier ramp needs about 31 points dark and 25 light at the 8.40
-    #   separation floor, so it fits with room.
+    #   SIZE EACH GAP AGAINST THE BAR AT ITS OWN LIGHTNESS. DO NOT MULTIPLY ONE
+    #   STEP BY N. CIEDE2000's SL term makes the same delta-L* worth less as
+    #   lightness rises, so the gaps must grow:
+    #
+    #     dark, up from L* 59.82:   ~10.2,  ~11.6,  ~13.2     span ~35
+    #     light, down from 44.30:   ~9.6,   ~11.0,  ~12.5     span ~33
+    #
+    #   THE FIGURES ARE A BOUND, NOT A POINT. Two CIEDE2000 implementations
+    #   measuring the same greys put the dark span between 35.0 and 36.0; the
+    #   rule is the sizing method, which does not depend on whose arithmetic you
+    #   use. It still fits: about 40 points are available on dark and 44 on light.
+    #
+    #   THIS CORRECTS A FIGURE THIS FILE PUBLISHED. The rule read "about 31 points
+    #   dark and 25 light" -- produced by measuring one step at one end and
+    #   multiplying by three, which understates by roughly five points. It arrived
+    #   in a note, was carried here without re-deriving it, and became the
+    #   register's figure by transcription. Practices SS5.2.1: a derivation records
+    #   its inputs, and a figure adopted from a note is an input nobody checked.
+    #
+    #   MEASURE THE SEPARATION ON THE SIMULATED GREYS, NOT THE COLOURS. The ramp's
+    #   whole claim is that it ranks when hue is gone, so achromatopsia is the
+    #   binding case. The published four-tier example spans 30 points and reads
+    #   8.12 / 7.42 / 8.64 colour-to-colour but 8.06 / 7.24 / 6.58 grey-to-grey --
+    #   so NO gap in it clears 8.40 where it matters, and the top gap is the
+    #   worst rather than the best. Measuring the colours flatters the ramp.
     #
     #   CHROMA FOLLOWS THE GAMUT; ONLY HUE IS HELD. A saturated hue runs out of
     #   sRGB near white, so an iso-CHROMA ramp is not available -- L* 88 at
@@ -1530,11 +1553,49 @@ STATUS = {
     #   Every tier clears the floor, every tier is in gamut, and the greys are
     #   strictly ordered BECAUSE LIGHTNESS IS THE RANK.
     #
+    #   THAT EXAMPLE SPANS 30 POINTS AND IS THEREFORE ORDERED BUT UNDER-SEPARATED
+    #   -- kept, relabelled, and superseded by the widened one below, because an
+    #   example that demonstrates the ordering claim while failing the separation
+    #   claim is worth showing next to the one that does both.
+    #
+    #     tier        L*    gap to next (greys, CIEDE2000)
+    #     poor        60.0   10.2
+    #     fair        70.2   11.6
+    #     good        81.8   13.2
+    #     excellent   95.0   --            span 35.0, every gap clears 8.40
+    #
+    # THE RAMP IS SIZED FOR CO-VISIBLE TIERS, AND THE SERIAL ARGUMENT SUPPORTS
+    # THAT RATHER THAN OPPOSING IT. It was put that a rating label shows one tier
+    # at a time, so adjacent tiers never sit side by side and a thinner ramp would
+    # do. THAT INVERTS THE PERCEPTION. Telling two greys apart WITH BOTH IN VIEW
+    # is a discrimination task against a present stimulus; naming which tier you
+    # are looking at with the others ABSENT is identification against memory, and
+    # identification needs MORE separation than discrimination, not less. A ramp
+    # read serially is the harder case, not the easier one.
+    #
+    # So the rule sizes for the harder of the two and the other comes free: a
+    # construction that works when tiers are co-visible works when they are not.
+    # One tuned for serial reading fails a legend, a chart key or a difficulty
+    # meter, which show every tier at once.
+    #
     # WHICH HUE IS THE CONSUMER'S CHOICE from the registered set, and the register
     # does not rule it -- a rating scale, a difficulty ladder and an intensity
     # meter are different products and want different identities. What the
     # register rules is the CONSTRUCTION, which is the part that would otherwise
     # be re-derived wrongly each time.
+    #
+    # THE ACHROMATOPSIA MODEL IS NAMED, BECAUSE TWO OF THEM DISAGREE AND A GUARD
+    # WRITTEN AGAINST THE WRONG ONE FAILS ON DAY ONE. The greys published here
+    # are gamma-correct RELATIVE LUMINANCE. rnv-color-picker's own simulator uses
+    # 601 luma with int() truncation and gets #8d8d8d / #a8a8a8 / #c3c3c3 /
+    # #e1e1e1 against this file's #919191 / #ababab / #c6c6c6 / #e2e2e2.
+    #
+    # BOTH ARE STRICTLY ORDERED, SO THE RULING IS SAFE UNDER EITHER, and neither
+    # is canonical: this register names its model so its figures reproduce, and
+    # AN APPLICATION PINS ITS GUARD TO THE SIMULATOR THAT DRAWS ITS PIXELS. A
+    # guard asserting the register's greys inside an app would be asserting a
+    # model the app does not use -- practices SS5.5.3, verify the artifact that
+    # was consumed.
     #
     # HUE MUST NOT CARRY RANK. Nobody looks at purple beside orange and concludes
     # purple is higher; darker-to-lighter reads as a scale without instruction.
