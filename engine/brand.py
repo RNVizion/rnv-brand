@@ -745,8 +745,25 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 #   STATUS.warning-text-light #8e5e2b   7.45   app, light mode
 #   STATUS.error-text-light   #ae4650   7.45   app, light mode
 #
-# THE TWO BLUES ARE EXEMPT BECAUSE THEY PAINT NOTHING, AND THAT EXEMPTION HAS AN
-# EXPIRY. _PERMANENT_NOT_EMITTED declares both reach no stylesheet, so 7.42 is a
+# THE TWO BLUES DO NOT SHARE A SURFACE WITH THIS VALUE, AND THAT IS THE DURABLE
+# REASON. Teal is inline code on the web chip -- it appears in the site's post
+# template and nowhere in any application. Both blues are rating labels in
+# rnv-color-picker and appear nowhere on the web. They live in different
+# products.
+#
+# THE EXEMPTION USED TO READ "because they paint nothing", AND THAT SENTENCE
+# EXPIRED ON 2026-09-12 -- the day both blues were registered is the day the
+# picker began painting them, so the clause naming a future re-measurement was
+# already due when it was written. RE-MEASURED 2026-09-16: 7.42 and 7.10, both
+# reproducing exactly. NOTHING MOVED, AND THE REASON WAS THE THING THAT WAS
+# WRONG.
+#
+# A TEMPORARY REASON FOR A PERMANENT EXEMPTION IS AN EXPIRY NOBODY SET. "It is
+# unused" dates; "they are different products" does not. Where an exemption
+# rests on a fact that can change, either name the change that ends it or find
+# the reason that does not move.
+#
+# THE ORIGINAL WORDING AND ITS EXPIRY CLAUSE, KEPT: _PERMANENT_NOT_EMITTED declares both reach no stylesheet, so 7.42 is a
 # distance between a value that paints and a value that paints nothing -- and
 # BRAND_BLUE is an INGREDIENT of this colour, which is what makes it worth
 # recording rather than dismissing. THE DAY A SURFACE ADOPTS EITHER BLUE, THIS
@@ -1488,6 +1505,33 @@ STATUS = {
     # as #919191, #919191, #929292 and #909090. THE SCALE RANKS IN WORDS AND DOES
     # NOT RANK IN COLOUR.
     #
+    # THE CONSUMER THAT ASKED FOR THIS RULING IS NOT USING IT, AND THE REASON IS
+    # WORTH MORE THAN THE RULING. rnv-color-picker's rating scale was described
+    # as an ordinal set needing a rank. It is not one: the four hues are meant to
+    # be LEARNED, colour and word shown together so the pairing trains, with the
+    # intention that colour eventually carries severity alone. Four strengths of
+    # one hue cannot do that -- that is one signal with a volume control, where
+    # what is being trained is four signals. CATEGORICAL BY INTENT.
+    #
+    # THE RULING WAS ANSWERED CORRECTLY AND ASKED ABOUT THE WRONG THING. It stands
+    # and is unused; the next ordinal set gets it right for free.
+    #
+    # AND THE PROPERTY THAT PROMPTED THE ASK DOES NOT GO AWAY. That scale still
+    # does not rank under achromatopsia -- `fair` and `poor` are byte-identical
+    # in both modes, and the four tiers span seven grey levels out of 256. That
+    # was filed as harmless BECAUSE THE LABEL PRINTS ITS TIER IN WORDS. Under a
+    # training strategy the word is scaffolding, so:
+    #
+    #   A COLOUR TRAINED TO CARRY MEANING ALONE INHERITS AN OBLIGATION ITS
+    #   REDUNDANT VERSION DID NOT HAVE. The strategy's success condition -- the
+    #   word comes off -- is the condition under which the collapse becomes a
+    #   defect. For a viewer who cannot separate the four hues, two of them are
+    #   one pixel and always will be at these values, so for that viewer the word
+    #   can never come off.
+    #
+    # Not ruled here; recorded because it is a sentence about every value in this
+    # register that a consumer might train, not about one widget.
+    #
     # RULED 2026-09-16, AND THE ANSWER IS NEITHER RE-WALK NOR NEW VALUES:
     #
     #   AN ORDINAL SET IS ONE REGISTERED HUE AT N LIGHTNESSES, ASSIGNED FROM
@@ -1577,6 +1621,26 @@ STATUS = {
     # construction that works when tiers are co-visible works when they are not.
     # One tuned for serial reading fails a legend, a chart key or a difficulty
     # meter, which show every tier at once.
+    #
+    # A CONSUMER CAN ATTACH A SECOND MEANING TO A REGISTERED VALUE, AND THAT IS A
+    # CLAIM ON THE VALUE. The picker's scale maps success -> excellent, warning ->
+    # fair, error -> poor. It reads as an extension rather than a collision --
+    # the severity sense and the status sense point the same way -- but it
+    # constrains what those three can be reused for, and it was made by a
+    # consumer rather than here. Recorded so the constraint is visible to whoever
+    # next reaches for one of them.
+    #
+    # A FLEET CHECK AT THE SAME TIME FOUND NO REPURPOSING: every application
+    # carrying one of the six status values binds it to the same status name, and
+    # one app carries none of the family rather than carrying it differently.
+    # That consistency was not arranged; it is the construction working.
+    #
+    # BRAND_BLUE IS THE WEAK MEMBER OF ANY SET IT JOINS, AND THE REASON IS
+    # ARITHMETIC. The three status values are reinforced every time a viewer sees
+    # a status message anywhere in the fleet. BRAND_BLUE appears once, in one
+    # application, on a label shown only when a ratio lands between 4.5 and 7.0.
+    # Nothing to fix -- it was registered for exactly that slot -- but if one of
+    # four is last to be learned it is that one.
     #
     # WHICH HUE IS THE CONSUMER'S CHOICE from the registered set, and the register
     # does not rule it -- a rating scale, a difficulty ladder and an intensity
@@ -2113,8 +2177,20 @@ _resolver_covers_permanent()
 # as _resolver_covers_permanent(), for the same reason -- two lists of one
 # thing, one grows, nothing compared them.
 _PERMANENT_NOT_EMITTED = {
-    "blue": "no surface consumes it yet; registered 2026-09-12 for future work",
-    "dark-blue": "no surface consumes it yet; registered 2026-09-12 for future work",
+    # CORRECTED 2026-09-16. These read "no surface consumes it yet" and that was
+    # false from 2026-09-12, the day they were registered: rnv-color-picker binds
+    # both as Python constants for its rating labels. EMISSION AND CONSUMPTION ARE
+    # DIFFERENT ACTS -- this file's own rev 33 ruling -- and this table is about
+    # emission. The declaration was right and its REASON conflated the two.
+    #
+    # NO GUARD COULD HAVE CAUGHT IT. _permanent_emission_is_declared() compares
+    # PERMANENT against what tokens() emits and passed correctly throughout,
+    # because neither blue emits and neither claims to. THE STRUCTURE WAS
+    # PROTECTED AND THE SENTENCE WAS NOT, which is the shape this register keeps
+    # finding: a guard holds the shape of a declaration and nothing reads its
+    # prose.
+    "blue": "consumed by rnv-color-picker as a Python constant since 2026-09-12; emits no CSS token because no surface palette adopts it",
+    "dark-blue": "consumed by rnv-color-picker as a Python constant since 2026-09-12; emits no CSS token because no surface palette adopts it",
 }
 
 
