@@ -3,7 +3,17 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-16 (rev 40 — **the span figure in rev 39's ordinal rule was wrong and this
+Last locked: 2026-09-16 (rev 41 — **the consumer that asked for the ordinal ruling is not using it,
+and two exemption reasons expired while their guards passed.** The picker's rating scale is
+categorical by intent — four hues meant to be *learned* so colour eventually rides alone — so the
+ruling was answered correctly and asked about the wrong thing. It stands, unused, and the status
+family stays untouched. **Recorded with it: a colour trained to carry meaning alone inherits an
+obligation its redundant version did not have**, because the strategy's success condition is when the
+word comes off. **`_PERMANENT_NOT_EMITTED` said *"no surface consumes it yet"* for two values an
+application had bound since the day they were registered** — emission and consumption are different
+acts and the reason conflated them; the guard passed correctly throughout because **the structure was
+protected and the sentence was not.** The teal exemption was the same shape. **A temporary reason for
+a permanent exemption is an expiry nobody set.** rev 40 — **the span figure in rev 39's ordinal rule was wrong and this
 register put it there.** *"About 31 points dark and 25 light"* came from a note, was transcribed
 rather than re-derived, and was produced by multiplying one step by three — but **`SL` makes the same
 Δ`L*` worth less as lightness rises**, so the true spans are ~35 and ~33. The rule is now the sizing
@@ -1285,6 +1295,70 @@ identification needs more separation, not less.** A ramp read serially is the ha
 So the rule sizes for the harder of the two and the other comes free. **A construction that works
 when tiers are co-visible works when they are not; one tuned for serial reading fails a legend, a
 chart key or a difficulty meter**, which show every tier at once.
+
+### The consumer that asked for the ordinal ruling is not using it
+
+**The ruling stands and is unused**, and the reason is worth more than the ruling. The picker's
+rating scale was described as an ordinal set needing a rank. **It is not one.** The four hues are
+meant to be **learned** — colour and word shown together so the pairing trains, with the intention
+that colour eventually carries severity alone. **Four strengths of one hue cannot do that**: that is
+one signal with a volume control, where what is being trained is four signals. Categorical by intent.
+
+**The ruling was answered correctly and asked about the wrong thing.** The next ordinal set gets it
+right for free, and **the status family stays untouched either way**, which was the ruling's main
+protection.
+
+### A colour trained to carry meaning alone inherits an obligation its redundant version did not have
+
+**The property that prompted the ask does not go away.** That scale still does not rank under
+achromatopsia — `fair` and `poor` are byte-identical in both modes, and the four tiers span **seven
+grey levels out of 256**. It was filed as harmless **because the label prints its tier in words.**
+
+**Under a training strategy the word is scaffolding, so the strategy's success condition is the
+condition under which the collapse becomes a defect.** For a viewer who cannot separate the four
+hues, two of them are one pixel and always will be at these values — **so for that viewer the word
+can never come off.**
+
+**Recorded rather than ruled.** It is a sentence about every value here that a consumer might train,
+not about one widget.
+
+### A consumer can attach a second meaning to a registered value, and that is a claim on it
+
+The picker's scale maps **success → excellent, warning → fair, error → poor.** That reads as an
+extension rather than a collision — the severity sense and the status sense point the same way — but
+**it constrains what those three can be reused for**, and it was made by a consumer rather than here.
+
+**A fleet check found no repurposing:** every application carrying one of the six status values binds
+it to the same status name, and one app carries none of the family rather than carrying it
+differently. **That consistency was not arranged; it is the construction working.**
+
+**`BRAND_BLUE` is the weak member of any set it joins, and the reason is arithmetic.** The three
+status values are reinforced every time a viewer sees a status message anywhere in the fleet.
+`BRAND_BLUE` appears **once, in one application**, on a label shown only when a ratio lands between
+4.5 and 7.0. Nothing to fix — but if one of four is last to be learned, it is that one.
+
+### Two exemption reasons expired while their guards passed
+
+**`_PERMANENT_NOT_EMITTED` read *"no surface consumes it yet"* for both blues, and that was false from
+the day they were registered** — `rnv-color-picker` has bound both as Python constants since
+2026-09-12. **Emission and consumption are different acts**, which is this register's own rev 33
+ruling, and that table is about emission. The declaration was right; **its reason conflated the two.**
+
+**No guard could have caught it.** `_permanent_emission_is_declared()` compares `PERMANENT` against
+what `tokens()` emits and passed correctly throughout, because neither blue emits and neither claims
+to. **The structure was protected and the sentence was not.**
+
+**The teal block's exemption was the same shape.** It read *"they paint nothing"* with a clause saying
+the pair wants re-measuring the day a surface adopts either blue — **and that day was the day both
+were registered, so the clause was already due when it was written.** Re-measured: **7.42 and 7.10,
+both reproducing exactly. Nothing moved; the reason was the thing that was wrong.**
+
+> **A temporary reason for a permanent exemption is an expiry nobody set.** *"It is unused"* dates;
+> *"they are different products"* does not. Where an exemption rests on a fact that can change, name
+> the change that ends it or find the reason that does not move.
+
+The durable reason: **teal is inline code on the web chip and the blues are rating labels in an
+application. They live in different products and do not share a surface.**
 
 ### The achromatopsia model is named, because two of them disagree
 
