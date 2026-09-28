@@ -3,7 +3,19 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-16 (rev 41 — **the consumer that asked for the ordinal ruling is not using it,
+Last locked: 2026-09-28 (rev 42 — **rev 38's correction never reached the paragraph a reader meets
+first.** The blues' recipe at the value's own row still read *placed at L\* 60.06 and L\* 44.28* — the
+measurements, not the request — while the header, the proof table and `engine/brand.py` had carried
+60.16 / 44.17 since 2026-09-14. Re-deriving from the paragraph returned `#456c92`; found by
+`rnv-color-mcp` through its live `place_lightness`, and it is the second instance of a shape that
+project has now seen three times: **a correction lands where the reasoning lives and not where the
+thing is merely mentioned.** No value moves. **Recipes now name the engine they reproduce on** —
+`rnv-color-mcp` v1.3.0, per-channel Kubelka-Munk, clamp 0.001, truncating — because *reproduces* is
+a claim with a date on it once the instrument is one of the inputs, and the teal's zero red channel
+is recorded as the model's doing rather than the pigments'. **Notation gains eight-digit hex, ruled
+2026-09-25:** `#aarrggbb` is lower case, display text excluded. **Held for the owner's ruling, not
+decided here:** `blue` and `teal` shadow CSS names the way `gold` does, and only `gold` is recorded
+as deliberate. rev 41 — **the consumer that asked for the ordinal ruling is not using it,
 and two exemption reasons expired while their guards passed.** The picker's rating scale is
 categorical by intent — four hues meant to be *learned* so colour eventually rides alone — so the
 ruling was answered correctly and asked about the wrong thing. It stands, unused, and the status
@@ -319,7 +331,14 @@ surface that needs a lighter or darker gold derives it; it doesn't mint one.
 **It is mixed, not picked.** Through `rnv-color-mcp`'s `mix_colors` in **`paint`** mode —
 Kubelka-Munk pigment physics — from 2 parts `#b794ff` (the web violet), 6 parts CSS `steelblue`,
 1 part brand gold, 2 parts `STATUS["success"]`. That gives `#5c82a9`, which is then placed at
-L\* 60.06 and L\* 44.28 holding hue.
+**L\* 60.16 and L\* 44.17** holding hue — `rnv-color-mcp`'s `place_lightness`, live since 2026-09-14;
+before that the placement was done in LAB by hand. **Those are the requested lightnesses.** The
+finished hexes *measure* 60.06 and 44.28, and this paragraph carried the measurements as the recipe
+from rev 38 to rev 41 while the header, the proof table and `engine/brand.py` all carried the
+correction — re-deriving from here returned `#456c92` against a shipped `#456c91`. **The mix
+reproduces on `rnv-color-mcp` v1.3.0** (per-channel Kubelka-Munk, reflectance clamped at 0.001,
+truncating); a later paint model may not reproduce it byte-for-byte, and the registered values stand
+regardless — the mix is provenance, not a live formula.
 
 **`lab` mode was tried first and failed, and the failure is the interesting half.** An equal-weight
 `lab` blend of the same four ingredients gives `#968e9b` — a grey-mauve sitting ΔE 2.5 from
@@ -1050,8 +1069,13 @@ mix_colors(["#00aaae", "#d2bc93"], mode="paint", weights=[8, 6])  ->  #00b0a0
 ```
 
 `BRAND_BLUE` into a mint neon, then `BRAND_GOLD` into that. **Kubelka-Munk, both stages
-byte-identical against this register's own paint mode**, so the recipe reproduces rather than
-approximates. Chosen by eye against the live post; the arithmetic is published so nobody has to take
+byte-identical against this register's own paint mode** — `rnv-color-mcp` v1.3.0, per-channel
+Kubelka-Munk with reflectance clamped at 0.001, truncating — so the recipe reproduces rather than
+approximates *on that engine*. **The red channel is 0 because the model sets it, not the pigments:**
+`#00ffa3` has an empty red channel, a channel at 0 gives K/S ≈ 499 and dominates every later stage,
+and it takes roughly fifty times the recipe's gold weight to lift red off 0. The recipe describes
+this engine's behaviour and is not a prediction of physical dye or paint; a later paint model will
+move it, and the registered value stands regardless. Chosen by eye against the live post; the arithmetic is published so nobody has to take
 that on trust. **Paint and not lab, per rev 34** — a mixture is a physical-model question.
 
 **One ground, and it is the only one.** `article code` sets `background: var(--bg-3)`, so inline code
@@ -1961,7 +1985,14 @@ a change of toolkit and be nameable on a hangtag.
 
 ### Notation is lowercase — ruled 2026-08-15
 
-**A hex value is written lowercase in source: `#d2bc93`, never `#D2BC93`.** Names are local and
+**A hex value is written lowercase in source: `#d2bc93`, never `#D2BC93`.** **Eight digits too,
+ruled 2026-09-25: a colour at an alpha is `#aarrggbb` in lower case — `#ed1a1a1a`, never `#ED1A1A1A`.**
+The five desktop apps had written translucent values three ways by 2026-09-25, because each
+`translucent()` helper followed the literal it replaced; nothing rendered differently, since Qt reads
+either case, and this is the same shape as 2026-08-15 — a convention adopted, not a defect repaired.
+Each app's guard now holds every eight-digit value it builds or writes to lower case. **Display text
+is not covered:** a picker printing a picked colour to a person as `#FFAA00` is output, not source
+notation, and a rule on display case would be a separate decision. Names are local and
 values are canonical; notation is the third axis, and unlike names it does not get to vary by
 consumer. `brand.py` standardised on 2026-08-14 and the five desktop apps followed on
 2026-08-15 — 357 values across five files, one colour source file per repo.
