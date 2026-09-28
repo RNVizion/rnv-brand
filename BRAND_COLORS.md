@@ -3,8 +3,21 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-28 (rev 42 — **rev 38's correction never reached the paragraph a reader meets
-first.** The blues' recipe at the value's own row still read *placed at L\* 60.06 and L\* 44.28* — the
+Last locked: 2026-09-28 (rev 43 — **the resolver table was six rows short for the second time, one
+day after the sentence declaring it complete, and rev 42 carried a figure this register had never
+measured.** `teal` and its five aliases were registered 2026-09-13; the Resolver vocabulary table
+never gained the row, and the paragraph beneath it — written 2026-09-12 to record the *previous*
+six-row shortfall — went on saying *it is now complete*. Found by `rnv-color-mcp` checking rev 42
+against its own mirror. **The claim is now a check:** `verify_resolver_table` compares the table
+with `RNV_BRAND` on every facts pass, both directions and by value, and failed six times by name
+before the row landed. **And the ruling on the collisions:** `gold`, `blue` and `teal` all stay bare
+— they are brand colours, set in the brand the way the gold is — and the prose above the table now
+names all three, with the `css:` escape for each. **The figure:** rev 42 said it takes *roughly
+fifty times* the recipe's gold to lift the teal's red channel off zero. It takes four — 8:24, gold
+three to one over the teal stage — and red reaches only 1 of 255 there. Measured on the live engine
+this time; rev 42's number was transcribed from a note that had sampled one point, which is the
+failure rev 40 records against this register and rev 42 repeated. No value moves. rev 42 — **rev 38's
+correction never reached the paragraph a reader meets first.** The blues' recipe at the value's own row still read *placed at L\* 60.06 and L\* 44.28* — the
 measurements, not the request — while the header, the proof table and `engine/brand.py` had carried
 60.16 / 44.17 since 2026-09-14. Re-deriving from the paragraph returned `#456c92`; found by
 `rnv-color-mcp` through its live `place_lightness`, and it is the second instance of a shape that
@@ -1073,7 +1086,12 @@ byte-identical against this register's own paint mode** — `rnv-color-mcp` v1.3
 Kubelka-Munk with reflectance clamped at 0.001, truncating — so the recipe reproduces rather than
 approximates *on that engine*. **The red channel is 0 because the model sets it, not the pigments:**
 `#00ffa3` has an empty red channel, a channel at 0 gives K/S ≈ 499 and dominates every later stage,
-and it takes roughly fifty times the recipe's gold weight to lift red off 0. The recipe describes
+and **red leaves 0 only when gold outweighs the teal stage three to one** — 8:24, four times the
+recipe's gold weight, and it reaches just 1 of 255 there (8:23 → `#00b698` red 0 · 8:24 → `#01b698`
+red 1 · 8:50 → `#01b995` red 1; measured on the live engine, v1.3.0, 2026-09-28). *rev 42 said
+"roughly fifty times", a figure transcribed from a note that had sampled one point and never
+searched for the threshold — the same failure rev 40 records against itself, repeated here two
+revisions later.* The recipe describes
 this engine's behaviour and is not a prediction of physical dye or paint; a later paint model will
 move it, and the registered value stands regardless. Chosen by eye against the live post; the arithmetic is published so nobody has to take
 that on trust. **Paint and not lab, per rev 34** — a mixture is a physical-model question.
@@ -2027,8 +2045,16 @@ either notation and stops catching a regression. **Nothing caught the day the ap
 ## Resolver vocabulary (MCP)
 
 What the color server resolves brand names to in chat. Defined once in `brand.py` as
-`RNV_BRAND`; the resolver imports it. RNV names win over CSS names on collision (so `gold` =
-brand gold, not CSS gold); use `css:gold` to force the universal one.
+`RNV_BRAND`; the resolver imports it. **RNV names win over CSS names on collision, and three bare
+names collide: `gold`, `blue` and `teal` are brand colours and resolve to the brand values, not to
+CSS `#ffd700`, `#0000ff` and `#008080`.** Use `css:gold`, `css:blue`, `css:teal` to force the
+universal one. **Ruled 2026-09-28: all three stay bare, because they are colours set in the brand
+the way the gold is** — the founding decision of 2026-06-23 named only `gold` and the other two
+joined on 12 and 13 September without a sentence here saying so, so a model asking to *mix red and
+blue* got brand blue and `rnv-color-mcp`'s own README example returned a dark red for two weeks.
+Dropping the bare names was considered and rejected: the resolver falls through to CSS, so removing
+`blue` would repoint it to `#0000ff` silently, which is the one change a resolver must never make
+(below). `black` and `white` also collide, at identical values, so nothing turns on them.
 
 | You say | Resolves to |
 |---|---|
@@ -2042,13 +2068,20 @@ brand gold, not CSS gold); use `css:gold` to force the universal one.
 | black, true black | `#000000` |
 | white, brand white | `#ffffff` |
 | web black | `#0a0a0f` |
+| teal, brand teal, code, code teal, web code, web-code | `#00b0a0` |
 
 **This table published `#b19145` for the dark-gold row until 2026-09-12**, twenty-six days after
 rev 16 moved the value to `#8c7337`. The row is a *contract* — it states what the colour server
 answers — so for that period the register's own document and the register's own source gave
 different answers to `dark gold`. Nothing compared them. The table was also short by six rows
-against `RNV_BRAND`, which is why the omission of a whole colour would not have shown either;
-it is now complete, and completeness is what makes the next divergence visible.
+against `RNV_BRAND`, which is why the omission of a whole colour would not have shown either.
+**rev 41 said here that the table "is now complete". It was six rows short again the next day** —
+the teal was registered on 2026-09-13 with six resolver keys and the row above did not exist until
+rev 43, fifteen days later; the mirror's owner found it reading rev 42. **Completeness is no longer
+a sentence: `verify_resolver_table` in `scripts/refresh_profile.py` asserts on every facts pass
+that every `RNV_BRAND` key has a row here, every name here is a key, and every name's value here is
+the engine's.** It failed six times by name against rev 42 before this row was added, which is the
+correct first result for a guard.
 
 **"near-black" resolves to charcoal `#1a1a1a`, not to the web ground.** The web ground is
 `web black`. Both readings were in circulation — this file called `#0a0a0f` "web near-black"
