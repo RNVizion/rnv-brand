@@ -3,7 +3,18 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-09-12 (rev 10 — **rev 9 closed the prose-link item on a count of six posts and
+Last locked: 2026-09-28 (rev 11 — **one bullet described a page that stopped existing, and the
+count beside it had been wrong for a day before that.** `/aiii/` gained the site nav at
+`rnvizion.github.io@48228b7`, which is the event decision #18 anticipated — the mark drawn, the face
+requested, the comment retired — and this register's bullet went on saying the page carried no nav.
+Rewritten as the decision's record rather than deleted, and **`aiii/index.html` leaves
+`profile.json`'s `no_canonical_link.paths` in the same commit**, because prose and config were one
+exemption and a split between them reads coherently on both sides. The retirement was run through
+`verify_type` on the real commits before landing: 0 findings after the change, a named failure
+before it. *"The twelve chrome pages"* was seventeen at the time of writing and sixteen the day
+before — a figure that moves when a page ships, now stated as the rule and not the number. Reported
+by the site chat with the grep that distinguishes the link from a comment quoting it; the obvious
+grep passed on both commits. rev 10 — **rev 9 closed the prose-link item on a count of six posts and
 there are eight.** `honest-and-wrong` and `the-margin-not-the-price` were live and carried no
 rule; the pass that should have reached them used a hardcoded list built in August, and two posts
 shipped after it. **Second consecutive revision to close this item on a bad enumeration, by a
@@ -505,12 +516,24 @@ different pipeline.
 
 - **`/card/` does not carry the canonical font link, by decision.** It requests exactly the three
   faces and four weights it draws and nothing else. The rule is *a page requests every face it
-  draws and no face it doesn't*; the twelve chrome pages share one string only because they happen
-  to draw all five.
-- **`aiii/` declares `--font-mark` and never uses it** — decision #18. The page carries no site
-  nav, so there is no wordmark on it to set in the mark face; the Montserrat request was removed and
-  the token declaration kept, so the five-token vocabulary stays identical on every page. A comment
-  in the file names what to restore and when.
+  draws and no face it doesn't*; the chrome pages share one string only because they happen to
+  draw all five — and *how many* share it is a count that moves when a page ships, so it is not
+  written here. Read it from the pages; `verify_type` computes the set on every run.
+- **`aiii/` — decision #18's condition fired on 2026-09-28, and its exemption retired with it.**
+  From 2026-08-15 the page declared `--font-mark` and never used it: it carried no site nav, so
+  there was no wordmark to set in the mark face, the Montserrat request was removed, and a comment
+  in the file named what to restore and when. **`rnvizion.github.io@48228b7` restored it** — the
+  page now carries the site nav, draws the mark on `.logo`, requests `Montserrat:wght@900`, and the
+  comment is gone; its font link is byte-identical to the chrome set's. So `aiii/index.html` left
+  `profile.json`'s `type_register.no_canonical_link.paths` in the same change as this bullet
+  (v1.3.3, rev 11), because the two describe one exemption and retiring either alone leaves two
+  canonical entries that disagree. **Verified on the real checker before either moved:** with the
+  entry removed, `verify_type` reports 0 findings at `48228b7` and *"font link differs from the 16
+  pages that share one string; no exemption covers it"* at `1c527e9`, the commit before. The
+  exemption was correct for forty-four days and false for none. **Still true and untouched:** aiii
+  declares its six palette tokens on `nav`, not `:root`, to keep them out of AIII's own register —
+  the collector reads custom properties from every rule, so they resolve; **narrow it to `:root`
+  and it false-fails aiii and only aiii.**
 - **`/card/` is generated.** Its mark tracking lives in `scripts/generate_contact_card.py`, not in
   `card/index.html`. A checker reading the page reads a build artifact.
 
