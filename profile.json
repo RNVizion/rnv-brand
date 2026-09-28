@@ -1,8 +1,8 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "_updated_note": "STALE FOR THREE WEEKS AND CAUGHT BY A CONSUMER CITING IT, 2026-09-02. This field read 2026-08-12 while version had moved to 1.3.1 and the manifest had been edited many times -- a header date asserting a freshness the body did not have, in the file that publishes the rule against exactly that. A reader Built-from-ing against it would have cited a three-week-old state as current. CITE THE VERSION, NOT THIS FIELD: version moves when the contents move and this one moves when someone remembers.",
-  "updated": "2026-09-02",
+  "updated": "2026-09-28",
   "_resumes_out_of_scope": "2026-08-12, v1.3.0. The .docx resume variants are PERSONAL documents, handed directly to people, and they carry the personal cell. They are deliberately not modelled here: no appears_in list names them, no fact claims to appear on them, and nothing in this manifest describes their contents. This is a scope decision, not an oversight -- do not re-add 'resumes' to an appears_in list. TWO DIFFERENT ARTIFACTS SHARE THE WORD: resume/index.html in rnvizion.github.io is the PUBLIC web resume, it carries no phone number, and it stays fully checked -- see facts.eval_cases.sources. Verify the one that serves. scripts/refresh_profile.py --docx still exists as a local, opt-in, recordless tool a human can point at their own files; it stores nothing and no workflow passes that flag.",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
@@ -128,9 +128,9 @@
         ],
         "note": "Source 'def test_' count is a floor: parametrized tests expand at runtime. The checker verifies the displayed floor is actually supported by source, and says when the next rung on the ladder has been earned. SUBSET: rnv-publishing-agent and rnv-brand are not counted, so the floor is conservative by construction. Adding a repo to this list requires recomputing floor_observed in the same change."
       },
-      "_floor_observed_note": "REFRESHED 2026-08-17, 4908 -> 5131. This is a recorded observation, not a target: it is what the eight listed repos derived on the day it was measured, and it moves whenever they gain tests. The PUBLISHED value stays '5,000+' -- the floor rising does not oblige the prose to follow, and 5,131 supports it more comfortably than 4,908 did. The next rung is 5,500, and the checker will say so when source earns it rather than when someone feels like claiming it.",
+      "_floor_observed_note": "REFRESHED 2026-09-28, 5131 -> 6033 (the checker asked for it in the previous facts run, and this was the next manifest edit). Previously 2026-08-17, 4908 -> 5131. This is a recorded observation, not a target: it is what the eight listed repos derived on the day it was measured, and it moves whenever they gain tests. The PUBLISHED value stays '5,000+' -- the floor rising does not oblige the prose to follow, and 5,131 supports it more comfortably than 4,908 did. The next rung is 5,500, and the checker will say so when source earns it rather than when someone feels like claiming it.",
       "_floor_evidence": "THIS GUARD FIRED ON 2026-09-02 AND STOPPED A REAL REGRESSION, recorded because a guard that never fires reads the same as a guard that cannot. A site pass drafted removing 5,000+ from index.html and resume/index.html, replacing the homepage stat tile with an OpenSSF control count, on the reasoning that figures moving without a human decision should be retired. THAT REASONING WAS RIGHT AND MISAPPLIED: this figure is a floor_display stepping a declared ladder, so it moves on a DECISION, which is the test it was accused of failing. Three things the site side could not see from its own repo: facts.tests.sources names both files with match '5,000+', so the removal is a FAIL on the next run rather than a silent improvement; the ladder makes it decision-based; and scripts/generate_site_og.py renders og-image.png from those stat tiles, so the swap would have changed the share image AND replaced a guarded decision-based figure with an unguarded one whose denominator OpenSSF owns. All three were caught by reading the CONSUMER rather than the declaration.",
-      "floor_observed": 5131,
+      "floor_observed": 6033,
       "ladder": [
         "5,000+",
         "10,000+",
@@ -159,6 +159,20 @@
         },
         "note": "Exactly derivable: one JSON object per line, each carrying a 'kind'. Frozen at 60 by decision 2026-08-05; update split in the same commit as any trap flip. CORRECTED 2026-08-17 from 38/22 to 39/21, and the correction is this check working exactly as the note above predicts: a trap flipped out_of_corpus -> in_corpus in the corpus repo, the TOTAL stayed at 60, and no published surface moved. Nothing but this machine-checked split could have caught it, which is precisely why the split lives here rather than on a page. The flip itself is the corpus chat's to explain; this manifest records only what the file now holds."
       }
+    },
+    "card_line": {
+      "value": "Vizion, built not borrowed.",
+      "match": "<p class=\"line\">Vizion, built not borrowed.</p>",
+      "sources": ["card/index.html", "card/print/index.html"],
+      "appears_in": ["rnvizion.github.io/card/", "rnvizion.vcf NOTE (downgraded, consumer-side)"],
+      "note": "The card line. Its registry status is Brand Book section 5; read the row there, it is not restated here. Landed v1.3.3 so generate_contact_card.py reads it from here (PATHS -> facts.card_line.value) instead of CARD_OVERRIDES; that wiring is the site repo's. The vCard NOTE carries the same line with the comma escaped and the kicker's dots downgraded to slashes for older parsers -- consumer-side by decision, so it is not matched here. Moves on a human decision only; nothing derives it."
+    },
+    "discipline_kicker": {
+      "value": "AI \u00b7 SOFTWARE \u00b7 WEB \u00b7 BRAND",
+      "match": "<p class=\"kicker\">AI \u00b7 SOFTWARE \u00b7 WEB \u00b7 BRAND</p>",
+      "sources": ["card/index.html", "card/print/index.html"],
+      "appears_in": ["rnvizion.github.io/card/", "rnvizion.vcf NOTE (downgraded, consumer-side)"],
+      "note": "The discipline kicker, middle dots on web surfaces. This is the web form; the generator downgrades the dots to slashes inside the vCard NOTE and that downgrade stays consumer-side. Landed v1.3.3 for the same reason as card_line. Moves on a human decision only; nothing derives it."
     }
   },
   "eval_thresholds": {
@@ -498,8 +512,8 @@
       "selectors": ["logo", "mark", "wordmark"]
     },
     "no_canonical_link": {
-      "_comment": "Pages the register exempts from the shared font-link string, so the link-drift check does not report a decision as drift. THE RULE IS: a page requests every face it draws and no face it doesn't; the chrome pages share one string only because they happen to draw all five. /card/ requests only the three faces and four weights it draws. aiii/ had Montserrat trimmed on 2026-08-15 because it draws no mark -- it has no site nav, and its own AIII wordmark is mono. It still DECLARES --font-mark per decision #18, so the five-token vocabulary is identical on every page; declaring a token costs nothing and keeps a guard reading one shape everywhere. Each entry here is a decision recorded in BRAND_TYPE.md, not a value tolerated.",
-      "paths": ["card/index.html", "card/print/index.html", "aiii/index.html"]
+      "_comment": "Pages the register exempts from the shared font-link string, so the link-drift check does not report a decision as drift. THE RULE IS: a page requests every face it draws and no face it doesn't; the chrome pages share one string only because they happen to draw all five. /card/ requests only the three faces and four weights it draws. aiii/ was listed here from 2026-08-15 (Montserrat trimmed because it drew no mark) until v1.3.3: rnvizion.github.io@48228b7 gave the page the site nav, so it draws the mark, requests the face, and its link is byte-identical to the chrome set's -- nothing left to exempt, and verify_type reported 0 findings with the entry gone and a named failure at the commit before. Retired in the same commit as BRAND_TYPE.md rev 11's bullet; the two are one exemption. Each entry here is a decision recorded in BRAND_TYPE.md, not a value tolerated.",
+      "paths": ["card/index.html", "card/print/index.html"]
     }
   },
   "protected": {
