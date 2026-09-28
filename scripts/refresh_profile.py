@@ -1179,6 +1179,104 @@ def verify_rev_matches_version(cfg, rep, workdir: Path):
                  f"in the same change that bumps the rev, or `pip show` lies")
 
 
+def verify_resolver_table(cfg, rep, workdir: Path):
+    """BRAND_COLORS.md's Resolver vocabulary table names exactly RNV_BRAND's keys, at
+    RNV_BRAND's values.
+
+    THE TABLE IS A CONTRACT, AND TWICE IT WAS A STALE ONE. It published `#b19145`
+    for dark gold for twenty-six days after the engine moved to `#8c7337`, and the
+    paragraph recording that incident says the table "was also short by six rows
+    against RNV_BRAND ... it is now complete". The teal was registered the next
+    day (2026-09-13) and the table never gained its row: six keys short again,
+    all `#00b0a0`, for fifteen days, found by the mirror's owner reading rev 42.
+    A correction lands where the reasoning lives (brand.py) and not where the
+    thing is merely mentioned (this table) -- practices 4.5's fifth instance.
+
+    THREE COMPARISONS, BECAUSE THE TWO INCIDENTS FAILED DIFFERENTLY. Every
+    RNV_BRAND key has a row (a whole colour cannot be omitted). Every name in the
+    table is a key (the register cannot document a name that falls through to
+    CSS). Every name's row value equals RNV_BRAND[name] (the dark-gold drift).
+    Both directions, per practices 3.3.
+
+    LIKE verify_rev_matches_version, THIS READS THE REGISTER'S OWN TREE, not a
+    fetched surface: both files are in this repository. RNV_BRAND is read through
+    a subprocess rather than an import, the same isolation verify_tokens uses on
+    the emitter -- an import-time assertion firing inside brand.py becomes a FAIL
+    here rather than a traceback.
+
+    A ROW IS A VOCABULARY ROW IF ITS SECOND CELL IS A SIX-DIGIT HEX. Header and
+    separator rows drop out on shape, not on their text, so renaming a column
+    header does not blind the parse; a malformed hex drops its names out of the
+    table set and they surface as missing keys, which is the loud direction.
+    Every parse failure fails rather than returns.
+    """
+    rep.checks += 1
+    colors = REPO_ROOT / "BRAND_COLORS.md"
+    engine_dir = REPO_ROOT / "engine"
+    if not colors.exists() or not (engine_dir / "brand.py").exists():
+        rep.fail("resolver", "rnv-brand",
+                 "BRAND_COLORS.md or engine/brand.py not found beside the checker; "
+                 "this check reads the register's own tree and cannot run without both")
+        return
+    try:
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "import json, brand; print(json.dumps({k: str(v) for k, v in brand.RNV_BRAND.items()}))"],
+            cwd=engine_dir, capture_output=True, text=True, timeout=30)
+    except Exception as e:  # noqa: BLE001 -- any failure to read the engine is a FAIL, not a skip
+        rep.fail("resolver", "engine/brand.py", f"could not run the engine to read RNV_BRAND ({e!r})")
+        return
+    if r.returncode != 0 or not r.stdout.strip():
+        rep.fail("resolver", "engine/brand.py",
+                 f"engine exited {r.returncode} while reading RNV_BRAND; the table was "
+                 f"compared against nothing. stderr tail: {r.stderr.strip()[-200:]!r}")
+        return
+    engine = {k: v.lower() for k, v in json.loads(r.stdout).items()}
+
+    text = colors.read_text(encoding="utf-8")
+    start = text.find("## Resolver vocabulary")
+    if start < 0:
+        rep.fail("resolver", "BRAND_COLORS.md",
+                 "no '## Resolver vocabulary' heading; the section moved and this check is blind")
+        return
+    end = text.find("\n## ", start + 10)
+    section = text[start: end if end > 0 else len(text)]
+    table: dict[str, str] = {}
+    for line in section.splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 2:
+            continue
+        m = re.fullmatch(r"`?(#[0-9a-fA-F]{6})`?", cells[1])
+        if not m:
+            continue                      # header, separator, or not a vocabulary row
+        for name in cells[0].split(","):
+            name = name.strip()
+            if name:
+                table[name] = m.group(1).lower()
+    if not table:
+        rep.fail("resolver", "BRAND_COLORS.md",
+                 "the Resolver vocabulary table parsed to zero rows; its shape moved and "
+                 "nothing was compared")
+        return
+
+    for k in sorted(set(engine) - set(table)):
+        rep.fail("resolver", "BRAND_COLORS.md",
+                 f"RNV_BRAND key '{k}' ({engine[k]}) has no row in the Resolver vocabulary "
+                 f"table; the server answers a name the register does not document")
+    for k in sorted(set(table) - set(engine)):
+        rep.fail("resolver", "BRAND_COLORS.md",
+                 f"the Resolver vocabulary table names '{k}', which RNV_BRAND does not carry; "
+                 f"the register documents a name the engine does not answer")
+    for k in sorted(set(table) & set(engine)):
+        if table[k] != engine[k]:
+            rep.fail("resolver", "BRAND_COLORS.md",
+                     f"'{k}' resolves to {engine[k]} in RNV_BRAND but the table says "
+                     f"{table[k]}; the register's document and the register's source give "
+                     f"different answers to the same name")
+
+
 def verify_threshold_prose(cfg, rep, workdir: Path):
     """The eval gates as PRINTED on the resume page, against the manifest.
 
@@ -1849,6 +1947,7 @@ def main():
             verify_threshold_prose(cfg, rep, Path(tmp))
             verify_expiring(cfg, rep, Path(tmp))
             verify_rev_matches_version(cfg, rep, Path(tmp))
+            verify_resolver_table(cfg, rep, Path(tmp))
         scanned.append("manifest")
 
     if args.root:
