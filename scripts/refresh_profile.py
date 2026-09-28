@@ -1279,9 +1279,11 @@ def verify_type(cfg, rep, workdir: Path):
          wordmark from mono, and nothing reported it.
       2. The mark face drawn but never requested. **The direction matters and it
          was nearly built backwards.** Loading a face and not drawing it is a
-         wasted request that renders fine -- aiii/ does exactly that, kept
-         deliberately per decision #18. Drawing a face without loading it puts
-         the wordmark in a fallback and is visibly wrong. Arm the second.
+         wasted request that renders fine -- aiii/ did exactly that from
+         2026-08-15 until rnvizion.github.io@48228b7 gave it the site nav, per
+         decision #18; it now draws and requests like every chrome page. Drawing
+         a face without loading it puts the wordmark in a fallback and is
+         visibly wrong. Arm the second.
       3. The canonical font link drifting on one page out of the set that shares
          it. No stored copy: the set defines itself, so there is nothing to go
          stale. Pages the register exempts are excluded first.
