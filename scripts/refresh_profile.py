@@ -295,6 +295,8 @@ class Report:
         self.checks = 0
         # (phrase, exempt path) -> occurrences it actually covered
         self.exempt_use: dict[tuple[str, str], int] = {}
+        # protected string -> files it appears in, outside the manifest itself
+        self.protected_seen: dict[str, int] = {}
         # phrase -> occurrences excused by a point-of-use marker
         self.marked: dict[str, int] = {}
         # every file that exists under a scanned root, and every file read.
@@ -407,6 +409,93 @@ def marker_excuses(lines: list[str], idx: int, phrase: str) -> bool:
 
 
 # --------------------------------------------------------------------------
+# rendering a figure into its printed phrase
+# --------------------------------------------------------------------------
+_NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven",
+                 "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen",
+                 "fifteen", "sixteen", "seventeen", "eighteen", "nineteen", "twenty"]
+
+
+def number_word(n):
+    """10 -> 'ten'. Returns None past twenty rather than guessing a spelling:
+    the caller fails and says to write the phrase with {value} instead."""
+    try:
+        i = int(str(n).replace(",", ""))
+    except ValueError:
+        return None
+    return _NUMBER_WORDS[i] if 0 <= i < len(_NUMBER_WORDS) else None
+
+
+def render_phrase(template, value):
+    """Substitute a figure into a match phrase: {value} the figure as written,
+    {word} its spelling, {Word} the spelling capitalised for a sentence start.
+
+    THE PHRASE IS DERIVED FROM THE VALUE SO THE TWO CANNOT DRIFT APART IN CONFIG.
+    `match` moves with `value` has been a standing rule since August and was
+    enforced only by a loud failure after someone forgot; a template makes the
+    pairing structural. Literal replace, not str.format: an existing match that
+    ever carries a brace must not become a KeyError.
+
+    Returns (needle, None) or (None, reason)."""
+    out = template.replace("{value}", str(value))
+    if "{word}" in out or "{Word}" in out:
+        w = number_word(value)
+        if w is None:
+            return None, (f"cannot spell {value!r} as a word; write this phrase "
+                          f"with {{value}} instead of {{word}}")
+        out = out.replace("{word}", w).replace("{Word}", w.capitalize())
+    return out, None
+
+
+def _mcp_tool_names(path):
+    """The tools a FastMCP server registers, by static parse -- never by import.
+
+    Both registration styles in this ecosystem are read: the call form
+    `mcp.tool(api.<name>, ...)` (rnv-color-mcp) and the decorator form
+    `@mcp.tool()` on a function (rnv-publishing-agent). A `name=` keyword
+    overrides either. A grep for "mcp.tool(" is not an instrument for this: on
+    rnv-color-mcp it counts 11 against 10 registered, because a comment spells
+    the call. The source's own test parses with ast for exactly that reason.
+
+    Returns (names, None) or (None, reason)."""
+    import ast
+    try:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+    except (OSError, SyntaxError, UnicodeDecodeError) as e:
+        return None, f"could not parse ({e.__class__.__name__}: {e})"
+
+    def is_mcp_tool(f):
+        return (isinstance(f, ast.Attribute) and f.attr == "tool"
+                and isinstance(f.value, ast.Name) and f.value.id == "mcp")
+
+    def name_kw(call):
+        for k in getattr(call, "keywords", []):
+            if k.arg == "name" and isinstance(k.value, ast.Constant):
+                return k.value.value
+        return None
+
+    decorator_calls = set()
+    names = []
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            for d in node.decorator_list:
+                f = d.func if isinstance(d, ast.Call) else d
+                if is_mcp_tool(f):
+                    if isinstance(d, ast.Call):
+                        decorator_calls.add(id(d))
+                    names.append(name_kw(d) or node.name)
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call) and is_mcp_tool(node.func) and id(node) not in decorator_calls:
+            if node.args:
+                a = node.args[0]
+                target = a.attr if isinstance(a, ast.Attribute) else getattr(a, "id", None)
+                names.append(name_kw(node) or target)
+            elif name_kw(node):
+                names.append(name_kw(node))
+    return [x for x in names if x], None
+
+
+# --------------------------------------------------------------------------
 # checks — each takes (cfg, root, rep, scope)
 # --------------------------------------------------------------------------
 def check_retired(cfg, root, rep, scope):
@@ -417,6 +506,13 @@ def check_retired(cfg, root, rep, scope):
     phrases = [(e["phrase"], e.get("reason", ""), exempt_entries(e)) for e in cfg["retired"]]
 
     for rel, body in text_files(root):
+        # Existence ledger for protected strings, counted before the archive skip
+        # because an archive holding the string still means the string exists.
+        # The manifest's own copy is the list, not an occurrence of it.
+        if not (scope == "rnv-brand" and rel == "profile.json"):
+            for ps in protected:
+                if ps in body:
+                    rep.protected_seen[ps] = rep.protected_seen.get(ps, 0) + 1
         if _archived(rel):
             rep.mark_archived(scope, rel)
             continue
@@ -624,11 +720,29 @@ def check_facts(cfg, root, rep, scope):
         # font weight — which is how a stale resume PAGE once passed this check with
         # total confidence. Fall back to value when no match is given, so a
         # fact without one keeps working exactly as before.
-        needle = spec.get("match") or spec["value"]
+        match = spec.get("match") or spec["value"]
         for src in sources:
             p = root / src
             if not p.exists():
                 rep.warn(scope, src, f"declared source for '{name}' not found")
+                continue
+            # A page prints a figure inside its own sentence, so one fact on
+            # three pages can need three phrases. `match` may be a dict keyed
+            # by source; a source it does not name is a config error, not a skip.
+            if isinstance(match, dict):
+                template = match.get(src)
+                if template is None:
+                    rep.fail(scope, "profile.json",
+                             f"facts.{name}.match names no phrase for {src}, which "
+                             f"is one of its sources; that page is checked for nothing")
+                    rep.checks += 1
+                    continue
+            else:
+                template = match
+            needle, why = render_phrase(template, spec["value"])
+            if needle is None:
+                rep.fail(scope, "profile.json", f"facts.{name}.match for {src}: {why}")
+                rep.checks += 1
                 continue
             if needle not in p.read_text(encoding="utf-8", errors="ignore"):
                 what = (f"the phrase \u201c{needle}\u201d (match for value {spec['value']})"
@@ -685,16 +799,44 @@ def check_thresholds(cfg, root, rep, scope):
     bug one layer up."""
     spec = cfg.get("eval_thresholds", {})
     p = root / "eval" / "thresholds.json"
+    # Both early exits used to be a return and a warn. This group runs on one
+    # repo, the one that owns the gates, so a missing or unreadable file there
+    # means no gate was compared -- which is a failure, not an absence of news.
     if not p.exists():
+        rep.fail(scope, "eval/thresholds.json",
+                 "not found in the repo that declares the gates; nothing was compared. "
+                 "If it moved, move this check's path in the same change")
+        rep.checks += 1
         return
     try:
         live = json.loads(p.read_text(encoding="utf-8"))
-    except Exception:
-        rep.warn(scope, "eval/thresholds.json", "could not parse")
+    except Exception as e:
+        rep.fail(scope, "eval/thresholds.json",
+                 f"could not parse ({e.__class__.__name__}); nothing was compared")
+        rep.checks += 1
         return
-    for key in ("retrieval_accuracy", "ooc_refusal_accuracy", "false_refusal_rate"):
-        if key not in spec:
-            continue
+
+    # THE GATES ARE DISCOVERED, NOT LISTED. This loop was a hardcoded tuple of
+    # three, and `claim_accuracy` landed in thresholds.json on 2026-09-17 and
+    # was printed on /resume/ from 2026-09-25 with nothing comparing it --
+    # a gate added at the source was unguarded by default. Now every numeric
+    # key in the source must be carried by the manifest, and every gate the
+    # manifest carries must exist at the source.
+    meta = {"source_of_truth", "prose", "appears_in"}
+    live_gates = {k for k, v in live.items()
+                  if not k.startswith("_") and isinstance(v, (int, float))
+                  and not isinstance(v, bool)}
+    spec_gates = {k for k in spec if not k.startswith("_") and k not in meta}
+    if not live_gates:
+        rep.fail(scope, "eval/thresholds.json",
+                 "declares no numeric gates; the discovery found nothing, so every "
+                 "comparison below would pass vacuously")
+    for key in sorted(live_gates - spec_gates):
+        rep.fail(scope, "eval/thresholds.json",
+                 f"declares gate {key} = {live[key]}, which the manifest does not carry; "
+                 f"a page can print it and nothing compares it. Add it to "
+                 f"eval_thresholds with a prose phrase, in one change")
+    for key in sorted(spec_gates):
         if key not in live:
             rep.fail(scope, "eval/thresholds.json",
                      f"{key} is absent; the eval falls back to its default, so the "
@@ -1179,6 +1321,69 @@ def verify_rev_matches_version(cfg, rep, workdir: Path):
                  f"in the same change that bumps the rev, or `pip show` lies")
 
 
+def verify_tool_sets(cfg, rep, workdir: Path):
+    """A printed tool count against the tools the server actually registers.
+
+    FOR EVERY `facts` ENTRY WHOSE derive.method IS "mcp_tool_set": fetch the
+    named repo, parse the named server file with ast, and compare twice.
+
+      1. The COUNT against `value` -- which check_facts holds every page to, so
+         the chain runs source -> manifest -> page with no unverified hop.
+      2. The SET against `derive.set`. **A count guards the number and not the
+         sentence around it.** A one-for-one swap keeps "Ten" true while a page's
+         list of what the tools do goes stale, and no check can read that prose.
+         So the manifest records the names, a swap fails here by name, and the
+         person updating `derive.set` is the one prompted to reread the pages.
+
+    NOT PART OF verify_facts, deliberately: its tests section returns early on
+    a fetch MISS, so anything appended after it would be skipped silently on
+    exactly the runs where the network misbehaved. Unconditional in the facts
+    pass, same dispatch as verify_tokens.
+    """
+    for name, spec in sorted(cfg.get("facts", {}).items()):
+        if name.startswith("_") or not isinstance(spec, dict):
+            continue
+        d = spec.get("derive", {})
+        if d.get("method") != "mcp_tool_set":
+            continue
+        rep.checks += 1
+        root, why = fetch_repo(d["repo"], workdir)
+        if root is None:
+            rep.miss("verify", d["repo"],
+                     f"could not fetch ({why}); facts.{name} unverified. {MISS_HINT}")
+            continue
+        f = root / d["file"]
+        if not f.exists():
+            rep.fail("verify", f"{d['repo']}/{d['file']}",
+                     f"does not exist; facts.{name} derives its tool set from it. If the "
+                     f"server moved, move derive.file in the same change")
+            continue
+        names, err = _mcp_tool_names(f)
+        if names is None:
+            rep.fail("verify", f"{d['repo']}/{d['file']}", f"{err}; facts.{name} unverified")
+            continue
+        if not names:
+            rep.fail("verify", f"{d['repo']}/{d['file']}",
+                     f"the parse found no registered tools; either the server registers "
+                     f"them a way this reader does not know, or it has none -- a count of "
+                     f"zero here is the instrument going blind, not a finding")
+            continue
+        actual, declared = set(names), set(d.get("set", []))
+        if str(len(names)) != str(spec["value"]).replace(",", ""):
+            rep.fail("verify", f"{d['repo']}/{d['file']}",
+                     f"registers {len(names)} tools; facts.{name} says {spec['value']}, "
+                     f"which is what the pages are held to")
+        if actual != declared:
+            gone, new = sorted(declared - actual), sorted(actual - declared)
+            rep.fail("verify", f"{d['repo']}/{d['file']}",
+                     f"tool set moved: left {gone or 'none'}, arrived {new or 'none'}. "
+                     f"Reread every page in facts.{name}.sources for sentences describing "
+                     f"what the tools do, then update derive.set (and value, if the count "
+                     f"moved) in the same change")
+        if str(len(names)) == str(spec["value"]).replace(",", "") and actual == declared:
+            print(f"    derived  {name} = {len(names)}  (set agrees)")
+
+
 def verify_resolver_table(cfg, rep, workdir: Path):
     """BRAND_COLORS.md's Resolver vocabulary table names exactly RNV_BRAND's keys, at
     RNV_BRAND's values.
@@ -1282,7 +1487,7 @@ def verify_threshold_prose(cfg, rep, workdir: Path):
 
     THE HOP THIS CLOSES. `check_thresholds` verifies the manifest against
     rnv-ask-the-corpus/eval/thresholds.json, so source and manifest agree. The
-    page then quotes all three gates in prose and nothing compared them, so the
+    page then quotes every gate in prose and nothing compared them, so the
     chain ran source -> manifest -> (nothing) -> surface. Raise a gate in
     thresholds.json and the page keeps advertising the old bar, correctly
     formatted, indefinitely.
@@ -1347,6 +1552,21 @@ def verify_threshold_prose(cfg, rep, workdir: Path):
                      f"the page did not, or the page was reworded and this check "
                      f"has stopped finding its needle -- both matter, and the "
                      f"second one is the quiet failure")
+    # The page also prints HOW MANY gates there are ("any of four thresholds"),
+    # and a gate added without rewording that sentence leaves a true list under
+    # a false count. count_phrase renders the number of gates as a word.
+    count_template = prose.get("count_phrase")
+    if count_template:
+        n_gates = len([g for g in et if not g.startswith("_")
+                       and g not in ("source_of_truth", "appears_in", "prose")])
+        needle, why = render_phrase(count_template, n_gates)
+        if needle is None:
+            rep.fail("thresholds", "profile.json", f"eval_thresholds.prose.count_phrase: {why}")
+        elif needle.lower() not in flat.lower():
+            rep.fail("thresholds", surface,
+                     f"does not print \"{needle}\"; the manifest carries {n_gates} "
+                     f"gates and the page's count of them has not followed, or the "
+                     f"sentence was reworded and the needle is lost")
     for gate in sorted(et):
         if gate.startswith("_") or gate in ("source_of_truth", "appears_in", "prose"):
             continue
@@ -1776,6 +1996,36 @@ def verify_facts(cfg, rep, workdir: Path):
 
 
 # --------------------------------------------------------------------------
+def report_protected(cfg, rep):
+    """Every protected string must still exist somewhere in the ecosystem.
+
+    A PROTECTED STRING IS AN EXEMPTION: it excuses any retired phrase or old
+    repo link within 80 characters of it, and it tells a bulk rename what not
+    to touch. Retired-phrase exemptions have had a ledger since August;
+    this list never did, so an entry could die and read as armed.
+    `repo_id="RNVizion/ask-the-corpus"` did exactly that: the Space deploy
+    moved into scripts/deploy_space.py on 2026-09-17 as
+    `SPACE_ID = "RNVizion/ask-the-corpus"`, and for twelve days the list
+    protected a line that no longer existed and did not name the one that did.
+    Found by the Ecosystem Master's rev 44 scan, not by this checker.
+
+    WARN, NOT FAIL, for the same reason a dead exemption warns: a string can
+    vanish because it was removed on purpose, because it moved, or because the
+    file holding it was never read, and only a human can tell which. Runs only
+    on a complete sweep, because a partial one cannot tell unvisited from gone.
+    """
+    strings = cfg.get("protected", {}).get("strings", [])
+    for ps in strings:
+        if rep.protected_seen.get(ps, 0) == 0:
+            rep.warn("protected", "profile.json",
+                     f"protected string {ps!r} appears in no file across the sweep "
+                     f"(the manifest's own list excluded). Either it was removed on "
+                     f"purpose, it moved and the entry should follow it, or the file "
+                     f"holding it is outside the walk -- only the first justifies "
+                     f"deleting the entry")
+    rep.checks += 1
+
+
 def report_exemptions(cfg, rep):
     """The exemption ledger. Coverage you cannot see is coverage you cannot
     trust, so every skip gets named: what it covered, what it allows, and which
@@ -1948,6 +2198,7 @@ def main():
             verify_expiring(cfg, rep, Path(tmp))
             verify_rev_matches_version(cfg, rep, Path(tmp))
             verify_resolver_table(cfg, rep, Path(tmp))
+            verify_tool_sets(cfg, rep, Path(tmp))
         scanned.append("manifest")
 
     if args.root:
@@ -1982,6 +2233,7 @@ def main():
     # Only a complete sweep can tell a dead exemption from an unvisited one.
     if full_sweep and (not only or "retired" in only):
         report_exemptions(cfg, rep)
+        report_protected(cfg, rep)
 
     print(f"\nCHECKED against {mp.name} v{cfg.get('version','?')} "
           f"({rep.checks} checks over {len(scanned)} surface set(s))")
