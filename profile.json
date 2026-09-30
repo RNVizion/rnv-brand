@@ -1,8 +1,8 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "_updated_note": "STALE FOR THREE WEEKS AND CAUGHT BY A CONSUMER CITING IT, 2026-09-02. This field read 2026-08-12 while version had moved to 1.3.1 and the manifest had been edited many times -- a header date asserting a freshness the body did not have, in the file that publishes the rule against exactly that. A reader Built-from-ing against it would have cited a three-week-old state as current. CITE THE VERSION, NOT THIS FIELD: version moves when the contents move and this one moves when someone remembers.",
-  "updated": "2026-09-28",
+  "updated": "2026-09-29",
   "_resumes_out_of_scope": "2026-08-12, v1.3.0. The .docx resume variants are PERSONAL documents, handed directly to people, and they carry the personal cell. They are deliberately not modelled here: no appears_in list names them, no fact claims to appear on them, and nothing in this manifest describes their contents. This is a scope decision, not an oversight -- do not re-add 'resumes' to an appears_in list. TWO DIFFERENT ARTIFACTS SHARE THE WORD: resume/index.html in rnvizion.github.io is the PUBLIC web resume, it carries no phone number, and it stays fully checked -- see facts.eval_cases.sources. Verify the one that serves. scripts/refresh_profile.py --docx still exists as a local, opt-in, recordless tool a human can point at their own files; it stores nothing and no workflow passes that flag.",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
@@ -128,9 +128,9 @@
         ],
         "note": "Source 'def test_' count is a floor: parametrized tests expand at runtime. The checker verifies the displayed floor is actually supported by source, and says when the next rung on the ladder has been earned. SUBSET: rnv-publishing-agent and rnv-brand are not counted, so the floor is conservative by construction. Adding a repo to this list requires recomputing floor_observed in the same change."
       },
-      "_floor_observed_note": "REFRESHED 2026-09-28, 5131 -> 6033 (the checker asked for it in the previous facts run, and this was the next manifest edit). Previously 2026-08-17, 4908 -> 5131. This is a recorded observation, not a target: it is what the eight listed repos derived on the day it was measured, and it moves whenever they gain tests. The PUBLISHED value stays '5,000+' -- the floor rising does not oblige the prose to follow, and 5,131 supports it more comfortably than 4,908 did. The next rung is 5,500, and the checker will say so when source earns it rather than when someone feels like claiming it.",
+      "_floor_observed_note": "REFRESHED 2026-09-29, 6033 -> 6064 (asked for by the checker; this was the next manifest edit). Previously 2026-09-28, 5131 -> 6033 (the checker asked for it in the previous facts run, and this was the next manifest edit). Previously 2026-08-17, 4908 -> 5131. This is a recorded observation, not a target: it is what the eight listed repos derived on the day it was measured, and it moves whenever they gain tests. The PUBLISHED value stays '5,000+' -- the floor rising does not oblige the prose to follow, and 5,131 supports it more comfortably than 4,908 did. The next rung is 5,500, and the checker will say so when source earns it rather than when someone feels like claiming it.",
       "_floor_evidence": "THIS GUARD FIRED ON 2026-09-02 AND STOPPED A REAL REGRESSION, recorded because a guard that never fires reads the same as a guard that cannot. A site pass drafted removing 5,000+ from index.html and resume/index.html, replacing the homepage stat tile with an OpenSSF control count, on the reasoning that figures moving without a human decision should be retired. THAT REASONING WAS RIGHT AND MISAPPLIED: this figure is a floor_display stepping a declared ladder, so it moves on a DECISION, which is the test it was accused of failing. Three things the site side could not see from its own repo: facts.tests.sources names both files with match '5,000+', so the removal is a FAIL on the next run rather than a silent improvement; the ladder makes it decision-based; and scripts/generate_site_og.py renders og-image.png from those stat tiles, so the swap would have changed the share image AND replaced a guarded decision-based figure with an unguarded one whose denominator OpenSSF owns. All three were caught by reading the CONSUMER rather than the declaration.",
-      "floor_observed": 6033,
+      "floor_observed": 6064,
       "ladder": [
         "5,000+",
         "10,000+",
@@ -173,13 +173,49 @@
       "sources": ["card/index.html", "card/print/index.html"],
       "appears_in": ["rnvizion.github.io/card/", "rnvizion.vcf NOTE (downgraded, consumer-side)"],
       "note": "The discipline kicker, middle dots on web surfaces. This is the web form; the generator downgrades the dots to slashes inside the vCard NOTE and that downgrade stays consumer-side. Landed v1.3.3 for the same reason as card_line. Moves on a human decision only; nothing derives it."
+    },
+    "color_mcp_tools": {
+      "value": "10",
+      "match": {
+        "index.html": "{Word} tools cover",
+        "resume/index.html": "{Word} deterministic tools",
+        "bio/index.html": "{word} deterministic tools"
+      },
+      "sources": ["index.html", "resume/index.html", "bio/index.html"],
+      "appears_in": ["rnvizion.github.io"],
+      "note": "The number of tools rnv-color-mcp registers, printed on three pages. Each match carries the noun and a neighbouring word, because a bare \"Ten\" matches anything; {Word}/{word} render the value, so the phrase moves when the value does. A forecast that the count will hold is not a freeze: it moved eight, nine, ten in a month. The capability lists in these sentences cannot be checked; derive.set is the prompt to reread them.",
+      "derive": {
+        "method": "mcp_tool_set",
+        "repo": "rnv-color-mcp",
+        "file": "server.py",
+        "set": ["color_difference", "contrast_check", "convert_color", "generate_harmony", "get_palette", "list_palettes", "mix_colors", "place_lightness", "save_palette", "transform_text"],
+        "note": "verify_tool_sets parses server.py with ast (call form mcp.tool(api.<name>, ...)) and compares both the count and the set. A one-for-one swap keeps the count true and fails here by name, so whoever updates this set rereads the pages first. The source repo holds its own surfaces to the same set in tests/test_public_surfaces.py; this entry covers the site, which that test cannot see."
+      }
+    },
+    "publishing_agent_tools": {
+      "value": "6",
+      "match": {
+        "index.html": "exposes {word} tools",
+        "resume/index.html": "exposing {word} tools"
+      },
+      "sources": ["index.html", "resume/index.html"],
+      "appears_in": ["rnvizion.github.io"],
+      "note": "The number of tools rnv-publishing-agent registers. Same shape and same reason as color_mcp_tools; found unguarded while verifying that one.",
+      "derive": {
+        "method": "mcp_tool_set",
+        "repo": "rnv-publishing-agent",
+        "file": "server.py",
+        "set": ["commit_and_push", "list_posts", "publish_post", "update_corpus", "validate_post", "wait_for_live"],
+        "note": "Decorator form, @mcp.tool() on each function; verify_tool_sets reads both registration styles."
+      }
     }
   },
   "eval_thresholds": {
-    "_comment": "The three gates. Declared in rnv-ask-the-corpus/eval/thresholds.json, carried here, and quoted in prose on the resume page. check_thresholds verifies this manifest against the source file; verify_threshold_prose verifies the page against this manifest, so the chain runs source -> manifest -> surface with no unverified hop. CLOSED 2026-08-16, and the original note here was wrong about why: it said adding 'thresholds' to the site repo would 'fail spuriously' because the dispatch looks for eval/thresholds.json. It would not fail -- check_thresholds returns early on a missing file, so it would run, find nothing, and PASS having verified nothing. Quieter and worse than the failure predicted, and the reason the fix is a separate check rather than an extra entry in a checks array.",
+    "_comment": "The gates, every one of them, and the set is DISCOVERED rather than listed: check_thresholds fails on any numeric gate in thresholds.json this block does not carry, because a hardcoded list of three left claim_accuracy (landed 2026-09-17, printed on /resume/ from 2026-09-25) compared by nothing. Declared in rnv-ask-the-corpus/eval/thresholds.json, carried here, and quoted in prose on the resume page. check_thresholds verifies this manifest against the source file; verify_threshold_prose verifies the page against this manifest, so the chain runs source -> manifest -> surface with no unverified hop. CLOSED 2026-08-16, and the original note here was wrong about why: it said adding 'thresholds' to the site repo would 'fail spuriously' because the dispatch looks for eval/thresholds.json. It would not fail -- check_thresholds returns early on a missing file, so it would run, find nothing, and PASS having verified nothing. Quieter and worse than the failure predicted, and the reason the fix is a separate check rather than an extra entry in a checks array.",
     "retrieval_accuracy": 85.0,
     "ooc_refusal_accuracy": 90.0,
     "false_refusal_rate": 10.0,
+    "claim_accuracy": 100.0,
     "source_of_truth": "rnv-ask-the-corpus/eval/thresholds.json",
     "prose": {
       "_comment": "THE NEEDLE IS THE PHRASE, NOT THE NUMBER, and the direction word is the reason. `85%` matches anything on the page, and flipping 'at or above' to 'at or below' leaves the number intact while inverting the gate -- the value would still agree and the sentence would be a lie. {value} is substituted from the figure above, so the phrase and the value cannot drift apart here the way they can in prose. A phrase that no longer matches is a FAILURE and not a skip: it means the page was reworded, and a check that quietly stops finding its needle is a check that verifies nothing while reporting clean.",
@@ -187,8 +223,10 @@
       "phrases": {
         "retrieval_accuracy": "retrieval accuracy at or above {value}%",
         "ooc_refusal_accuracy": "out-of-corpus refusal at or above {value}%",
-        "false_refusal_rate": "false-refusal rate at or below {value}%"
-      }
+        "false_refusal_rate": "false-refusal rate at or below {value}%",
+        "claim_accuracy": "public-claim accuracy at {value}%"
+      },
+      "count_phrase": "any of {word} thresholds"
     },
     "appears_in": [
       "rnvizion.github.io",
@@ -517,11 +555,11 @@
     }
   },
   "protected": {
-    "_comment": "Strings that look like the renamed repos but must NEVER be rewritten. Hugging Face Space IDs are deliberately exempt from the rnv- prefix.",
+    "_comment": "Strings that look like the renamed repos but must NEVER be rewritten. Hugging Face Space IDs are deliberately exempt from the rnv- prefix. EACH ENTRY IS AN EXEMPTION AND IS AUDITED LIKE ONE: report_protected warns on a complete sweep when a string appears in no file outside this list. The Space ID moved from a workflow repo_id= to scripts/deploy_space.py on 2026-09-17 and this list protected the vanished line for twelve days; the entry now names the line that exists.",
     "strings": [
       "huggingface.co/spaces/RNVizion/ask-the-corpus",
       "rnvizion-ask-the-corpus.hf.space",
-      "repo_id=\"RNVizion/ask-the-corpus\""
+      "SPACE_ID = \"RNVizion/ask-the-corpus\""
     ]
   },
   "manual_surfaces": [
