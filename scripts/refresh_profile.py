@@ -2164,11 +2164,11 @@ def main():
     cfg = json.loads(mp.read_text(encoding="utf-8"))
 
     # Refuse to proceed on a manifest carrying a number that is not the brand
-    # one. Exit 1, not 2, on purpose: profile-drift.yml only understands 0 and
-    # 1, and a 2 falls through the open branch, the close branch AND the
-    # fail-the-job branch — a silent green run. 1 opens the drift issue, which
-    # is exactly the signal this deserves. (The pre-existing `return 2` for a
-    # missing manifest has that same silent-green problem and is not fixed here.)
+    # one. Exit 1, not 2, on purpose: 1 opens the drift issue, which is exactly
+    # the signal this deserves, and 2 opens nothing. (When this was written the
+    # workflow understood only 0 and 1, and a 2 went green in silence. It has
+    # named 2 since: red job, no issue. The choice of 1 here stands on the
+    # first reason alone.)
     phone_problems = audit_manifest_phones(cfg)
     if phone_problems:
         print("MANIFEST PHONE AUDIT FAILED — nothing else ran.", file=sys.stderr)
@@ -2281,4 +2281,26 @@ def main():
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    # A CRASH IS NOT DRIFT. An uncaught exception makes Python exit 1, and
+    # profile-drift.yml reads 1 as "something I read disagrees": it opens the
+    # public drift issue, with a traceback for a body, about surfaces nothing
+    # finished comparing. Exit 2 is the code the workflow already names for
+    # "the checker could not run at all": a red job, no issue opened, none
+    # closed. An unparseable manifest lands here too, which is what the
+    # workflow's own message for 2 has always said it meant.
+    #
+    # Replayed at 2ba2773 (2026-09-30): a manifest one commit ahead of this
+    # file reached a check_facts that could not read it, and the TypeError
+    # exited 1. A two-file change uploaded one file per commit has an
+    # intermediate state, and this is what that state now reports as.
+    try:
+        _code = main()
+    except Exception:
+        import traceback
+        traceback.print_exc()
+        print("\nCHECKER CRASHED: exit 2. This is not a finding about any surface. "
+              "Nothing was compared to completion, and no issue is opened or closed "
+              "on it. Usual cause: profile.json and this file are one commit out of "
+              "step, or the manifest does not parse.", file=sys.stderr)
+        _code = 2
+    raise SystemExit(_code)
