@@ -1,17 +1,21 @@
-# Drop this at the root of RNVizion/rnv-brand, beside engine/.
+# Makes the register pip-installable. engine/brand.py is standard library
+# only: no dependencies, pure data and pure functions.
 #
-# It makes the register pip-installable, which is the only thing standing
-# between the five applications and 22 tests that currently skip. Nothing
-# about engine/brand.py has to change: it is 1569 lines with ZERO imports,
-# pure data and pure functions, and it parses on 3.10, 3.11 and 3.12.
-#
-# After this lands, each application pins it in requirements-dev.txt as
+# A consumer pins a commit,
 #
 #     rnv-brand @ git+https://github.com/RNVizion/rnv-brand@<sha>
 #
-# and the pinned sha becomes a written statement of which revision that
-# application mirrors -- visible in a diff when it changes, which is exactly
-# what a hand-maintained PINNED dict cannot give you.
+# and the pinned sha is a written statement of which revision that consumer
+# reads -- visible in a diff when it changes, which a hand-kept copy of the
+# values cannot give you.
+#
+# EVERY CONSUMER INSTALLS BY BUILDING THIS FILE, with whatever setuptools is
+# current on the day it installs: the requirement below is a floor, and nothing
+# a consumer pins reaches the build backend. A warning this build prints is
+# therefore every consumer's problem at once, on a date, with no commit
+# anywhere. Before landing a change here, build it and read the output:
+#
+#     python -m build --wheel . 2>&1 | grep -i warning      # must print nothing
 
 [build-system]
 requires = ["setuptools>=61"]
@@ -23,7 +27,13 @@ version = "43.0.0"          # the register revision, so `pip show` answers "whic
 description = "The RNVizion brand register: the colours, and the rules that derive them."
 requires-python = ">=3.10"
 dependencies = []           # deliberately none -- see the note above
-license = { file = "LICENSE" }
+# NO `license` KEY, AND THAT IS THE DECISION, NOT AN OMISSION -- README.md,
+# "License". There is no LICENSE file in this repository and there has never
+# been one. Do not point at one: until 2026-10-02 this line read
+# `license = { file = "LICENSE" }`, which named a file that did not exist and
+# used a table form setuptools has dated ("By 2027-Feb-18 ... or your builds
+# will no longer be supported"). The built metadata carried no License field
+# then and carries none now.
 
 [project.urls]
 Homepage = "https://github.com/RNVizion/rnv-brand"
@@ -32,7 +42,7 @@ Homepage = "https://github.com/RNVizion/rnv-brand"
 packages = ["engine"]
 
 [tool.setuptools.package-data]
-# The applications read the published values, not the markdown. These are
-# included so an installed copy can still answer "what does the book say",
-# which is useful when a check fails and the reason is in prose.
+# py.typed marks the package as typed. The registers (BRAND_COLORS.md,
+# BRAND_TYPE.md) are NOT in the wheel: a consumer reads values from `engine`
+# and reads the reasoning in this repository, at the commit it pins.
 engine = ["py.typed"]
