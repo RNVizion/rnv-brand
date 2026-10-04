@@ -1,0 +1,140 @@
+name: Package build
+
+# Builds rnv-brand the way a consumer's install does, and goes red if that build
+# prints a warning.
+#
+# WHY THIS EXISTS. Every consumer installs this repository by building it, with
+# whatever setuptools is current that day -- pyproject.toml states a floor, and
+# nothing a consumer pins reaches the build backend. setuptools announces a
+# breaking change as a dated warning, months ahead. Measured 2026-10-03, pip
+# 26.2.1: a plain `pip install` or `pip wheel` prints NONE of the backend's
+# warnings. They appear only under `-v`. So a consumer's install log stays clean
+# until the day the warning becomes an error, and a consumer whose CI caches pip
+# may not rebuild at an unchanged pin at all. Two warnings sat in this build, one
+# of them dated 2027-02-18, until a consumer read a verbose log by hand. Nothing
+# in this repository built the package, so nothing here could have seen them.
+#
+# IT NEVER EDITS, AND IT OPENS NO ISSUE. A red run here is the whole signal.
+# profile-drift.yml owns the issue lifecycle and this file stays out of it.
+#
+# FOUR WAYS TO GO RED, ONE STEP EACH, SO THE FAILED STEP'S NAME IS THE MEANING:
+#
+#   Reach the package index        could not look. Not a finding about this
+#                                  repository; run it again.
+#   Build the package              the build itself failed. A consumer's install
+#                                  fails the same way today.
+#   Prove this run can see ...     the instrument is blind: a planted warning did
+#                                  not reach the scan. The scan after it would
+#                                  pass without having been able to fail, so it
+#                                  does not run.
+#   Fail on any warning            the build works and printed a warning. Read
+#                                  it for a date.
+#
+# THE ORDER IS THE DESIGN. The real build runs before the control, because the
+# control is a copy of this commit: run the control first and a broken
+# pyproject.toml would be reported as a blind instrument.
+#
+# WHAT IT DOES NOT COVER. One Python version, the one pinned below; consumers run
+# others. It does not install the wheel or import it, and it does not check that
+# the keys a Python consumer reads still exist. It says nothing about a consumer's
+# own environment.
+#
+# THE SCAN MATCHES WIDELY ON PURPOSE. Any line containing "warning" or "deprecat",
+# in any case, including a warning from pip itself. A scan that over-reports
+# costs one look; one that under-reports is this workflow not existing.
+
+on:
+  schedule:
+    - cron: "23 13 * * 1"        # Mondays. Actions cron can run hours late.
+  push:
+    branches: [main]
+    paths:
+      - "pyproject.toml"
+      - "engine/**"
+      - ".github/workflows/package-build.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  # ONE PATTERN, USED BY THE CONTROL AND BY THE SCAN. The control proves this
+  # pattern matches a real warning line on this run. Change it here and both move.
+  WARNING_PATTERN: "warning|deprecat"
+  CONTROL_MARKER: "RNV-BUILD-WATCH-CONTROL"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Reach the package index
+        run: |
+          mkdir -p "$RUNNER_TEMP/probe"
+          if ! python -m pip download --no-deps --no-cache-dir \
+                 -d "$RUNNER_TEMP/probe" "setuptools>=61" \
+                 > "$RUNNER_TEMP/probe.log" 2>&1; then
+            cat "$RUNNER_TEMP/probe.log"
+            echo "::error::COULD NOT LOOK. The package index did not serve a build backend, so nothing was built and nothing below is a finding about this repository. Run the workflow again."
+            exit 1
+          fi
+          backend="$(ls "$RUNNER_TEMP/probe" | head -n 1)"
+          echo "Build backend the index serves today: $backend"
+          echo "Build backend the index serves today: \`$backend\`" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build the package the way a consumer's install does
+        run: |
+          if ! python -m pip wheel -v --no-deps --no-cache-dir \
+                 -w "$RUNNER_TEMP/dist" . \
+                 > "$RUNNER_TEMP/build.log" 2>&1; then
+            tail -n 60 "$RUNNER_TEMP/build.log"
+            echo "::error::THE BUILD FAILED. A consumer installing this commit fails the same way today. The index was reachable, so this is about pyproject.toml or engine/."
+            exit 1
+          fi
+          ls "$RUNNER_TEMP/dist"
+
+      # THE POSITIVE CONTROL. A copy of this commit with one planted warning,
+      # built and scanned exactly as the real build is. If the planted line
+      # is not found, pip or setuptools has changed how warnings surface and a
+      # clean result from the real scan would mean nothing.
+      - name: Prove this run can see a build warning
+        run: |
+          control="$RUNNER_TEMP/control"
+          mkdir -p "$control"
+          git archive HEAD | tar -x -C "$control"
+          cat > "$control/setup.py" <<PY
+          import warnings
+          from setuptools import setup
+          warnings.warn("$CONTROL_MARKER: a planted warning. If the scan cannot see this line it cannot see a real one.")
+          setup()
+          PY
+          if ! python -m pip wheel -v --no-deps --no-cache-dir \
+                 -w "$RUNNER_TEMP/control-dist" "$control" \
+                 > "$RUNNER_TEMP/control.log" 2>&1; then
+            tail -n 40 "$RUNNER_TEMP/control.log"
+            echo "::error::THE CONTROL BUILD FAILED, so this run cannot show that it would see a warning. The real build of this commit succeeded just before it, so this is about the planted setup.py or the copy, not about pyproject.toml. The scan did not run."
+            exit 1
+          fi
+          seen="$(grep -iE "$WARNING_PATTERN" "$RUNNER_TEMP/control.log" | grep -c "$CONTROL_MARKER" || true)"
+          if [ "$seen" -lt 1 ]; then
+            echo "::error::THE CONTROL DID NOT FIRE. A warning was planted in a copy of this commit and the scan did not find it. Verbose pip output no longer carries build warnings, or the pattern no longer matches them. The scan did not run, because a clean result from it would mean nothing."
+            exit 1
+          fi
+          echo "Control fired: the planted warning reached the scan on $seen line(s)."
+
+      - name: Fail on any warning the build printed
+        run: |
+          if grep -inE "$WARNING_PATTERN" "$RUNNER_TEMP/build.log"; then
+            echo "::error::THE BUILD PRINTED A WARNING. The lines are above, with their line numbers in the build log. A consumer's install does not show them: pip hides build output unless it is run with -v. Read them for a date."
+            echo "The build printed a warning. See the failed step." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "The build printed no warning."
+          echo "The build printed no warning." >> "$GITHUB_STEP_SUMMARY"
