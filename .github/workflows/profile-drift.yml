@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20          # --all fetches every repo as a tarball
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # Full history, so the version guard below can read profile.json as it
           # stood before this push. Default depth is 1, which makes the previous
@@ -110,7 +110,7 @@ jobs:
           fetch-depth: 0
 
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -237,7 +237,7 @@ jobs:
 
       - name: Keep the reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: profile-drift-report
           path: |
