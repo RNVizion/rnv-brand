@@ -533,24 +533,61 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 #
 # giving #5c82a9, which is then placed at the two lightnesses below.
 #
-# `lab` MODE WAS TRIED FIRST AND IS RECORDED BECAUSE IT FAILED. An equal-weight
-# lab blend of the same four ingredients gives #968e9b -- a grey-mauve sitting
-# dE 2.5 from STATUS["success-text"] under deuteranopia, which is to say the
-# same colour. Averaging in a perceptual space moves toward the centroid and
-# the centroid of four hues is grey. Pigment mixing keeps the chroma. The
-# ingredient list did not change between those two results; only the model did.
+# `lab` MODE WAS TRIED FIRST, AND WHAT IT SHOWED IS NARROWER THAN THIS COMMENT
+# SAID UNTIL 2026-10-05 (register rev 44). The colour recorded as its failure,
+# #968e9b, is an equal-weight lab blend of THREE ingredients -- steelblue, gold
+# and STATUS["success"], no violet. It is a grey-mauve, chroma 7.98 where the
+# same three in paint give #6d8397 at 13.68, and it sits dE 2.0-2.8 from
+# STATUS["success-text"] under deuteranopia, which is to say the same colour.
+# A lab mix is the centroid of its ingredients, and those three sit round the
+# wheel, so their centroid is near grey.
 #
-# VIOLET ALONE WAS ALSO TRIED. accent-violet + gold + purple with no blue gives
-# #a885ae, dE 6.5 from STATUS["success-text"] -- too near the status purple to
-# separate from it. The blue is doing the work; the violet is why the blue has
-# a trace of red in it rather than reading as steel.
+# FOR THE FOUR AS PUBLISHED IT IS THE OTHER WAY ROUND. Hex, then CIELAB chroma:
 #
-# THE PURPLE EARNS ITS PLACE, MEASURED. Without it the mix lands at a = -10.12
-# and dE 17.2 from success-text under deuteranopia; with it, a = -2.35 and dE
-# 19.4. It pushes b further negative, and b is the axis that SURVIVES
-# deuteranopia -- so the ingredient chosen on taste also improved the one
-# number a red-green viewer depends on. Recorded because the reverse was the
-# expectation.
+#     steelblue, gold, purple, equal   paint #6d8397 13.68   lab #968e9b  7.98
+#     the four, equal                  paint #7787a2 16.26   lab #a08fb4 21.77
+#     the four, 2:6:1:2, the recipe    paint #5c82a9 24.97   lab #7e87b7 27.43
+#
+# With the violet in, lab keeps MORE chroma than paint and lands on a
+# periwinkle, a = +8.05, where paint lands on a blue, a = -2.51. This comment
+# said #968e9b came from "the same four ingredients" and that "the ingredient
+# list did not change between those two results; only the model did". The list
+# changed too. Paint is how this blue was made. That paint kept it from going
+# grey is measured for three ingredients and not for the four.
+#
+# VIOLET WITHOUT THE BLUE WAS ALSO TRIED. accent-violet + gold + purple at
+# 6:1:2 in paint -- the violet taking the blue's six parts -- gives #ad8ab3,
+# placed at L* 60.16 as #a885ae. That is dE 3.93 from STATUS["success-text"]
+# in CIEDE2000, this register's default; the 6.5 published here until
+# 2026-10-05 was CIE76 and did not say so. Too near the status purple to
+# separate from it on either metric. The blue is doing the work; the violet is
+# why the blue has a trace of red in it rather than reading as steel.
+#
+# WHAT THE PURPLE DOES, MEASURED AGAIN 2026-10-05, AND IT IS THE REVERSE OF
+# WHAT STOOD HERE. The earlier text set a = -10.12 "without" the purple against
+# a = -2.35 "with" it. The first figure is steelblue and gold alone at 6:2
+# (#518ba9, placed at L* 60.16 as #5f98b7): no violet either, and the gold
+# doubled. Removing ONLY the purple -- 2:6:1 in paint, #5589b5, placed at
+# L* 60.16 as #6396c3 -- gives
+#
+#     without the purple   #6396c3   a -4.52   b -28.52   dE 11.4-12.5
+#     the finished blue    #6f94bc   a -2.35   b -24.82   dE  9.7-10.9
+#
+# dE from success-text under deuteranopia. THE PURPLE MOVES a TOWARD RED BY
+# ABOUT 2.2 AND b TOWARD YELLOW BY ABOUT 3.7. "It pushes b further negative"
+# was wrong in sign, and the separation a red-green viewer depends on goes DOWN
+# with the purple in every simulation tried, by 1.6 to 1.8. The blue still
+# clears 8.40 in all of them. So the purple is in the recipe on taste, as this
+# comment always said, and the claim that a measurement also argued for it is
+# withdrawn. The expectation recorded on 2026-09-12 is what is measured.
+#
+# THE DEUTERANOPIA FIGURES ARE RANGES ACROSS THREE SIMULATIONS, because the one
+# used on 2026-09-12 was never recorded. This comment carried dE 2.5, 17.2 and
+# 19.4 with no simulation and no metric named; none of sixteen readings tried
+# returns all three, and they are withdrawn. The replacements are CIEDE2000,
+# truncated, under Vienot 1999, Machado 2009 and Brettel 1997 at full severity.
+# The instruments and the reasoning are in BRAND_COLORS.md, "Blue -- the second
+# hue"; this comment carries the figures and points there.
 #
 # ------------------------------------------------------------------------
 # WHY THIS IS A PAIR AND NOT A VALUE. There is no single colour that carries
