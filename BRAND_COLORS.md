@@ -3,7 +3,20 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
-Last locked: 2026-09-28 (rev 43 — **the resolver table was six rows short for the second time, one
+Last locked: 2026-10-05 (rev 44 — **the blues' account of their own making carried three figures from
+ingredient lists it did not name, and one conclusion the published recipe does not support.** Found
+by `rnv-color-mcp`, which reproduced both recipes on its engine and then tried the sentences beside
+them. `#968e9b`, recorded as the `lab` blend of *the same four ingredients*, is three of them — no
+violet. *Without the purple, a = −10.12* is steelblue and gold alone, with the gold doubled. **And
+*the purple earns its place, measured* is withdrawn:** with only the purple removed, the recipe
+gives a −4.52 and b −28.52 against the finished −2.35 and −24.82, so the purple moves b *toward*
+yellow and costs separation from `success-text` under every deuteranopia simulation tried. The blue
+clears 8.40 with it regardless. **Three ΔE figures *under deuteranopia* are withdrawn as
+unreproducible** — the simulation was never recorded and the engine has none — and replaced by
+ranges across three named simulations. **`#a885ae`'s *ΔE 6.5* was CIE76 in a register whose default
+is CIEDE2000**, and is 3.93 there. Every corrected string first appears in one commit, `3d34a3e`,
+so history does not say whether the account was written before the violet joined the recipe. **No
+value moves and neither recipe moves.** rev 43 — **the resolver table was six rows short for the second time, one
 day after the sentence declaring it complete, and rev 42 carried a figure this register had never
 measured.** `teal` and its five aliases were registered 2026-09-13; the Resolver vocabulary table
 never gained the row, and the paragraph beneath it — written 2026-09-12 to record the *previous*
@@ -353,16 +366,61 @@ reproduces on `rnv-color-mcp` v1.3.0** (per-channel Kubelka-Munk, reflectance cl
 truncating); a later paint model may not reproduce it byte-for-byte, and the registered values stand
 regardless — the mix is provenance, not a live formula.
 
-**`lab` mode was tried first and failed, and the failure is the interesting half.** An equal-weight
-`lab` blend of the same four ingredients gives `#968e9b` — a grey-mauve sitting ΔE 2.5 from
-`success-text` under deuteranopia, which is to say the same colour. Averaging in a perceptual space
-walks toward the centroid, and the centroid of four hues is grey. **The ingredient list did not
-change between those two results; only the model did.**
+**`lab` mode was tried first, and what it showed is narrower than this paragraph said until rev 44.**
+The colour recorded here as its failure, `#968e9b`, is an equal-weight `lab` blend of **three**
+ingredients — steelblue, brand gold and `STATUS["success"]`, with no violet. It is a grey-mauve,
+chroma 7.98 where the same three in `paint` give `#6d8397` at 13.68, and it sits ΔE 2.0–2.8 from
+`success-text` under deuteranopia, which is to say the same colour. A `lab` mix is the centroid of
+its ingredients, and those three sit round the wheel, so their centroid is near grey. **For the four
+as published it is the other way round:**
 
-**The purple earns its place, measured.** Without it the mix lands at a = −10.12 and ΔE 17.2 from
-`success-text` under deuteranopia; with it, a = −2.35 and ΔE 19.4. It pushes b further negative,
-and b is the axis that *survives* deuteranopia — so the ingredient chosen on taste improved the one
-number a red-green viewer depends on. Recorded because the opposite was expected.
+| Ingredients and weights | `paint` | `lab` |
+|---|---|---|
+| steelblue, gold, purple — equal | `#6d8397`, chroma 13.68 | `#968e9b`, chroma 7.98 |
+| the four — equal | `#7787a2`, chroma 16.26 | `#a08fb4`, chroma 21.77 |
+| the four — 2:6:1:2, the recipe | `#5c82a9`, chroma 24.97 | `#7e87b7`, chroma 27.43 |
+
+With the violet in, `lab` keeps *more* chroma than `paint` and lands on a periwinkle, a = +8.05,
+where `paint` lands on a blue, a = −2.51. This paragraph said `#968e9b` came from *the same four
+ingredients* and that *the ingredient list did not change between those two results; only the model
+did.* The list changed too. **`paint` is how this blue was made. That `paint` kept it from going
+grey is measured for three ingredients and not for the four.**
+
+**Violet without the blue was also tried.** `#b794ff`, gold and purple at 6:1:2 in `paint` — the
+violet taking the blue's six parts — give `#ad8ab3`, placed at L\* 60.16 as `#a885ae`. That is
+ΔE 3.93 from `success-text`, too near the status purple to separate from it. `engine/brand.py`
+published 6.5 for this until rev 44; that figure is CIE76 and did not say so.
+
+**What the purple does, measured again at rev 44 — and it is the reverse of what stood here.** The
+earlier text set a = −10.12 *without* the purple against a = −2.35 *with* it. The first figure is
+steelblue and gold alone at 6:2 (`#518ba9`, placed at L\* 60.16 as `#5f98b7`): no violet either,
+and the gold doubled, so three things differed between the two and the comparison said nothing
+about any one of them. Removing only the purple — 2:6:1 in `paint`, `#5589b5`, placed at L\* 60.16
+as `#6396c3` — gives:
+
+| | a | b | ΔE from `success-text` under deuteranopia |
+|---|---|---|---|
+| the recipe without its purple, `#6396c3` | −4.52 | −28.52 | 11.4 – 12.5 |
+| the finished blue, `#6f94bc` | −2.35 | −24.82 | 9.7 – 10.9 |
+
+**The purple moves a toward red by about 2.2 and b toward yellow by about 3.7.** *It pushes b
+further negative* was wrong in sign, and the separation a red-green viewer depends on goes *down*
+with the purple in every simulation tried, by 1.6 to 1.8. The blue still clears 8.40 in all of
+them. **So the purple is in the recipe on taste, as this paragraph always said, and the claim that
+a measurement also argued for it is withdrawn.** The expectation recorded on 2026-09-12 is what is
+measured.
+
+**The deuteranopia figures are ranges across three simulations, because the one used on 2026-09-12
+was never recorded.** This section carried ΔE 2.5, 17.2 and 19.4 with no simulation and no metric
+named. `rnv-color-mcp` has no colour-vision transform, and none of sixteen readings tried returns
+all three; the nearest single match is the finished blue, which reads 19.4 in CIE76 under Viénot on
+both instruments. They are withdrawn rather than repaired. **The replacements name their
+instrument:** Viénot 1999, Machado 2009 and Brettel 1997 at full severity, through DaltonLens 0.1.5,
+with the first two also run from this project's own matrices in linear light; then CIELAB, then
+CIEDE2000, truncated. The two instruments agree within 0.4 on every figure and on the order of every
+pair. A range is published because the simulations differ from each other by about one unit, which
+is more than a second decimal can carry. **The pair's other half, measured the same way:** `#456c91`
+sits 9.5–11.0 from `success-text-light`.
 
 **Why a pair and not a value.** 4.5:1 on `#1a1a1a` requires relative luminance ≥ 0.221484; on
 `#f5f5f5` it requires ≤ 0.164022. The intervals do not meet, and the best any single colour manages
@@ -1044,15 +1102,25 @@ compare **commits**, which is exact regardless of the version string.
 
 ### Interpolation is a perceptual-space question; mixture is a physical-model question
 
-The lab-mode failure that produced `#968e9b` was not the space — it was **averaging**. A two-colour
-ramp interpolates between two points, and the space's uniformity is exactly what is wanted. A
-four-colour mix takes a centroid, and **a centroid has no direction**; with four hues around the wheel
-it lands near the achromatic axis in any space. Kubelka-Munk did better because it is not an average
-at all — a subtractive absorption model, where the strongest absorber dominates rather than being
-diluted.
+The lab-mode result `#968e9b` was not the space — it was **averaging**. A two-colour ramp
+interpolates between two points, and the space's uniformity is exactly what is wanted. A mix of
+several colours takes a centroid, and **a centroid has no direction**: where the ingredients sit
+round the wheel it lands near the achromatic axis in any space, and where they do not, it does not.
+Kubelka-Munk is not an average at all — a subtractive absorption model, where the strongest absorber
+dominates rather than being diluted.
 
-**Two endpoints and a parameter want OKLab. Four pigments and a ratio want Kubelka-Munk.** The status
-family got the first right; the blue needed the second.
+**Corrected at rev 44.** This paragraph said *a four-colour mix* and *four hues around the wheel*,
+and that Kubelka-Munk *did better*. `#968e9b` is three ingredients — steelblue, gold, purple — and
+those three do surround the axis. The four as published do not: the violet pulls the centroid out,
+and `lab` keeps more chroma than `paint` at equal weights and at the recipe's own (the table is at
+"Blue — the second hue"). Placed at L\* 60.16, the recipe's `lab` result `#7e87b7` becomes
+`#868fbf` and sits 9.7–11.0 from `success-text` under deuteranopia, against the finished blue's
+9.7–10.9. **So for the published recipe the two models are not a pass and a fail. They are two
+colours, a periwinkle and a blue, and the blue is the one that was chosen.**
+
+**Two endpoints and a parameter want OKLab. Pigments and a ratio want Kubelka-Munk.** The status
+family got the first right. The blue was made with the second; what is measured for it is that the
+models differ in kind and in result, and not that one of them failed.
 
 ### `BRAND_TEAL` `#00b0a0` — a brand teal; inline code is its first role
 
