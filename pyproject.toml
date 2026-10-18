@@ -23,8 +23,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rnv-brand"
-version = "44.0.0"          # the register revision, so `pip show` answers "which rev?"
-description = "The RNVizion brand register: the colours, and the rules that derive them."
+version = "44.1.0"          # major = the color register revision, so `pip show` answers "which rev?"
+description = "The RNVizion brand register: the colors, the type and its font files, and the rules that derive them."
 requires-python = ">=3.10"
 dependencies = []           # deliberately none -- see the note above
 # NO `license` KEY, AND THAT IS THE DECISION, NOT AN OMISSION -- README.md,
@@ -39,10 +39,21 @@ dependencies = []           # deliberately none -- see the note above
 Homepage = "https://github.com/RNVizion/rnv-brand"
 
 [tool.setuptools]
-packages = ["engine"]
+# engine.fonts holds no Python. It is listed because Python treats any folder
+# inside a package as importable, and setuptools warns, which the build watch
+# turns red, when such a folder ships without being named here. Measured
+# 2026-10-18 on setuptools 84.0.0: one warning with it absent, none with it here.
+packages = ["engine", "engine.fonts"]
 
 [tool.setuptools.package-data]
 # py.typed marks the package as typed. The registers (BRAND_COLORS.md,
 # BRAND_TYPE.md) are NOT in the wheel: a consumer reads values from `engine`
 # and reads the reasoning in this repository, at the commit it pins.
+#
+# THE FONT FILES ARE, with each family's license beside them, because a
+# consumer serves them from where the wheel installed them: engine.fonts_dir().
+# The SIL Open Font License travels with the fonts by its own terms, and it is
+# the fonts' license, not this repository's. Added 2026-10-18, minor version 1:
+# the colors did not move, so the major did not.
 engine = ["py.typed"]
+"engine.fonts" = ["*.woff2", "OFL-*.txt"]

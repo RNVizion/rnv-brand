@@ -3,7 +3,16 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-09-28 (rev 11 — **one bullet described a page that stopped existing, and the
+Last locked: 2026-10-18 (rev 12 — **the brand's faces now ship with the brand.** Chris ruled on
+2026-10-18 that the files every surface draws are held here, in `engine/fonts/`, and reach a
+consumer through the pin that already brings it the colors. Two surfaces asked for it. The corpus
+demo drew Gradio's own font files, whose 600 weight holds 3 of the 95 printable ASCII characters,
+so its headings, its button and its bold text fell to the visitor's own device face; it takes the
+brand's body and code faces from here. The site asked Google for all five faces on every page; it
+moves to these files too, which is the Brand Architect's change to make. **Twenty-two `woff2`
+files, five licenses, and a guard at import** that fails by name when a file TYPE calls for is
+missing, when the folder holds one it does not, when a file is not a `woff2`, or when a family's
+license is gone. Broken six ways before it was trusted. See *The font files*. rev 11 — **one bullet described a page that stopped existing, and the
 count beside it had been wrong for a day before that.** `/aiii/` gained the site nav at
 `rnvizion.github.io@48228b7`, which is the event decision #18 anticipated — the mark drawn, the face
 requested, the comment retired — and this register's bullet went on saying the page carried no nav.
@@ -131,6 +140,50 @@ the repo or requested from a pinned font link, and drawable by both the web and 
 recorded where they appear because they describe the degraded state, not the intended one.
 
 **Five faces are yours.** Bricolage Grotesque, Montserrat, Instrument Serif, JetBrains Mono, Inter.
+
+---
+
+## The font files
+
+**Ruled 2026-10-18 by Chris: the brand's faces are served from files the brand holds.** They are
+in `engine/fonts/`, they ship in the wheel, and a consumer gets them at the commit it pins, the same
+way it gets the colors. Nothing is fetched from a font service at run time.
+
+**What is there.** One `woff2` file for every role, weight and style `TYPE` names, in two subsets,
+Latin and Latin Extended: Montserrat 900; Bricolage Grotesque as one variable file carrying weight
+and optical size, declared 300 to 800 as `TYPE` rules; Instrument Serif 400, roman and italic;
+JetBrains Mono 400, 500, 600 and 700; Inter 400, 500 and 600. Twenty-two files, about 520 KB in
+all, of which a page that draws only Latin text downloads only what it uses. Taken unchanged from
+Fontsource 5.3.0, which splits Google's files the same way and declares the same character ranges.
+
+**Measured 2026-10-18 with fontTools:** every Latin file holds all 95 printable ASCII characters.
+That is the failure this replaces, measured the same way: Gradio's 600-weight files hold 3.
+
+**The license travels with the files.** All five faces are under the SIL Open Font License 1.1, and
+none carries a Reserved Font Name. Each family's license text sits beside its files, as the license
+requires. It is the fonts' license; this repository's own is recorded in `README.md` as none.
+
+**How a consumer uses them.** `engine.brand.fonts_dir()` is the folder; `font_faces(url)` writes the
+`@font-face` rules for every file, given the URL the consumer serves that folder at; from a shell,
+`python engine/brand.py --font-faces <url>/` writes the same rules. The family names are `TYPE`'s
+own, so the `--rnv-font-*` tokens resolve to these faces with nothing else to set.
+
+**Guarded at import, and the guard's boundary is part of it.** `_font_files_match_type()` fails by
+name when a file `TYPE` calls for is missing, when the folder holds a file `TYPE` does not call for,
+when a file does not begin with the `woff2` signature, or when a family's license is missing. Broken
+six ways on 2026-10-18 and named each time, with the clean tree as the control. **It cannot see
+inside a font.** A file with the right name and the wrong glyphs passes, because reading glyphs
+needs a font parser and `engine/brand.py` is standard library only. The 95-of-95 measurement
+above is a dated reading, not a check.
+
+**What this does not fix.** At the corpus demo's own `.hf.space` address, opened as the top window,
+Gradio's Hugging Face header asks Google for two faces of its own. That request is Gradio's, made
+for Gradio's header, and no file here or setting in the demo removes it. The site's embed of the
+demo and the Hugging Face page do not make it.
+
+**Who takes them.** The corpus demo, for its body and code roles, by Chris's ruling of 2026-10-18;
+the site, by the same ruling, through the Brand Architect. **Until a surface serves these files,
+nothing draws them**, and this section says so rather than counting a ruling as a consumer.
 
 ---
 

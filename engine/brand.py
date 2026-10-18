@@ -1921,6 +1921,174 @@ TYPE = {
     "body":         {"family": "Inter",               "weights": (400, 500, 600)},
 }
 
+# ------------------------------------------------------------------- font files
+# THE BRAND'S FACES SHIP WITH THE BRAND. Ruled by Chris on 2026-10-18: the files
+# every surface draws live in engine/fonts/ and reach a consumer through the
+# same pin that brings it the colors. Before that ruling the site asked Google
+# for all five faces on every page, and the corpus demo drew Gradio's own files,
+# whose 600 weight held 3 of the 95 printable ASCII characters, so its headings,
+# its button and its bold text fell to the visitor's own device face.
+#
+# WHAT IS HERE AND WHERE IT CAME FROM. One woff2 file per role, weight, style
+# and subset that TYPE names, for two subsets, Latin and Latin Extended, taken
+# unchanged from Fontsource 5.3.0: @fontsource/inter, jetbrains-mono,
+# montserrat and instrument-serif, and @fontsource-variable/bricolage-grotesque's
+# `opsz` file, which carries both the wght and opsz axes. They are the files
+# Google Fonts serves, split the same way, and _FONT_RANGES below are the ranges
+# all five packages declare. Every Latin file was measured on 2026-10-18 with
+# fontTools: all 95 printable ASCII characters in each. No check here can repeat
+# that measurement, because it needs a font parser and this file is standard
+# library only. A character outside both subsets falls to the next face in the
+# consumer's list, as it did from Google.
+#
+# THE LICENSE TRAVELS WITH THE FILES. All five faces are under the SIL Open Font
+# License 1.1, none with a Reserved Font Name. It permits bundling and
+# redistribution as long as its text goes with the fonts, so each family's text
+# is in engine/fonts/ beside its files and in the wheel beside them. That is the
+# fonts' license. It says nothing about this repository's own, which README.md
+# records as none.
+#
+# A FILE IS NAMED FOR WHAT IS IN IT, the way Fontsource names it:
+# <stem>-<subset>-<weight>-<style>.woff2, and for the variable face
+# <stem>-<subset>-opsz-<style>.woff2. font_files() derives every name from TYPE,
+# so a weight added to TYPE without its file fails at import, below.
+_FONT_STEMS = {
+    "Montserrat": "montserrat",
+    "Bricolage Grotesque": "bricolage-grotesque",
+    "Instrument Serif": "instrument-serif",
+    "JetBrains Mono": "jetbrains-mono",
+    "Inter": "inter",
+}
+
+_FONT_LICENSES = {
+    "Montserrat": "OFL-Montserrat.txt",
+    "Bricolage Grotesque": "OFL-Bricolage-Grotesque.txt",
+    "Instrument Serif": "OFL-Instrument-Serif.txt",
+    "JetBrains Mono": "OFL-JetBrains-Mono.txt",
+    "Inter": "OFL-Inter.txt",
+}
+
+# Latin Extended first, as Google and Fontsource order them. Three code points
+# (U+0304, U+0308, U+0329) are in both ranges, and a browser takes the face
+# declared last, so the Latin file draws them.
+_FONT_RANGES = {
+    "latin-ext": (
+        "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,"
+        "U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,"
+        "U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF"
+    ),
+    "latin": (
+        "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,"
+        "U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,"
+        "U+FEFF,U+FFFD"
+    ),
+}
+
+
+def fonts_dir():
+    """The folder that holds the brand's font files and their licenses.
+
+    A consumer serves this folder, or copies it, and passes the URL it is served
+    at to font_faces(). Inside an installed wheel it is the installed folder.
+    """
+    import pathlib
+    return pathlib.Path(__file__).resolve().parent / "fonts"
+
+
+def font_files() -> list[dict]:
+    """Every font file TYPE calls for, in the order font_faces() declares them.
+
+    One entry per family, style, weight and subset: `family`, `style`, `weight`
+    (a number, or "300 800" for the variable face), `subset`, `file`.
+    """
+    out = []
+    for spec in TYPE.values():
+        family = spec["family"]
+        stem = _FONT_STEMS[family]
+        styles = ("normal", "italic") if 1 in spec.get("ital", (0,)) else ("normal",)
+        if spec.get("variable"):
+            lo, hi = spec["weights"]
+            # The opsz file, because TYPE gives this face an opsz range.
+            axis = "opsz" if "opsz" in spec else "wght"
+            weights = [(f"{lo} {hi}", axis)]
+        else:
+            weights = [(str(w), str(w)) for w in spec["weights"]]
+        for style in styles:
+            for weight, token in weights:
+                for subset in _FONT_RANGES:
+                    out.append({
+                        "family": family,
+                        "style": style,
+                        "weight": weight,
+                        "subset": subset,
+                        "file": f"{stem}-{subset}-{token}-{style}.woff2",
+                    })
+    return out
+
+
+def font_faces(url_prefix: str) -> str:
+    """@font-face rules for every brand face, with files served at `url_prefix`.
+
+    `url_prefix` is where the consumer serves fonts_dir(), ending in "/". The
+    families are TYPE's own strings, so the font tokens emit_css() writes
+    resolve to these faces with nothing else to configure.
+    """
+    if not url_prefix.endswith("/"):
+        raise ValueError("url_prefix must end in '/', the folder the files are served from")
+    rules = []
+    for f in font_files():
+        rules.append(
+            "@font-face {\n"
+            f'  font-family: "{f["family"]}";\n'
+            f'  font-style: {f["style"]};\n'
+            f'  font-weight: {f["weight"]};\n'
+            "  font-display: swap;\n"
+            f'  src: url("{url_prefix}{f["file"]}") format("woff2");\n'
+            f'  unicode-range: {_FONT_RANGES[f["subset"]]};\n'
+            "}"
+        )
+    return "\n".join(rules) + "\n"
+
+
+def _font_files_match_type():
+    """The font folder holds exactly what TYPE calls for, and each family's license.
+
+    RUNS AT IMPORT, like the color guards above. Fails, rather than skipping,
+    when the folder cannot be read: a guard that cannot look has checked nothing.
+    It checks names, the woff2 signature and the license files. It cannot check
+    what is inside a font; see the note above font_files().
+    """
+    folder = fonts_dir()
+    try:
+        present = {p.name for p in folder.iterdir()}
+    except OSError as exc:
+        raise AssertionError(
+            f"_font_files_match_type() cannot read {folder} ({exc}). The brand's "
+            f"fonts ship in engine/fonts/; a copy of brand.py without that folder "
+            f"is not the brand."
+        )
+    wanted = {f["file"] for f in font_files()}
+    licenses = {_FONT_LICENSES[spec["family"]] for spec in TYPE.values()}
+    missing = sorted((wanted | licenses) - present)
+    extra = sorted(present - wanted - licenses)
+    if missing:
+        raise AssertionError(
+            "TYPE calls for font files engine/fonts/ does not have: " + ", ".join(missing)
+            + ". Add each file and its family's license in the same change as the TYPE entry."
+        )
+    if extra:
+        raise AssertionError(
+            "engine/fonts/ holds files TYPE does not call for: " + ", ".join(extra)
+            + ". Remove them, or add the role, weight or style to TYPE."
+        )
+    for name in sorted(wanted):
+        with open(folder / name, "rb") as fh:
+            if fh.read(4) != b"wOF2":
+                raise AssertionError(f"engine/fonts/{name} is not a woff2 file.")
+
+
+_font_files_match_type()
+
 # ---------------------------------------- resolver contract (rnv-color-mcp)
 # The documented MCP interface (BRAND_COLORS.md, "Resolver vocabulary"):
 # the color server imports RNV_BRAND; RNV names win over CSS names on
@@ -2391,5 +2559,11 @@ if __name__ == "__main__":
         i = sys.argv.index("--css")
         surface = sys.argv[i + 1] if len(sys.argv) > i + 1 else "web"
         sys.stdout.write(emit_css(surface))
+    elif "--font-faces" in sys.argv:
+        i = sys.argv.index("--font-faces")
+        if len(sys.argv) <= i + 1:
+            sys.exit("usage: brand.py --font-faces <URL the fonts folder is served at, ending in />")
+        sys.stdout.write(font_faces(sys.argv[i + 1]))
     else:
-        sys.exit("usage: python engine/brand.py --css [web|app|records] > tokens.css")
+        sys.exit("usage: python engine/brand.py --css [web|app|records] > tokens.css\n"
+                 "       python engine/brand.py --font-faces <url-of-fonts-folder/> > fonts.css")
