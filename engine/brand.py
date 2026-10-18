@@ -76,12 +76,19 @@ identifier across its own repos is not positioned to align anyone else's.
 # notation and stops catching a regression.
 #
 # TWO CAVEATS, both of which decide scope before comparator. Roughly fifty
-# capitalised values survive OUTSIDE the five colour files -- arbitrary test
-# fixtures, plus six instances of a value this file does define, all in test
-# files. So a guard scoped to the colour sources can compare exactly and start
-# clean; one folded into a whole-repo walk cannot. And the apps are slated to
-# move their colour definitions into a single colors.py per repo, so the
-# file-to-repo map a guard would enumerate today is temporary.
+# capitalised values survived OUTSIDE the five colour files when this was
+# written -- arbitrary test fixtures, plus six instances of a value this file
+# does define, all in test files. So a guard scoped to the colour sources could
+# compare exactly; one folded into a whole-repo walk cannot. The apps were then
+# slated to move their colour definitions into one file per repo, and on
+# 2026-10-18 they did: every app keeps its colours, palettes included, in
+# utils/colors.py, which its brand_map.json names as `color_file`. A guard now
+# reads one path per app. MEASURED THAT DAY, A GUARD SCOPED THAT WAY WOULD NOT
+# START CLEAN: six capitalised values sit in two apps' colour files, every one
+# marked app-owned -- five history samples in rnv-color-mixer and one pattern
+# example in rnv-text-transformer. Whether app-owned sample data is held to the
+# notation rule is the apps' question, and it is routed. Outside the colour
+# files, the Python of the five apps held 34 that day.
 #
 # NOTHING CAUGHT THE DAY THE TWO SIDES DISAGREED. Not a checker failure -- no
 # checker was ever pointed at notation. Same shape as type before R2.
@@ -1388,7 +1395,9 @@ RECORDS = {
 #
 # WHY BOOTSTRAP AND NOT MATERIAL: three applications already shipped Bootstrap's
 # values in source -- rnv-color-picker (utils/config.py), rnv-icon-builder
-# (ui/colors.py), rnv-text-transformer (utils/dialog_styles.py). Choosing the
+# (ui/colors.py), rnv-text-transformer (utils/dialog_styles.py). Those are the
+# files they were in on 2026-08-13; since 2026-10-18 every app keeps its colours
+# in utils/colors.py. Choosing the
 # set that reality already holds moves one dict in one file and no pixel
 # anywhere. Choosing Material would have made three apps wrong on the day it
 # landed, each fix in someone else's repository. Warning was never in dispute:

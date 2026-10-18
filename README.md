@@ -36,8 +36,8 @@ A value is stated once, here. `BRAND_COLORS.md` points at it rather than restati
 
 ## The rules
 
-- **Six values are permanent** — gold `#d2bc93`, dark gold `#b19145`, true black `#000000`,
-  charcoal `#1a1a1a`, web near-black `#0a0a0f`, white `#ffffff`. A color is permanent if the
+- **The permanent values are `PERMANENT` in `engine/brand.py`**, and this file does not list or
+  count them: it said six until 2026-10-18, when the dict held ten. A color is permanent if the
   brand will use it again on any medium, including a printed one.
 - **Gold on dark, dark gold on light.** Dark gold is additionally gold's shade on dark, where
   full gold is too loud.
