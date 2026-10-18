@@ -119,7 +119,7 @@ jobs:
       # bitten once. A complete drop-in built from a stale base once overwrote
       # profile.json and erased role_emails entirely: the JSON stayed valid, the
       # checker ran clean, and two domain addresses simply stopped being
-      # recognised. Nothing failed. It was caught because a human noticed the
+      # recognized. Nothing failed. It was caught because a human noticed the
       # version had gone backwards -- 1.2.3 where 1.2.4 had been twenty minutes
       # earlier. That is not a control, it is luck with good timing.
       #

@@ -3,6 +3,11 @@
 The register of RNVizion's **permanent** colors. Machine source: `engine/brand.py`
 (import from there; never hardcode). This doc is the human-readable explanation.
 
+**Spelling only, 2026-10-18, not a revision.** British spellings in this file became American by
+Chris's ruling of that day, from a reviewed word list: *colour* to *color*, *grey* to *gray*, and
+the rest. No value, figure or ruling moved, so the revision did not, and `pyproject.toml`'s major
+did not. Two quotations of earlier text keep the spelling they were written in.
+
 Last locked: 2026-10-05 (rev 44 — **the blues' account of their own making carried three figures from
 ingredient lists it did not name, and one conclusion the published recipe does not support.** Found
 by `rnv-color-mcp`, which reproduced both recipes on its engine and then tried the sentences beside
@@ -24,7 +29,7 @@ six-row shortfall — went on saying *it is now complete*. Found by `rnv-color-m
 against its own mirror. **The claim is now a check:** `verify_resolver_table` compares the table
 with `RNV_BRAND` on every facts pass, both directions and by value, and failed six times by name
 before the row landed. **And the ruling on the collisions:** `gold`, `blue` and `teal` all stay bare
-— they are brand colours, set in the brand the way the gold is — and the prose above the table now
+— they are brand colors, set in the brand the way the gold is — and the prose above the table now
 names all three, with the `css:` escape for each. **The figure:** rev 42 said it takes *roughly
 fifty times* the recipe's gold to lift the teal's red channel off zero. It takes four — 8:24, gold
 three to one over the teal stage — and red reaches only 1 of 255 there. Measured on the live engine
@@ -43,9 +48,9 @@ is recorded as the model's doing rather than the pigments'. **Notation gains eig
 decided here:** `blue` and `teal` shadow CSS names the way `gold` does, and only `gold` is recorded
 as deliberate. rev 41 — **the consumer that asked for the ordinal ruling is not using it,
 and two exemption reasons expired while their guards passed.** The picker's rating scale is
-categorical by intent — four hues meant to be *learned* so colour eventually rides alone — so the
+categorical by intent — four hues meant to be *learned* so color eventually rides alone — so the
 ruling was answered correctly and asked about the wrong thing. It stands, unused, and the status
-family stays untouched. **Recorded with it: a colour trained to carry meaning alone inherits an
+family stays untouched. **Recorded with it: a color trained to carry meaning alone inherits an
 obligation its redundant version did not have**, because the strategy's success condition is when the
 word comes off. **`_PERMANENT_NOT_EMITTED` said *"no surface consumes it yet"* for two values an
 application had bound since the day they were registered** — emission and consumption are different
@@ -56,28 +61,28 @@ register put it there.** *"About 31 points dark and 25 light"* came from a note,
 rather than re-derived, and was produced by multiplying one step by three — but **`SL` makes the same
 Δ`L*` worth less as lightness rises**, so the true spans are ~35 and ~33. The rule is now the sizing
 method rather than a number: **size each gap against the bar at its own lightness.** Two further
-corrections: **measure the separation on the simulated greys, not the colours** — the worked example
-reads 8.64 on its top gap in colour and **6.58** in grey, so measuring the colours flatters it — and
+corrections: **measure the separation on the simulated grays, not the colors** — the worked example
+reads 8.64 on its top gap in color and **6.58** in gray, so measuring the colors flatters it — and
 **the serial-reading argument for a thinner ramp inverts**, since identification from memory needs
 more separation than side-by-side discrimination. The achromatopsia model is named. rev 39 — **an ordinal set is one hue at N lightnesses, assigned from rank.**
 The status text rule produces iso-lightness by construction — `L*` is set by the ground, not the hue —
 and now says so; six values sit inside 0.50 `L*` on dark. **A four-tier scale built from them ranked
-in words and not in colour**, reading as one grey under achromatopsia. **Neither a re-walk nor new
+in words and not in color**, reading as one gray under achromatopsia. **Neither a re-walk nor new
 values:** the status family is categorical and forcing it onto a ramp would impose an order that does
 not exist, and the construction already exists here unnamed. Chroma follows the gamut; only hue is
 held. rev 38 — **the published blue derivation did not reproduce the published
 blue.** It recorded the lightnesses the finished hexes *measure* rather than the ones requested, and
 re-deriving from them returns `#456c92` against a shipped `#456c91`. **Publish what was requested;
 the achieved value is a measurement of the result, not a step in the recipe.** Corrected to L\* 60.16
-and 44.17. **And *"Same a, same b"* is corrected to *within the quantisation of 8-bit hex*** — it sat
+and 44.17. **And *"Same a, same b"* is corrected to *within the quantization of 8-bit hex*** — it sat
 three lines under a table showing those figures differing by 0.41 and 0.23. No value moves. rev 37 — **`BRAND_WEB_CODE` is renamed `BRAND_TEAL`, one day old, and the
 `PERMANENT` key follows it to `teal`.** The value, the emitted token and every resolver key are
 unchanged — `web-code` still answers. **The original name came off the `web-black` precedent, which
 matched structurally and not semantically:** `web-black` is blue-lifted where app neutrals are pure
-grey, so it genuinely is a black *for the web*; this is a base that can anchor a ramp, and rev 36's
-own ruling says a first role does not confine a colour to a surface. **A constant naming a role reads
+gray, so it genuinely is a black *for the web*; this is a base that can anchor a ramp, and rev 36's
+own ruling says a first role does not confine a color to a surface. **A constant naming a role reads
 as off-limits elsewhere no matter what the comment says**, and the fashion app consumes this resolver.
-rev 36 — **the definition of a brand colour is corrected, and the count is
+rev 36 — **the definition of a brand color is corrected, and the count is
 now spelled nowhere.** Brand and permanent mean the same thing; the line is **base versus derived**,
 not identity-wide versus surface-specific, so *"platform convenience"* leaves the exclusion list — it
 excluded the exact category `web-code` belongs to. **The count was spelled twice, at six and nine
@@ -85,7 +90,7 @@ against a dict of ten**, four hundred lines apart, with the remedy *"spell it on
 lines above one of them. A remedy in prose is not a remedy applied:
 `_permanent_count_is_not_spelled()` now enforces it, and two failures in building that guard are
 recorded at it. rev 35 — **`web-code` `#00b0a0` is registered and inline code stops
-borrowing the accent.** Tenth permanent, on the `web-black` precedent — `PERMANENT` names the colour,
+borrowing the accent.** Tenth permanent, on the `web-black` precedent — `PERMANENT` names the color,
 `WEB["code"]` names the role, `--rnv-code` is emitted, four resolver keys. Mixed in **paint** mode
 from `BRAND_BLUE` and `BRAND_GOLD`, both stages byte-identical against this register's own mixer. The
 gold it replaces reads 9.3098 on the chip against this value's 6.3277 — **a step down in contrast
@@ -101,7 +106,7 @@ question. rev 33 — **registration and emission are ruled as two different acts
 and `BRAND_DARK_BLUE` `#456c91` are permanent, mixed in `paint` mode from the web violet, a steel
 blue, brand gold and `STATUS["success"]`, and placed at the status family's own two lightnesses.
 **They enter as a pair because no single value can carry text on both grounds** — 4.5:1 on
-`#1a1a1a` needs Y ≥ 0.221484 and on `#f5f5f5` needs Y ≤ 0.164022, and the best any colour manages
+`#1a1a1a` needs Y ≥ 0.221484 and on `#f5f5f5` needs Y ≤ 0.164022, and the best any color manages
 on both at once is 3.9954:1. **Four statements in this file were publishing the retired `#b19145`
 as current**, including the resolver contract table, and are corrected in the same change; the
 value moved in rev 16 and the prose did not follow. rev 31 — **the three light text variants are re-walked against `#e8e8e8`,
@@ -120,9 +125,9 @@ day. It was safe only by accident: the RNV fills are mid-tones by design. **And 
 describes one subject** — the stream — while a folder watcher is a signal by this register's own test
 with no value here. Not registered: one live paint site in five apps does not earn a brand value. The
 four things a registration would have to settle are enumerated, and the trigger is a second consumer
-rather than a date. rev 29 — **the error source is re-dialled inside sRGB and the correction
+rather than a date. rev 29 — **the error source is re-dialed inside sRGB and the correction
 runs through the whole chain.** `#ff008f` was a per-channel clip of a coordinate outside the gamut,
-and the clip **moved the hue** — it sat at h 357.2 against the 359 that was dialled, with two
+and the clip **moved the hue** — it sat at h 357.2 against the 359 that was dialed, with two
 channels on rails. Corrected by holding L and h and reducing chroma to C 84: **`#fe0f8a`, interior,
 no channel on a rail**, so the coordinate resolves identically in sRGB, P3 and print. The fill moves
 one byte to `#c75b64` and both error text variants are re-derived from it rather than left as
@@ -171,7 +176,7 @@ unknowns, and the crossing always lands on whatever ground you fed it. rev 22 �
 registered, and the light hover plate is settled at `#e8e8e8`.** `APP` gains `canvas` `#0a0a0a`,
 `panel-hover` `#3a3a3a` and `hover-light` `#e8e8e8`; no existing value moved. **A correction from
 this side is recorded rather than quietly dropped:** rev 21 called the dark ladder "two-thirds
-specified" on the grounds that `border` `#333333` is not a rung — it is `grey(3)` on the ink grid,
+specified" on the grounds that `border` `#333333` is not a rung — it is `gray(3)` on the ink grid,
 an edge rather than a surface, and was never part of this ladder. The wrong reading is what sent the
 app side hunting a gap that did not exist. rev 21 — **three rulings out of the ink-grid rollout, and two of them
 came from applying the grid rather than from looking for defects.** **Coincidence is permitted and
@@ -182,10 +187,10 @@ families. **`#d0d0d0` is retired as a light interaction ground**, found independ
 and settled at the value rather than at either dialog. **And the light-surface ladder is NOT ruled
 here** — the anchor offered for it does not hold, and the reason is in the ramp section below.
 rev 20 — **the ink grid is ruled and `APP["text"]` moved onto it.**
-`grey(n) = n * 0x11`; every ink and every edge lands on a step, in both modes, with no exceptions.
+`gray(n) = n * 0x11`; every ink and every edge lands on a step, in both modes, with no exceptions.
 `#e0e0e0` was the single exception and it was **one hex doing two jobs** — ink in dark mode, a light
 surface elsewhere — which is why it would not sit on a grid that governs inks. The ink half is now
-`grey(13)` `#dddddd`; the surface half keeps `#e0e0e0` and the two contrast rows below are
+`gray(13)` `#dddddd`; the surface half keeps `#e0e0e0` and the two contrast rows below are
 unchanged. **The grid's scope is stated with the grid:** it governs inks and edges and never
 surfaces, because `APP["panel"]` is `BRAND_BLACK` at n = 1.53 and a permanent does not move to fit a
 ladder. rev 19 — **three corrections, and in two of them this register was the
@@ -195,13 +200,13 @@ identifiers, which is the unpublished-derivation failure recurring in another fa
 as `STATUS["error-text-light"]`. **The hover-gold rename is reverted at source**: `BRAND_HOVER_GOLD`
 retired an identifier in five of six repositories, 43 occurrences, and left the light-mode
 counterpart unspellable — `BRAND_GOLD_HOVER`, which this register never stopped publishing, was
-right. And `still-gold` was a permanent colour the brand's own resolver refused for a day; the
+right. And `still-gold` was a permanent color the brand's own resolver refused for a day; the
 resolver keys and an import-time completeness guard both landed. rev 18 — **stamp dates in this file are the clock of the commit that
 shipped the subject, with the short SHA beside them.** An earlier pass re-dated every 2026-08-17
 stamp to "today" on the belief that nothing happened that day. **Seven commits carry it**, and the
 gold value change demonstrably shipped in `1003a6c` on it. Corrected per stamp against
 `git log -S`, which is the only witness that does not depend on anyone's memory. — **the ring stopped being chrome, and a claim in this register
-stopped being true with it.** It was gold in every state and therefore signalled nothing; on
+stopped being true with it.** It was gold in every state and therefore signaled nothing; on
 `rnv-live` it is now stateful across three states, so *"identical in all states"* is retired and the
 four-channel table replaces it. **Three of the four channels order and the fill cannot** — it carries
 hue identity rather than intensity, so live's fill is the dimmest of the three, and claiming
@@ -211,7 +216,7 @@ stream being prepped *and* a partial outage. Values unchanged. **Every figure he
 rounded** — see the note under the contrast table. rev 17 — **the derivation rule is published, and a hole is named.** Three
 applications derived `-14` from the same base independently; `rnv-color-picker` pointed out that
 **three apps agreeing is luck, not design**, and that an unpublished derivation permits four *values*
-for one colour — worse than four names, because a wrong value is invisible in a diff.
+for one color — worse than four names, because a wrong value is invisible in a diff.
 `engine/brand.py` now carries `lighten()` and both derivatives with their walks. **Dark-mode pressed
 is recorded as OPEN**, since the two apps disagree and it is a design question rather than a
 measurement. **And the light-mode error text is now published** as `STATUS["error-text-light"]` `#c82131`: `#dc3545` reads 4.1528 on a light panel, and
@@ -236,12 +241,12 @@ site and ~10.7:1 to **~6.3:1** on `rnv-live`, both at 1x. Aligning rather than d
 sameness is the stated justification for a sub-floor fill, and a tracked mismatch becomes
 intentional by age. Carried as a `[confirm/fill]`, since the value is unverified below 3x. Also
 records a defect: the hero dot had been an ellipse at every viewport width, squeezed by flex,
-through three passes of work on this same component — every one of which was about colour.
+through three passes of work on this same component — every one of which was about color.
 Rev 13 — **third revision on this date; the sequence is in the rev
 number, not the stamp.** Lands `signal-live` at `#a5034e` and moves the fill's ratio to 2.43:1;
 retires "wine" as a descriptor for the current value. Repairs a blind pass that ran over rev 12
 and hit only the sentences that are *about* hex case: three mentions of `#FFC107` lowercased into
-meaninglessness, the `#8B2C3B`/`#8b2c3b` illustration replaced with two different colours, and the
+meaninglessness, the `#8B2C3B`/`#8b2c3b` illustration replaced with two different colors, and the
 one line that actually stated a value left carrying a retired one. **A find-and-replace cannot
 tell a mention from a use.** Rev 12 — the signal dot's ring was decoupled from its fill on both
 surfaces, so the ring no longer dims and the dim-end contrast figure in the signal section is
@@ -252,7 +257,7 @@ now stands on parity rather than on the accessibility floor that originally set 
 a document that no longer existed. A dated header is the only thing that surfaces a stale-base
 clobber, and it cannot do that job while it is itself behind. Rev 11 closes the signal ruling:
 `rnvizion.dev` landed the change, so both surfaces are clean and `#4ade80` is gone from the
-ecosystem rather than merely retired at the source. Normalises `#8b2c3b` to lowercase, the case
+ecosystem rather than merely retired at the source. Normalizes `#8b2c3b` to lowercase, the case
 hazard this file already names about `#FFC107`. Retires the typography block (R3) — it was not
 merely redundant with Brand Book §3.2, it stated three facts that §3.2 had already retired.
 Rev 10 — the two-dark rule re-derived from measurement after the
@@ -267,7 +272,7 @@ name; that citation now resolves. Adds the three-artifact ownership split and re
 ramp tables as dated census evidence rather than value listings, so this file points at the
 machine source instead of restating it. Rev 7 named the warm register **Records** and settled
 its routing rule; rev 6 published its steps as derived canon. Rev 5 settled the
-two golds and their usage split. Rev 4 restructured this document from a usage catalogue
+two golds and their usage split. Rev 4 restructured this document from a usage catalog
 into a register of permanent colors; revs 1–3 predate that shape.)
 
 ---
@@ -303,7 +308,7 @@ A color is **not** a brand color if it is any of the following:
 | **Platform convention** | An OS or framework's semantic color, left alone deliberately because it fits | Selection blue `#0078d4`; Material and Bootstrap status colors |
 | **Tool primitive** | Color math the software needs, not design | `#ff0000`, `#00ff00`, `#0000ff` |
 | **Modulation** | Derived from a permanent color by opacity, lift, drop, tint, or mix | Scrollbar handles, hovers, pressed states, image-mode alphas |
-| **Product decision** | Which permanent color a given surface uses where | Whether a panel is white or grey in one app's light theme |
+| **Product decision** | Which permanent color a given surface uses where | Whether a panel is white or gray in one app's light theme |
 
 **This is why the list is short.** A census across seven surfaces turned up roughly sixty
 distinct hex values. Six are permanent. The rest are ramp steps, alphas, platform semantics,
@@ -367,11 +372,11 @@ truncating); a later paint model may not reproduce it byte-for-byte, and the reg
 regardless — the mix is provenance, not a live formula.
 
 **`lab` mode was tried first, and what it showed is narrower than this paragraph said until rev 44.**
-The colour recorded here as its failure, `#968e9b`, is an equal-weight `lab` blend of **three**
-ingredients — steelblue, brand gold and `STATUS["success"]`, with no violet. It is a grey-mauve,
+The color recorded here as its failure, `#968e9b`, is an equal-weight `lab` blend of **three**
+ingredients — steelblue, brand gold and `STATUS["success"]`, with no violet. It is a gray-mauve,
 chroma 7.98 where the same three in `paint` give `#6d8397` at 13.68, and it sits ΔE 2.0–2.8 from
-`success-text` under deuteranopia, which is to say the same colour. A `lab` mix is the centroid of
-its ingredients, and those three sit round the wheel, so their centroid is near grey. **For the four
+`success-text` under deuteranopia, which is to say the same color. A `lab` mix is the centroid of
+its ingredients, and those three sit round the wheel, so their centroid is near gray. **For the four
 as published it is the other way round:**
 
 | Ingredients and weights | `paint` | `lab` |
@@ -384,7 +389,7 @@ With the violet in, `lab` keeps *more* chroma than `paint` and lands on a periwi
 where `paint` lands on a blue, a = −2.51. This paragraph said `#968e9b` came from *the same four
 ingredients* and that *the ingredient list did not change between those two results; only the model
 did.* The list changed too. **`paint` is how this blue was made. That `paint` kept it from going
-grey is measured for three ingredients and not for the four.**
+gray is measured for three ingredients and not for the four.**
 
 **Violet without the blue was also tried.** `#b794ff`, gold and purple at 6:1:2 in `paint` — the
 violet taking the blue's six parts — give `#ad8ab3`, placed at L\* 60.16 as `#a885ae`. That is
@@ -412,7 +417,7 @@ measured.
 
 **The deuteranopia figures are ranges across three simulations, because the one used on 2026-09-12
 was never recorded.** This section carried ΔE 2.5, 17.2 and 19.4 with no simulation and no metric
-named. `rnv-color-mcp` has no colour-vision transform, and none of sixteen readings tried returns
+named. `rnv-color-mcp` has no color-vision transform, and none of sixteen readings tried returns
 all three; the nearest single match is the finished blue, which reads 19.4 in CIE76 under Viénot on
 both instruments. They are withdrawn rather than repaired. **The replacements name their
 instrument:** Viénot 1999, Machado 2009 and Brettel 1997 at full severity, through DaltonLens 0.1.5,
@@ -423,7 +428,7 @@ is more than a second decimal can carry. **The pair's other half, measured the s
 sits 9.5–11.0 from `success-text-light`.
 
 **Why a pair and not a value.** 4.5:1 on `#1a1a1a` requires relative luminance ≥ 0.221484; on
-`#f5f5f5` it requires ≤ 0.164022. The intervals do not meet, and the best any single colour manages
+`#f5f5f5` it requires ≤ 0.164022. The intervals do not meet, and the best any single color manages
 on both at once is **3.9954:1**. This is arithmetic, not a search that gave up. The gold family and
 `STATUS` already answer it with two values each; the blue is the third, and the first to have the
 reason written down here rather than rediscovered.
@@ -454,10 +459,10 @@ floor is `#f5f5f5`, where it has room.
 rule across.
 
 **It is permanent because the brand adopted it.** The rule recorded on 2026-09-04 — that a *role*
-colour is registered on a second consumer rather than a date — governs roles, not permanence. Gold
+color is registered on a second consumer rather than a date — governs roles, not permanence. Gold
 did not wait for a second consumer either. **And it is not a platform blue:** this file excludes
 `#0078d4` by name, and the distinction is provenance rather than hue. `#0078d4` is Windows'
-selection colour, adopted because it was there; this one is mixed from colours the register already
+selection color, adopted because it was there; this one is mixed from colors the register already
 owns. Two values can sit a few degrees apart on the wheel and belong to different categories.
 
 **`#b794ff`'s own permanence remains open** and this does not settle it — see "Canonical usage"
@@ -508,10 +513,10 @@ sits on `#0a0a0f`. Collapsing the darks re-renders all of them.
 ### The ink grid, ruled 2026-08-28
 
 ```
-grey(n) = n * 0x11,  n in 0..15      TRUE_BLACK -> WHITE in fifteen steps
+gray(n) = n * 0x11,  n in 0..15      TRUE_BLACK -> WHITE in fifteen steps
 ```
 
-**Every ink and every edge lands on `grey(n)`, in both modes, with no exceptions.**
+**Every ink and every edge lands on `gray(n)`, in both modes, with no exceptions.**
 
 | role | key | value | n |
 |---|---|---|---|
@@ -519,13 +524,13 @@ grey(n) = n * 0x11,  n in 0..15      TRUE_BLACK -> WHITE in fifteen steps
 | ink | `APP["text-dim"]` | `#aaaaaa` | 10 |
 | edge | `APP["border"]` | `#333333` | 3 |
 
-**Primary text is one role with two mode values:** dark is a grey on the ink grid, light is
+**Primary text is one role with two mode values:** dark is a gray on the ink grid, light is
 `TRUE_BLACK`. Already true in all five apps with no app disagreeing — it had simply never been
 written down, which is why it read as a question rather than a rule.
 
 **THE GRID GOVERNS INKS AND EDGES. IT DOES NOT GOVERN SURFACES AND IT NEVER CAN.** `APP["panel"]` is
 `BRAND_BLACK` `#1a1a1a` at n = 1.53 and `APP["card"]` is `#2a2a2a` at n = 2.47. **`BRAND_BLACK` is a
-permanent brand colour and will not move to fit a ladder.** The scope is stated here rather than
+permanent brand color and will not move to fit a ladder.** The scope is stated here rather than
 discovered by whoever extends the grid to surfaces and finds a permanent in the way — the same
 failure as a coverage boundary that decays, arriving in a ramp.
 
@@ -537,7 +542,7 @@ defensible alone.
 **The value was one hex doing two unrelated jobs.** Ink in dark mode; a light **surface** in the
 apps' light palettes and in this register's own contrast tables below. It refused to sit on the grid
 because **the grid governs inks and half its uses were not ink.** Split the roles and both halves
-land — the ink half becomes `grey(13)`, the surface half keeps `#e0e0e0` and does not move. **The
+land — the ink half becomes `gray(13)`, the surface half keeps `#e0e0e0` and does not move. **The
 two contrast rows further down are about the surface and stand unchanged.**
 
 | ground | before | after |
@@ -576,7 +581,7 @@ arithmetic is right and **`#0a0a0a` is not a value this brand holds.** The canva
 
 **Inversion anchors exactly one value in use, and it is `#ffffff`.** `#f5f5f5` looked anchored
 because `#0a0a0a` is one byte from the canvas in the blue channel alone. That is a coincidence with a
-colour the brand does not hold, and building a ladder on it would pin fifteen uses to a value nothing
+color the brand does not hold, and building a ladder on it would pin fifteen uses to a value nothing
 in the register defines.
 
 **The dark ladder that was offered as the model is also not published.** `BRAND_BLACK ± 0x10` gives
@@ -594,7 +599,7 @@ boundary for gold as text, and any ladder stepping over it makes that ruling har
    Until `border` at `#333333` versus a `#3a3a3a` rung is settled, there is no model to mirror.
 2. **Decide which of the nine light values are real distinctions.** Four carry 65 of the 71 uses —
    `#ffffff` 32, `#f5f5f5` 15, `#eeeeee` 11, `#e0e0e0` 7. The other five have nine uses between them.
-   **That is a judgement about whether a user can tell a list-alternate row from a list header, and
+   **That is a judgment about whether a user can tell a list-alternate row from a list header, and
    it is made by looking, not by measuring.**
 3. **Then derive**, with `#e8e8e8` fixed as a rung because it is already load-bearing.
 
@@ -638,18 +643,18 @@ ladder and leaves the edges to applications is publishing a derivation nobody ca
 
 **`border` is not a rung, and its absence was never a gap.** An earlier reading from this side
 called the ladder *"two-thirds specified"* because `APP["border"]` `#333333` is not `#3a3a3a`.
-**`#333333` is `grey(3)` exactly on the ink grid, and that grid governs inks *and edges*.** A border
+**`#333333` is `gray(3)` exactly on the ink grid, and that grid governs inks *and edges*.** A border
 is an edge. It was measured against the wrong family and reported as a hole in this one — the
 correction is recorded rather than quietly applied, because the wrong reading is what sent the app
 side looking for a rung that does not exist.
 
 **`#0a0a0a` is not `WEB_BLACK`, and the seam is deliberate.** The web canvas is `#0a0a0f` — same
-lightness, blue channel lifted. This register already rules it: **app neutrals are pure grey,
+lightness, blue channel lifted. This register already rules it: **app neutrals are pure gray,
 R = G = B, without exception**, and the web ground carries a tint the apps do not. Two canvases one
 byte apart is not drift.
 
 **And that near-miss is what made the light-side inversion anchor look convincing.**
-`invert(#0a0a0a) = #f5f5f5` is true of a colour the brand does not hold; `invert(#0a0a0f) = #f5f5f0`
+`invert(#0a0a0a) = #f5f5f5` is true of a color the brand does not hold; `invert(#0a0a0f) = #f5f5f0`
 is true of one it does. The same one-byte seam produced a correct-looking derivation on one side and
 a false one on the other.
 
@@ -697,7 +702,7 @@ It keeps its three surface uses and its role as the binding ground. It is simply
 ### A claim withdrawn, in the same change
 
 Rev 22 argued that the apps walking *up* from a failing plate and this register walking *down* from a
-failing text colour and **both stopping at `#e8e8e8`** was *"a boundary two independent walks land on
+failing text color and **both stopping at `#e8e8e8`** was *"a boundary two independent walks land on
 is doing real work."*
 
 **The walks were never independent.** It is one equation — `cr(gold, ground) >= 4.5` — solved for two
@@ -802,7 +807,7 @@ space are equal perceptual steps.
 | — | `#333333` | `#e0e0e0` | **off the ladder** | pressed, tab, scrollbar trough | 10 |
 
 **Pressed comes from the edge family, not the ladder.** Dark's pressed is `#333333`, which is
-`grey(3)`, which is `APP["border"]`. An earlier proposal made `#e0e0e0` the bottom rung — **dark does
+`gray(3)`, which is `APP["border"]`. An earlier proposal made `#e0e0e0` the bottom rung — **dark does
 not put an interaction state in its surface ladder and neither does light.**
 
 **The hover → pressed step is the one that had to match**, because it is the one a user sees fire
@@ -854,13 +859,13 @@ measurements made keeping them indefensible.
 `#ffffff` and **1.49** on `#f5f5f5` against a 3:1 fill floor. Not taste — arithmetic. The green
 failed too, at 2.87 on `#f5f5f5`.
 
-**And `success` and `error` were the same colour to a deuteranope** — roughly 8% of men. They sit
+**And `success` and `error` were the same color to a deuteranope** — roughly 8% of men. They sit
 ~74 apart in normal vision and about **4** apart simulated: both collapse to one olive, because
 deuteranopia flattens red and green onto a single axis and what survives is lightness, of which those
-two have almost none between them. **Success and error are the two most consequential colours in any
+two have almost none between them. **Success and error are the two most consequential colors in any
 interface.**
 
-**A search of the recognisable status hue bands found no triple that both separates under
+**A search of the recognizable status hue bands found no triple that both separates under
 deuteranopia and clears 3:1 on all four grounds.** That was true, and the *constraint* was the
 problem: it assumed green / amber / red. **Leaving the red-green axis dissolves a problem that cannot
 be solved inside it.**
@@ -874,7 +879,7 @@ be solved inside it.**
 **The derivation:** `50% toward BRAND_DARK_GOLD #8c7337, interpolated in OKLab`. OKLab and not sRGB
 because the ramp must stay perceptually even — an sRGB blend goes muddy through the middle and the
 midpoint would not be one. **50% is the deepest mix that passes every bar**; at 60% the worst
-colour-blind pair drops to 6.8 and the nearest registered value to 7.4, both under this register's
+color-blind pair drops to 6.8 and the nearest registered value to 7.4, both under this register's
 own *clearly different* threshold.
 
 **The mix is provenance, not a live formula.** Held as a rule, the ratio becomes an edit anyone can
@@ -883,23 +888,23 @@ registered `BRAND_STILL_GOLD` rather than deriving it. The derivation is publish
 auditable; the values are then written down.
 
 **The three fills are registered. The six text variants are derived** — one deterministic rule, no
-judgement, recomputed rather than re-decided if a fill moves. **None of the three fills clears 4.5 as
+judgment, recomputed rather than re-decided if a fill moves. **None of the three fills clears 4.5 as
 text on any ground**, which is not a fault in the choice but the fill band: anything working as a
 fill on both a dark and a light ground sits at L\* 48–59, and a mid-tone cannot carry text on either
 side.
 
 **`error-text` and `error-text-light` move with their base.** `#e56b77` and `#c82131` were derived
 from `#dc3545`; with that base retired they are **orphans** — values derived from something no longer
-in the palette, which is the `#c4a458` failure this programme has already paid for once. **This moves
+in the palette, which is the `#c4a458` failure this program has already paid for once. **This moves
 values five applications mirror**, and that is the correct cost of moving a base.
 
-**The gamut correction, closed 2026-09-04.** The error source was published as `#ff008f`, dialled at
+**The gamut correction, closed 2026-09-04.** The error source was published as `#ff008f`, dialed at
 CIELCh **L 55.3 / C 90 / h 359** — a coordinate outside sRGB, so what shipped was a naive
 per-channel clip.
 
 **The clip moved the hue, which is the part worth knowing.** Measured, `#ff008f` sits at **h 357.2**,
-not the 359 that was dialled. Clipping channels does not preserve hue, so the published "source" was
-a different colour at a different angle — and its red sat on 255 with its green on 0. **Two rails is
+not the 359 that was dialed. Clipping channels does not preserve hue, so the published "source" was
+a different color at a different angle — and its red sat on 255 with its green on 0. **Two rails is
 what a clipped value looks like.**
 
 **Proper gamut mapping holds L and h and reduces chroma only**, which is the CSSWG's own
@@ -907,7 +912,7 @@ recommendation for exactly this. At L 55.3 / h 359 the sRGB boundary is C 84.99:
 
 | chroma | | |
 |---|---|---|
-| C 90 | outside | the dialled coordinate |
+| C 90 | outside | the dialed coordinate |
 | C 85.8 | outside | what was published as the source's chroma |
 | **C 84** | **inside** | **`#fe0f8a` — zero channels on a rail** |
 
@@ -934,13 +939,13 @@ alone would have orphaned them **one week after the last orphan was cleaned up**
 
 **`signal-standby` `#ffd166` against the old `STATUS.warning` `#ffc107` read CIEDE2000 6.83** — the
 closest cross-family pair in the whole matrix, and **below this register's own threshold for a
-distinguishable colour**, since `BRAND_STANDBY_GOLD`'s published walk calls 8.40 *"perceptible at a
+distinguishable color**, since `BRAND_STANDBY_GOLD`'s published walk calls 8.40 *"perceptible at a
 glance"* and would not take it. Two ambers, one meaning *running but not the main event* and one
 meaning *warning*. **The new family closes it** — but the amber moved for two independent measured
 reasons, and a value with two should not read as though it had one.
 
-**And `signal-live`'s nearest status neighbour was not `error`.** The note recording 18.22 against
-`STATUS.error` says *"the error red was always this value's nearest neighbour"* — true of the family,
+**And `signal-live`'s nearest status neighbor was not `error`.** The note recording 18.22 against
+`STATUS.error` says *"the error red was always this value's nearest neighbor"* — true of the family,
 stale for the member: `error-text-light` `#c82131` was **16.19**, published after that note was
 written. **A note recording one distance reads as though all of them were checked**, which is this
 register's own four-channel failure in another family.
@@ -978,7 +983,7 @@ signal is the state of something the brand runs* — and it has no value here.
 earn a brand value. **What would have to be decided if it did:**
 
 1. **Two values, not one.** Every value registered this month has needed a light-mode sibling.
-2. **Its counterpart.** An *active* colour implies a not-active one. If active is registered and idle
+2. **Its counterpart.** An *active* color implies a not-active one. If active is registered and idle
    keeps borrowing `text-dim`, that is the asymmetry Bootstrap's missing light variants had.
 3. **The selection rule, published.** Three of five apps got the two-gold rule wrong while it lived in
    one comment. **A value without the rule that selects it is folk knowledge with a hex attached.**
@@ -1003,7 +1008,7 @@ value still resolves and reads fine.
 | `error-text-light` | `#b84e58` | **`#ae4650`** | 3.28 |
 
 **All three move well under this register's own 8.40 *clearly different* bar**, so they stay the same
-three colours to look at, and the colour-blind separation is unharmed — worst simulated pair 17.06.
+three colors to look at, and the color-blind separation is unharmed — worst simulated pair 17.06.
 
 **The floor is `#e8e8e8` and the reason is one boundary rather than two.** Walking to `#e0e0e0` would
 cover the pressed plate but would put the status text floor there while `BRAND_DARK_GOLD_DEEP`'s
@@ -1054,8 +1059,8 @@ toward the ink ramp. **That is a ruling, not a recomputation.**
 
 **`tokens()` walks the surface palettes, not `PERMANENT`, by design.**
 
-A **permanent** colour is one the brand owns. An **emitted** token is one a surface consumes. A
-colour reaches a stylesheet when a surface palette adopts it under that surface's own key — **never
+A **permanent** color is one the brand owns. An **emitted** token is one a surface consumes. A
+color reaches a stylesheet when a surface palette adopts it under that surface's own key — **never
 as a side-effect of being registered**, because a token arriving in `tokens.css` is a change to a
 consumer in another repository, and that is a decision someone makes rather than something that
 happens because a dict grew.
@@ -1066,7 +1071,7 @@ for. `still-gold` sat in exactly this position from 2026-08-23 until `signal-rin
 **That is the path, and it is the only path.**
 
 **But "permanent and not emitted" is a declared state, not an accident.** The two lists can diverge,
-so the divergence is written down in `_PERMANENT_NOT_EMITTED` with a reason per colour, and
+so the divergence is written down in `_PERMANENT_NOT_EMITTED` with a reason per color, and
 `_permanent_emission_is_declared()` runs at import. It fails in **both** directions — a permanent that
 is neither emitted nor declared is an undeclared gap; a declared one that some surface has since
 adopted is a stale exemption. Armed both ways.
@@ -1083,9 +1088,9 @@ written to catch a sibling of it** — a table only the thing it describes can r
 own dead rows. Closed 2026-09-12; both cases now fail by name.
 
 **A caution from arming it, worth carrying:** two guards standing in line means the second is easy to
-believe you have tested when you have only tested the first. Adding a bare colour to `PERMANENT`
+believe you have tested when you have only tested the first. Adding a bare color to `PERMANENT`
 trips `_resolver_covers_permanent()` before the emission guard gets a turn — the tamper has to give
-the colour a resolver key too.
+the color a resolver key too.
 
 ### The version *is* the rev, and for one day it was not
 
@@ -1102,9 +1107,9 @@ compare **commits**, which is exact regardless of the version string.
 
 ### Interpolation is a perceptual-space question; mixture is a physical-model question
 
-The lab-mode result `#968e9b` was not the space — it was **averaging**. A two-colour ramp
+The lab-mode result `#968e9b` was not the space — it was **averaging**. A two-color ramp
 interpolates between two points, and the space's uniformity is exactly what is wanted. A mix of
-several colours takes a centroid, and **a centroid has no direction**: where the ingredients sit
+several colors takes a centroid, and **a centroid has no direction**: where the ingredients sit
 round the wheel it lands near the achromatic axis in any space, and where they do not, it does not.
 Kubelka-Munk is not an average at all — a subtractive absorption model, where the strongest absorber
 dominates rather than being diluted.
@@ -1116,7 +1121,7 @@ and `lab` keeps more chroma than `paint` at equal weights and at the recipe's ow
 "Blue — the second hue"). Placed at L\* 60.16, the recipe's `lab` result `#7e87b7` becomes
 `#868fbf` and sits 9.7–11.0 from `success-text` under deuteranopia, against the finished blue's
 9.7–10.9. **So for the published recipe the two models are not a pass and a fail. They are two
-colours, a periwinkle and a blue, and the blue is the one that was chosen.**
+colors, a periwinkle and a blue, and the blue is the one that was chosen.**
 
 **Two endpoints and a parameter want OKLab. Pigments and a ratio want Kubelka-Munk.** The status
 family got the first right. The blue was made with the second; what is measured for it is that the
@@ -1127,13 +1132,13 @@ models differ in kind and in result, and not that one of them failed.
 **Renamed from `BRAND_WEB_CODE` on 2026-09-13, one day after it shipped.** The value does not move,
 the emitted token does not move, and every resolver key still answers — `web-code` included.
 
-**`PERMANENT["teal"]` names the colour, `WEB["code"]` names the role, and `--rnv-code` is emitted.**
+**`PERMANENT["teal"]` names the color, `WEB["code"]` names the role, and `--rnv-code` is emitted.**
 
 **The original name came off the `web-black` precedent, which matched structurally and not
 semantically.** `web-black` earns its surface-encoded name: `#0a0a0f` is blue-lifted, and app
-neutrals are pure grey `R = G = B` without exception, so it is a black *for the web* and can never be
+neutrals are pure gray `R = G = B` without exception, so it is a black *for the web* and can never be
 anything else. **This value is a base** — mixed from `BRAND_BLUE` and `BRAND_GOLD`, able to anchor a
-ramp — and the ruling of 2026-09-13 says **a first role does not confine a colour to that surface**.
+ramp — and the ruling of 2026-09-13 says **a first role does not confine a color to that surface**.
 `BRAND_WEB_CODE` stated in the constant the precise thing that ruling says is not true.
 
 **And a name is not undone by documentation.** The fashion app consumes this same resolver; a
@@ -1160,7 +1165,7 @@ red 1 · 8:50 → `#01b995` red 1; measured on the live engine, v1.3.0, 2026-09-
 "roughly fifty times", a figure transcribed from a note that had sampled one point and never
 searched for the threshold — the same failure rev 40 records against itself, repeated here two
 revisions later.* The recipe describes
-this engine's behaviour and is not a prediction of physical dye or paint; a later paint model will
+this engine's behavior and is not a prediction of physical dye or paint; a later paint model will
 move it, and the registered value stands regardless. Chosen by eye against the live post; the arithmetic is published so nobody has to take
 that on trust. **Paint and not lab, per rev 34** — a mixture is a physical-model question.
 
@@ -1175,14 +1180,14 @@ noise layer sits behind it and does not tint it.
 | `bg` `#0a0a0f` | 7.2588 | |
 
 **At `0.88em` of 17px it is 14.96px — normal text, so the floor is 4.5 and not 3.0.** A couple of
-pixels larger and the feasible region would widen; the size is doing as much work as the colour.
+pixels larger and the feasible region would widen; the size is doing as much work as the color.
 
 **`BRAND_GOLD` reads 9.3098 on the same chip, so this is a step down in contrast, bought
 deliberately.** On a typical post `strong`, every link, the drop cap and the heading italic are all
 `var(--accent)` — until now the only things separating code from bold were the chip and the mono
 face. Worst of normal vision plus four simulations:
 
-| neighbour | | worst | under |
+| neighbor | | worst | under |
 |---|---|---|---|
 | `text` `#e8e8f0` | | 30.97 | tritanopia |
 | `accent-warm` `#ffd166` | | 26.60 | achromatopsia |
@@ -1196,7 +1201,7 @@ face. Worst of normal vision plus four simulations:
 implied. It is a ring; inline code is prose; they share a page and never a line.
 
 **Ten registered values elsewhere come within 8.40**, all under achromatopsia except one, where every
-colour collapses to luma. `#00b0a0` is grey 121. **All forty-six distinct registered hexes were
+color collapses to luma. `#00b0a0` is gray 121. **All forty-six distinct registered hexes were
 checked — complete, not a sample**, because this register's own recorded failure is a note that gave
 one distance and read as though all of them had been checked.
 
@@ -1215,7 +1220,7 @@ one distance and read as though all of them had been checked.
 
 **The two blues are exempt because they paint nothing, and that exemption has an expiry.**
 `_PERMANENT_NOT_EMITTED` declares both reach no stylesheet, so 7.42 is a distance between a value
-that paints and one that paints nothing — **and `BRAND_BLUE` is an ingredient of this colour**, which
+that paints and one that paints nothing — **and `BRAND_BLUE` is an ingredient of this color**, which
 is what makes it worth recording rather than dismissing. **The day a surface adopts either blue, this
 pair wants re-measuring before it ships.**
 
@@ -1238,19 +1243,19 @@ in ΔE76 against a true 8.08**, over the bar in the wrong metric and under it in
 two values approved on that arithmetic. **Same slip, opposite verdict. A figure that happens to
 survive the wrong metric is not evidence the metric does not matter.**
 
-### What a brand colour is — the definition corrected 2026-09-13
+### What a brand color is — the definition corrected 2026-09-13
 
-> **Brand and permanent mean the same thing.** A colour enters when it takes a role on a brand
+> **Brand and permanent mean the same thing.** A color enters when it takes a role on a brand
 > surface and is added to this register. From then it is permanent: it will not be deleted, its value
-> may change, and the entry remains as a legacy colour. **Brand colours are the base colours the
-> brand reuses, derives others from, or builds ramps out of. A first role does not confine a colour
+> may change, and the entry remains as a legacy color. **Brand colors are the base colors the
+> brand reuses, derives others from, or builds ramps out of. A first role does not confine a color
 > to that surface.**
 
 Ruled by Chris as owner.
 
 **The line is base versus derived, not identity-wide versus surface-specific.** `engine/brand.py`'s
 carve-out listed *"platform convenience"* among the things excluded from `PERMANENT` — which
-described the wrong axis. **A base colour whose first role happens to be one surface is a brand
+described the wrong axis. **A base color whose first role happens to be one surface is a brand
 claim**, which is exactly what `web-code` is and what `web-black` was before it. Left as written, the
 sentence excluded from `PERMANENT` the precise category of value that had just been added to it.
 
@@ -1275,19 +1280,19 @@ spelled count, armed on both shapes that actually occurred.
 **Two things went wrong while building that guard, and both are recorded at it.** Its first draft
 caught its own exception and returned — and because `brand.py` imports no `pathlib` at module scope
 it hit `NameError` on every run and **reported clean**, which is the rule about checks that cannot
-run, broken inside a guard. And its pattern then flagged *"a permanent colour is **one** the brand
+run, broken inside a guard. And its pattern then flagged *"a permanent color is **one** the brand
 commits to"* — **the use/mention distinction, arriving inside the guard written to enforce a prose
 rule.**
 
 ### `web-code`'s note said what it was not granted; it now says what it lacks
 
 The teal's comment read *"not promoted to a third brand hue today."* A careful reader with the file
-open took that as a **membership** statement about the colour rather than a **completeness**
+open took that as a **membership** statement about the color rather than a **completeness**
 statement about the hue, concluded the register had put a non-brand value into `PERMANENT`, and
 drafted that as a definitional contradiction before it was corrected.
 
 **A sentence a careful reader gets backwards is worth ten words of disambiguation.** It now says the
-colour lacks a light-surface partner — no teal clears 4.5 on both `#1a1a1a` and `#f5f5f5`, ceiling
+color lacks a light-surface partner — no teal clears 4.5 on both `#1a1a1a` and `#f5f5f5`, ceiling
 3.9954 — rather than that it was withheld from anything.
 
 ### Publish what was requested, not what was achieved — 2026-09-14
@@ -1309,7 +1314,7 @@ answer* — and re-deriving by hand from the published numbers got a different a
 > **Publish what was requested. The achieved value is a measurement of the result, not a step in the
 > recipe.**
 
-**Placing a colour at an L\* and then measuring the result gives back a different L\***, because
+**Placing a color at an L\* and then measuring the result gives back a different L\***, because
 8-bit hex cannot hold the coordinate — 60.16 in, 60.0588 out. **Recording the output as the input
 silently swaps a reproducible instruction for an unreproducible observation, and it reads identically
 either way.** The corrected figures are 60.16 and 44.17, which are the status family's own rungs.
@@ -1321,11 +1326,11 @@ The comment read *"Same a, same b"* three lines under a table showing **a 20.38 
 
 **The spread is the format, not the method.** A pair built by holding `a` and `b` *exactly* still
 comes back about 0.35 apart on both axes once it is 8-bit hex. **The rule is sound; only the
-precision language overstated it.** Corrected to *shared `a` and `b` to within the quantisation of
+precision language overstated it.** Corrected to *shared `a` and `b` to within the quantization of
 8-bit hex*.
 
 **The app side found the same sentence in their own document and corrected it there** while the
-register — the artefact that governs — carried it unchanged. A downstream copy fixed ahead of its
+register — the artifact that governs — carried it unchanged. A downstream copy fixed ahead of its
 source is the inverse of the usual failure and worth the same attention.
 
 ### An ordinal set is one hue at N lightnesses — ruled 2026-09-16
@@ -1337,7 +1342,7 @@ by the hue. The six status text values sit inside **0.50 `L*`** on dark and **0.
 **Which means the family cannot rank, and is not meant to.** Success, warning and error are
 **categorical** — three semantic states, no league table. A four-tier rating scale drawn from them
 read `#919191`, `#919191`, `#929292`, `#909090` under achromatopsia. **It ranked in words and did not
-rank in colour.**
+rank in color.**
 
 > **An ordinal set is one registered hue at N lightnesses, assigned from rank. Lightness carries the
 > order; hue carries the identity and does not vary within the set.**
@@ -1349,7 +1354,7 @@ semantic error introduced to serve one widget.
 **And no new registered values are needed**, so §5.3's *prefer fewer values over tidier ones* is not
 spent. **The construction already exists here** and had never been named for this case: `BRAND_BLUE`
 and `BRAND_DARK_BLUE` are one hue at two lightnesses, the light surface ladder is shares of a span,
-the ink grid is `grey(n)`. An ordinal ramp is that construction with N tiers.
+the ink grid is `gray(n)`. An ordinal ramp is that construction with N tiers.
 
 **Two constraints bind, both measured:**
 
@@ -1383,14 +1388,14 @@ light, down from  44.30:   ~9.6,   ~11.0,  ~12.5     span ~33
 
 > **Size each gap against the bar at its own lightness. Do not multiply one step by N.**
 
-**The figures are a bound, not a point** — two CIEDE2000 implementations measuring the same greys put
+**The figures are a bound, not a point** — two CIEDE2000 implementations measuring the same grays put
 the dark span between 35.0 and 36.0. **The rule is the sizing method, which does not depend on whose
 arithmetic you use.** It still fits: about 40 points available on dark, 44 on light.
 
-**And measure the separation on the simulated greys, not the colours.** The ramp's whole claim is
+**And measure the separation on the simulated grays, not the colors.** The ramp's whole claim is
 that it ranks when hue is gone, so achromatopsia is the binding case. The worked example reads
-8.12 / 7.42 / 8.64 colour-to-colour and **8.06 / 7.24 / 6.58 grey-to-grey** — so no gap clears 8.40
-where it matters, and the top gap is the **worst** rather than the best. **Measuring the colours
+8.12 / 7.42 / 8.64 color-to-color and **8.06 / 7.24 / 6.58 gray-to-gray** — so no gap clears 8.40
+where it matters, and the top gap is the **worst** rather than the best. **Measuring the colors
 flatters the ramp.**
 
 ### The ramp is sized for co-visible tiers, and the serial argument supports that
@@ -1398,7 +1403,7 @@ flatters the ramp.**
 It was put that a rating label shows one tier at a time, so adjacent tiers never sit side by side and
 a thinner ramp would do. **That inverts the perception.**
 
-**Telling two greys apart with both in view is discrimination against a present stimulus. Naming
+**Telling two grays apart with both in view is discrimination against a present stimulus. Naming
 which tier you are looking at with the others absent is identification against memory — and
 identification needs more separation, not less.** A ramp read serially is the harder case.
 
@@ -1410,19 +1415,19 @@ chart key or a difficulty meter**, which show every tier at once.
 
 **The ruling stands and is unused**, and the reason is worth more than the ruling. The picker's
 rating scale was described as an ordinal set needing a rank. **It is not one.** The four hues are
-meant to be **learned** — colour and word shown together so the pairing trains, with the intention
-that colour eventually carries severity alone. **Four strengths of one hue cannot do that**: that is
+meant to be **learned** — color and word shown together so the pairing trains, with the intention
+that color eventually carries severity alone. **Four strengths of one hue cannot do that**: that is
 one signal with a volume control, where what is being trained is four signals. Categorical by intent.
 
 **The ruling was answered correctly and asked about the wrong thing.** The next ordinal set gets it
 right for free, and **the status family stays untouched either way**, which was the ruling's main
 protection.
 
-### A colour trained to carry meaning alone inherits an obligation its redundant version did not have
+### A color trained to carry meaning alone inherits an obligation its redundant version did not have
 
 **The property that prompted the ask does not go away.** That scale still does not rank under
 achromatopsia — `fair` and `poor` are byte-identical in both modes, and the four tiers span **seven
-grey levels out of 256**. It was filed as harmless **because the label prints its tier in words.**
+gray levels out of 256**. It was filed as harmless **because the label prints its tier in words.**
 
 **Under a training strategy the word is scaffolding, so the strategy's success condition is the
 condition under which the collapse becomes a defect.** For a viewer who cannot separate the four
@@ -1472,13 +1477,13 @@ application. They live in different products and do not share a surface.**
 
 ### The achromatopsia model is named, because two of them disagree
 
-The greys published here are **gamma-correct relative luminance**. `rnv-color-picker`'s own simulator
+The grays published here are **gamma-correct relative luminance**. `rnv-color-picker`'s own simulator
 uses 601 luma with `int()` truncation and gets `#8d8d8d` / `#a8a8a8` / `#c3c3c3` / `#e1e1e1` against
 this register's `#919191` / `#ababab` / `#c6c6c6` / `#e2e2e2`.
 
 **Both are strictly ordered, so the ruling is safe under either, and neither is canonical.** This
 register names its model so its figures reproduce; **an application pins its guard to the simulator
-that draws its pixels.** A guard asserting the register's greys inside an app asserts a model the app
+that draws its pixels.** A guard asserting the register's grays inside an app asserts a model the app
 does not use.
 
 **Which hue is the consumer's choice** from the registered set, and this register does not rule it —
@@ -1492,7 +1497,7 @@ darker-to-lighter reads as a scale without instruction. **A set that must rank, 
 ### The neutral ramp
 
 Every neutral in all five desktop apps — twenty-three distinct values from `#000000` to
-`#ffffff` — is a **pure grey**, R = G = B, without exception. That isn't twenty-three
+`#ffffff` — is a **pure gray**, R = G = B, without exception. That isn't twenty-three
 colors; it's one ramp with steps chosen per surface.
 
 **The rule: neutrals are steps between the two anchors, and a step is a modulation.** A
@@ -1651,11 +1656,11 @@ value, in the same spirit as the two tint censuses above — a derived value is 
 being permanent, and the source emits it so nobody re-derives it by hand.
 
 It reads **4.58:1 on a card**, 5.55 on panel, 6.70 on window, and **3.13:1 on white**, which fails.
-That is why `error` stays `#dc3545` for light mode: one colour, two grounds, the same shape as
+That is why `error` stays `#dc3545` for light mode: one color, two grounds, the same shape as
 `GOLD` and `DARK_GOLD`. Cross-checked through `rnv-color-mcp` rather than trusted to arithmetic.
 
 **It does not conform to the Records order and was not forced to.** Making R > G > B swung it to
-`#e56d3c`, burnt orange — a different colour wearing the right lightness. The tint rules govern
+`#e56d3c`, burnt orange — a different color wearing the right lightness. The tint rules govern
 the neutral ramps; a borrowed platform value that never conformed should not sprout a derived
 variant that does.
 
@@ -1670,7 +1675,7 @@ In its place, `engine/brand.py` carries a three-value **signal** set, distinct f
 **`signal-live` changed on 2026-08-14, from `#8b2c3b` to `#a5034e`.** Hue moved 350.5° to 332.2°
 and saturation 52% to 96%. **It was decided on the check that mattered rather than on taste:** a
 move toward magenta could have narrowed the gap to the error red, which was always this value's
-nearest neighbour in the system, and instead widened it — CIEDE2000 18.22 against `#dc3545`
+nearest neighbor in the system, and instead widened it — CIEDE2000 18.22 against `#dc3545`
 where the retired value was 17.40. Against the dark-theme error text it reads 25.92. Contrast on
 `bg-2` moves 2.37:1 to 2.43:1, immaterial either way, because the ring carries the boundary and
 the fill was never asked to.
@@ -1678,7 +1683,7 @@ the fill was never asked to.
 **"Wine" describes the retired value and should not be carried forward.** At 96% saturation the
 current value is not the muted red that word implies, and `engine/brand.py` already uses "wine"
 for what it replaced. This file now says `signal-live` or gives the hex. A descriptor that
-survives the thing it described starts naming the wrong colour to everyone who reads it.
+survives the thing it described starts naming the wrong color to everyone who reads it.
 
 **Signals are not status.** Status is the result of a user's action inside an app and moves when a
 UI framework moves. A signal is the state of something the brand runs and moves when the brand
@@ -1691,7 +1696,7 @@ fill breathes and the ring does not. That is what frees the fill to sit at 2.43:
 and every value in the set fails.
 
 **IT IS NO LONGER IDENTICAL IN ALL STATES, AND THAT CHANGED ON 2026-08-23.** It was gold everywhere
-and therefore chrome — it signalled nothing. On `rnv-live` it became **stateful**, so every channel
+and therefore chrome — it signaled nothing. On `rnv-live` it became **stateful**, so every channel
 agrees with the label instead of the fill carrying the meaning alone. The site's hero dot is
 unaffected: it has one state and is always live, so its ring stays unconditional.
 
@@ -1721,7 +1726,7 @@ reads *louder* than live's, inverting the ordering the states exist to express.
 **Standby breathes, slower and shallower.** Offline means nothing is running; standby means
 something is running but is not the main event. Motion reads as life, so making it a **gradient**
 rather than a binary is what makes standby a genuine middle state rather than offline in another
-colour. The ring does not animate, so the boundary holds at 7.073 at every frame.
+color. The ring does not animate, so the boundary holds at 7.073 at every frame.
 
 **[confirm/fill] Live and standby have never been rendered.** `rnv-live`'s pill carries `OFFLINE`
 by default and the other two states are applied by hand-editing markup. Every contrast figure above
@@ -1776,7 +1781,7 @@ carries a comment stating the former — it expires with this line.
 
 **The two dots were split on 2026-08-14, in one pass across both surfaces.** The ring moved to
 the element and the fill to its `::after`, so only the fill animates. It was done on both at
-once deliberately: *one recognisable mark across two mediums* is the stated justification for a
+once deliberately: *one recognizable mark across two mediums* is the stated justification for a
 fill sitting under the contrast floor, and a structural change to one dot and not the other
 would have quietly retired that justification while leaving the sentence in place.
 
@@ -1798,7 +1803,7 @@ measured at 5.6px wide by 10.4px tall against a specified 10 by 10. Its flex par
 squeezing it on the main axis while `align-items: center` held its height, and the 1px ring
 traced the distortion, which is why each size increase made the outline look heavier rather
 than better. It survived three passes of deliberate work on this component because every pass
-was about colour. **A component can be audited repeatedly on the axis someone is thinking
+was about color. **A component can be audited repeatedly on the axis someone is thinking
 about and stay broken on the one nobody is.**
 The two pills differ in type size and padding, so equal pixels would not read as equal marks.
 
@@ -1809,7 +1814,7 @@ colors, which is precisely the failure recorded one section above about `rnv-ico
 
 **That pair is kept in its original case on purpose, and it was destroyed once already.** A
 blind pass ran over this file after rev 12 and replaced `#8B2C3B` here with `#a5034e`, leaving
-a sentence claiming a case-sensitive comparison reads two *different colours* as different —
+a sentence claiming a case-sensitive comparison reads two *different colors* as different —
 which they are, so the example proved nothing. The same pass lowercased `#FFC107` in the three
 places that name it *as the uppercase instance*, and left line 318, the only place that
 actually stated a value, carrying a retired one.
@@ -1845,8 +1850,8 @@ number was read and the flags were not.**
 **The instrument is being changed as a result, ruled 2026-08-17 (`24c3fab`):** `ratio` returns the value
 unrounded, and `display` shows **three decimals, truncated rather than rounded.** Truncation is the
 part that matters — three decimals alone moves the trap without removing it, since a true 4.4996
-still *rounds* onto 4.500. A figure that can only err toward *fail* cannot authorise a usage the
-value does not support. Routed to the colour chat; the `wcag` flags are unchanged and were always
+still *rounds* onto 4.500. A figure that can only err toward *fail* cannot authorize a usage the
+value does not support. Routed to the color chat; the `wcag` flags are unchanged and were always
 correct.
 
 **Every other measured figure in this register was audited for the same problem. None sits within
@@ -1922,7 +1927,7 @@ BRAND_GOLD_HOVER     = lighten(BRAND_GOLD,       13)   # #dfc9a0  dark-mode HOVE
 `rnv-color-picker` put it: **three apps agreeing is luck, not design.** Nothing anywhere would have
 caught a fourth picking `-13`.
 
-**An unpublished derivation permits four *values* for one colour, which is worse than four names** —
+**An unpublished derivation permits four *values* for one color, which is worse than four names** —
 a wrong name is visible in a diff and a wrong value is not. Same shape as the
 `BRAND_GOLD_DARK` → `BRAND_DARK_GOLD` rename, one level down.
 
@@ -1942,7 +1947,7 @@ orphaned gold can be perfectly legible.**
 
 ### The light-mode error text, `#c82131` — published 2026-08-24
 
-`STATUS["error"]` `#dc3545` is a **fill** colour. As text on a light panel it does not clear:
+`STATUS["error"]` `#dc3545` is a **fill** color. As text on a light panel it does not clear:
 
 | ground | `#f44336` retired | `#dc3545` ruled | `#e56b77` error-text |
 |---|---|---|---|
@@ -2072,16 +2077,16 @@ a change of toolkit and be nameable on a hangtag.
 ### Notation is lowercase — ruled 2026-08-15
 
 **A hex value is written lowercase in source: `#d2bc93`, never `#D2BC93`.** **Eight digits too,
-ruled 2026-09-25: a colour at an alpha is `#aarrggbb` in lower case — `#ed1a1a1a`, never `#ED1A1A1A`.**
+ruled 2026-09-25: a color at an alpha is `#aarrggbb` in lower case — `#ed1a1a1a`, never `#ED1A1A1A`.**
 The five desktop apps had written translucent values three ways by 2026-09-25, because each
 `translucent()` helper followed the literal it replaced; nothing rendered differently, since Qt reads
 either case, and this is the same shape as 2026-08-15 — a convention adopted, not a defect repaired.
 Each app's guard now holds every eight-digit value it builds or writes to lower case. **Display text
-is not covered:** a picker printing a picked colour to a person as `#FFAA00` is output, not source
+is not covered:** a picker printing a picked color to a person as `#FFAA00` is output, not source
 notation, and a rule on display case would be a separate decision. Names are local and
 values are canonical; notation is the third axis, and unlike names it does not get to vary by
-consumer. `brand.py` standardised on 2026-08-14 and the five desktop apps followed on
-2026-08-15 — 357 values across five files, one colour source file per repo.
+consumer. `brand.py` standardized on 2026-08-14 and the five desktop apps followed on
+2026-08-15 — 357 values across five files, one color source file per repo.
 
 **This was adopting a convention, not repairing a defect.** The five apps agreed with each other
 throughout; nothing rendered incorrectly at any point, and CSS and Qt both treat hex as
@@ -2090,18 +2095,18 @@ That framing is kept because it governs how urgent this ever was, and how urgent
 
 **Three things learned doing it, each of which would have cost a day on its own:**
 
-- **A value with no case cannot be normalised.** All-numeric hex (`#123456`) has no case to fold;
+- **A value with no case cannot be normalized.** All-numeric hex (`#123456`) has no case to fold;
   326 such values sit in those five files. A folding pass matches them and reports no change,
   which reads like a broken pass rather than a correct skip. Exclude them from any count.
-- **Case and shorthand are different axes.** `#fff` and `#ffffff` name the same colour, and
+- **Case and shorthand are different axes.** `#fff` and `#ffffff` name the same color, and
   expanding shorthand changes string length where folding case does not. **One axis per pass**,
   or a failure in either is indistinguishable from a failure in the other.
 - **Prove a mechanical change is what it claims.** Every file was asserted with
   `before.lower() == after.lower()` before writing, so no *value* could move under cover of a
-  notation pass. A notation change that silently altered a colour would be invisible in review
+  notation pass. A notation change that silently altered a color would be invisible in review
   precisely because reviewers stop reading hex closely once they know the diff is cosmetic.
 
-**Now that source and consumers agree, a colour check should compare case-sensitively.** While
+**Now that source and consumers agree, a color check should compare case-sensitively.** While
 they disagreed, folding was the only workable comparison — a case-sensitive guard would have
 produced hundreds of findings on its first run and been switched off. Against zero findings the
 reasoning inverts: an exact comparison *enforces* the convention, where a folding one passes on
@@ -2114,9 +2119,9 @@ either notation and stops catching a regression. **Nothing caught the day the ap
 
 What the color server resolves brand names to in chat. Defined once in `brand.py` as
 `RNV_BRAND`; the resolver imports it. **RNV names win over CSS names on collision, and three bare
-names collide: `gold`, `blue` and `teal` are brand colours and resolve to the brand values, not to
+names collide: `gold`, `blue` and `teal` are brand colors and resolve to the brand values, not to
 CSS `#ffd700`, `#0000ff` and `#008080`.** Use `css:gold`, `css:blue`, `css:teal` to force the
-universal one. **Ruled 2026-09-28: all three stay bare, because they are colours set in the brand
+universal one. **Ruled 2026-09-28: all three stay bare, because they are colors set in the brand
 the way the gold is** — the founding decision of 2026-06-23 named only `gold` and the other two
 joined on 12 and 13 September without a sentence here saying so, so a model asking to *mix red and
 blue* got brand blue and `rnv-color-mcp`'s own README example returned a dark red for two weeks.
@@ -2139,10 +2144,10 @@ Dropping the bare names was considered and rejected: the resolver falls through 
 | teal, brand teal, code, code teal, web code, web-code | `#00b0a0` |
 
 **This table published `#b19145` for the dark-gold row until 2026-09-12**, twenty-six days after
-rev 16 moved the value to `#8c7337`. The row is a *contract* — it states what the colour server
+rev 16 moved the value to `#8c7337`. The row is a *contract* — it states what the color server
 answers — so for that period the register's own document and the register's own source gave
 different answers to `dark gold`. Nothing compared them. The table was also short by six rows
-against `RNV_BRAND`, which is why the omission of a whole colour would not have shown either.
+against `RNV_BRAND`, which is why the omission of a whole color would not have shown either.
 **rev 41 said here that the table "is now complete". It was six rows short again the next day** —
 the teal was registered on 2026-09-13 with six resolver keys and the row above did not exist until
 rev 43, fifteen days later; the mirror's owner found it reading rev 42. **Completeness is no longer
