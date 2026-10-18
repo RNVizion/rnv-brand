@@ -12,7 +12,9 @@ brand's body and code faces from here. The site asked Google for all five faces 
 moves to these files too, which is the Brand Architect's change to make. **Twenty-two `woff2`
 files, five licenses, and a guard at import** that fails by name when a file TYPE calls for is
 missing, when the folder holds one it does not, when a file is not a `woff2`, or when a family's
-license is gone. Broken six ways before it was trusted. See *The font files*. rev 11 — **one bullet described a page that stopped existing, and the
+license is gone. Broken six ways before it was trusted. See *The font files*. **Also, the same day,
+spelling:** British spellings became American by Chris's ruling, from a reviewed word list; one
+quotation of a retired site comment keeps its own. rev 11 — **one bullet described a page that stopped existing, and the
 count beside it had been wrong for a day before that.** `/aiii/` gained the site nav at
 `rnvizion.github.io@48228b7`, which is the event decision #18 anticipated — the mark drawn, the face
 requested, the comment retired — and this register's bullet went on saying the page carried no nav.
@@ -39,7 +41,7 @@ failing at all, its links already carrying a `border-bottom` at rest. **The meth
 finding:** the count came from a pattern that could not see a link appearing later in a
 paragraph, and **an enumeration that undercounts reports success rather than failure** — fewer
 hits look like a smaller problem, and nothing in the output says the method was wrong. The
-conclusion then travelled further than the count: *needs its own selectors* was inferred from a
+conclusion then traveled further than the count: *needs its own selectors* was inferred from a
 bad number instead of read off the page. rev 8 — **the consumption item closes within the hour it was opened, and
 the gap it recorded is worth more than the fix.** Rev 7 shipped saying no surface consumed
 `web-code`; the site mirrored it the same afternoon. Closed with evidence and its date kept,
@@ -114,7 +116,7 @@ this system exists to prevent. The split, so nothing is stated in two places:
 | **`BRAND_TYPE.md`** (this file) | The register, the rules, the exemptions, and the reasoning behind them |
 | **`engine/brand.py`** (`TYPE`) | The values. Every consumer imports them from there |
 
-**This mirrors the colour split deliberately, including the reason it exists.** `BRAND_COLORS.md`
+**This mirrors the color split deliberately, including the reason it exists.** `BRAND_COLORS.md`
 carried a typography block for months as a "(reference)" convenience copy. Rev 14 retired it and
 recorded why: it was not a stale copy of a current fact but **three retired ones at once** — it
 gave the wordmark to JetBrains Mono after decision #15 took it away, wrote body as "Inter /
@@ -193,7 +195,7 @@ nothing draws them**, and this section says so rather than counting a ruling as 
 |---|---|---|---|
 | **Mark** | **Montserrat** | **900 (Black)** | The RNVizion mark at every size and in every medium; initiative lockup letterforms; IG aphorism cards and carousels |
 | Display | Bricolage Grotesque | variable, 300–800 | Site headings, blog titles, OG share titles, the name block on résumé cards |
-| Emphasis | Instrument Serif | italic **and roman** | Pull lines, deks, the italicised signature phrases, the card back — **and the blog drop cap, which is roman** |
+| Emphasis | Instrument Serif | italic **and roman** | Pull lines, deks, the italicized signature phrases, the card back — **and the blog drop cap, which is roman** |
 | Labels, kickers, long form | JetBrains Mono | 400 / 500 / 600 / 700 | The tracked long form beneath a mark, uppercase tracked kickers, footers, captions, **and inline code in prose — see below** |
 | Body | Inter | 400 / 500 / 600 | Running text |
 
@@ -229,11 +231,11 @@ two have disagreed since the link was written.**
 **400 stays in the request, marked unconfirmed rather than dropped. [confirm/fill]** No selector
 reachable from `--font-mono` declares it, so it is either inherited from the body default or
 requested and never drawn. F8 forbids requesting what is not drawn — but the failure modes are not
-symmetric. An extra request costs bytes; a missing one **synthesises** the weight, which F8 forbids
+symmetric. An extra request costs bytes; a missing one **synthesizes** the weight, which F8 forbids
 outright and which fails silently. Confirm before removing.
 
 **F8 was unenforceable in both directions until today.** The ruling says *request the weights
-actually drawn and nothing synthesised*, and nothing could check it, because the source held
+actually drawn and nothing synthesized*, and nothing could check it, because the source held
 families and no weights at all. That is why `TYPE` was reshaped rather than merely extended.
 
 **The body row was one phrase describing two things.** "Inter / system stack" read as a single
@@ -362,7 +364,7 @@ describes a class**, because the artifact is checkable.
 - **One token vocabulary: `--font-{role}`, with `--font-mark` added.** Three vocabularies were live
   for the same five roles — the main pages, `aiii/`'s shortened set, and the `--rnv-font-{role}`
   set emitted by `brand.py` that **no page consumes**.
-- **One weight-axis standard per face.** Request the weights actually drawn and nothing synthesised.
+- **One weight-axis standard per face.** Request the weights actually drawn and nothing synthesized.
   A standard that does not name its axes leaves the next page to pick its own.
 
 **The mark gets its own token so it cannot move by accident.** Without `--font-mark`, the mark
@@ -380,8 +382,8 @@ teal `#00b0a0`**, on a `--bg-3` chip with 4px corners and `1px 6px` of padding. 
 **`0.88em` is a correction, not a shrink.** Mono carries a larger x-height than Inter at the same
 point size, so setting it at parity makes code look bigger than the text around it. At 17px body
 this computes to **14.96px — normal text** for WCAG, so the floor is 4.5 rather than 3.0. Written
-down because the size is doing as much work as the colour: a couple of pixels larger and the
-feasible region for the colour would have widened.
+down because the size is doing as much work as the color: a couple of pixels larger and the
+feasible region for the color would have widened.
 
 ### The chip carries it. The border does not.
 
@@ -395,7 +397,7 @@ the chip reads plainly as a distinct object; the bordered and unbordered version
 indistinguishable. **Remove the border.** It costs a declaration, reads as nothing, and looks
 load-bearing to anyone reading the rule rather than the render.
 
-**The rule that generalises, bought by getting this wrong first:**
+**The rule that generalizes, bought by getting this wrong first:**
 
 > **A contrast ratio measures a relationship, not a visibility.** Area and stroke width change what
 > a given ratio buys: a filled shape can read clearly at a ratio where a hairline of the same value
@@ -413,7 +415,7 @@ sits on — and a later reader finding the unchipped figure could reasonably con
 
 ### Code left gold, and that is the shared-hue rule working
 
-Until 2026-09-12 gold carried three jobs in prose, separated by face and weight rather than colour.
+Until 2026-09-12 gold carried three jobs in prose, separated by face and weight rather than color.
 Code has taken its own hue, the strongest channel available, and gold is left with two:
 
 | | weight | face | hue | box |
@@ -423,7 +425,7 @@ Code has taken its own hue, the strongest channel available, and gold is left wi
 | `code` | 400 | **JetBrains Mono** | **web-code** | chip |
 
 > **Gold in body copy is a shared hue. Any element that takes it must declare which channel
-> separates it — face, weight, or box — and that channel must be perceptible without colour.**
+> separates it — face, weight, or box — and that channel must be perceptible without color.**
 
 The rule did not stop code taking gold. It made the question askable, and the answer was to leave.
 **`strong` now separates by weight alone**, which is thin but real, and it is the last element
@@ -449,9 +451,9 @@ registered, measured against forty-six others, argued through two revisions — 
 nothing**, and nothing in either register would have said so. The interval was an hour here. It is
 only ever an hour when somebody is watching.
 
-**[confirm/fill] Prose links separate by colour alone and fail WCAG 1.4.1.** `article a` and `.bio a`
+**[confirm/fill] Prose links separate by color alone and fail WCAG 1.4.1.** `article a` and `.bio a`
 are gold at `text-decoration: none`, underlined on hover only — and hover does not exist on touch
-and is absent while a page is being read. Colour-alone requires **3:1 against surrounding text**;
+and is absent while a page is being read. Color-alone requires **3:1 against surrounding text**;
 this is 1.517:1. Present in every post and in the template. The fix is a rest-state underline scoped
 to prose links, leaving nav, footer and post-footer alone, since those are link regions rather than
 links embedded in running text.
@@ -481,7 +483,7 @@ the rule named the symptom and the habit had two forms.
 The fix walks. It reports the total it found before it edits anything, so a future gap shows up as a
 number that moved rather than as silence. Every link on `resume/`, `index.html` and
 `blog/index.html` sits in a region, and `aiii/index.html` was never failing: its `.byline a` and
-`footer.foot a` carry `border-bottom: 1px solid var(--hair)`, a non-colour cue at rest, and it holds
+`footer.foot a` carry `border-bottom: 1px solid var(--hair)`, a non-color cue at rest, and it holds
 no links inside `<article>` at all.
 
 **Rev 8 said something different and it was wrong in both directions.** It recorded *two pages and
@@ -498,7 +500,7 @@ of bio's four sit mid-sentence and were invisible to it.
 > fewer hits, which looks exactly like a smaller problem — nothing in the output says the method
 > was wrong. A guard that false-fails announces itself; a guard that false-passes does not.
 
-**And the conclusion travelled further than the count.** "Needs its own selectors" was inferred from
+**And the conclusion traveled further than the count.** "Needs its own selectors" was inferred from
 the bad number rather than read off the page, so a wrong figure became a wrong plan, and the plan
 read as though someone had looked. **Verify the consumer, not the declaration** applies to a count
 as much as to a flag: the question was never *how many did the pattern find*, it was *what does the
@@ -616,7 +618,7 @@ loads faces through `@fontsource` npm imports rather than a font link, so pointi
 `package.json`, and the entry in `package-lock.json`. Two were pushed and the build failed on
 `npm ci`, which refuses when the manifest and the lockfile disagree.
 
-**That refusal is the behaviour to want.** `npm ci` would not resolve from the manifest and quietly
+**That refusal is the behavior to want.** `npm ci` would not resolve from the manifest and quietly
 produce a dependency tree nobody had recorded; it failed at build time rather than deploying a page
 whose mark fell through to `system-ui`. Same posture this register asks of its own guards. The
 coupling was missed not because it was subtle but because it was **dull next to the interesting
@@ -709,7 +711,7 @@ The working scan that carried these items is superseded by this file. Outcomes p
 | F5 | Is decision #15 global to the raster pipeline? | Ruled — yes |
 | F6 | `generate_site_og.py`'s spaced `R N V I Z I O N` | Closed on evidence — the mark; face, case and spacing all fixed |
 | F7 | One token vocabulary | Ruled — `--font-{role}` plus `--font-mark` |
-| F8 | One weight-axis standard per face | Ruled — yes, nothing synthesised |
+| F8 | One weight-axis standard per face | Ruled — yes, nothing synthesized |
 | F9 | Does `font.sh` fetch Instrument Serif? | Closed — no, by design |
 | F10 | Mark tracking | **Superseded** — the single `+0.033em` gave way to the two-value system above |
 | F11 | Type fact in `profile.json` | Open — R1 + R2 |
@@ -724,10 +726,10 @@ part of why this file exists.
 
 ---
 
-## Colour — not here
+## Color — not here
 
-**`BRAND_COLORS.md` owns colour. This file owns type.** No colour value is restated here, including
-the gold the mark is set in; where a colour is named above it is naming a surface, not defining a
+**`BRAND_COLORS.md` owns color. This file owns type.** No color value is restated here, including
+the gold the mark is set in; where a color is named above it is naming a surface, not defining a
 value.
 
 ---
@@ -735,6 +737,6 @@ value.
 ## Evidence base
 
 Brand Book decisions **#15** (mark face), **#16** (initiative-page body), **#18** (`aiii/`
-Montserrat request), **#19** (hex notation, colour but same discipline). Register F1–F14, retired
+Montserrat request), **#19** (hex notation, color but same discipline). Register F1–F14, retired
 above. Verification against `main` on 2026-08-11, 08-12, 08-14 and 08-15; every figure in this file
 was read from a shipped artifact rather than a handoff note.

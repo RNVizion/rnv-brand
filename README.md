@@ -43,7 +43,7 @@ A value is stated once, here. `BRAND_COLORS.md` points at it rather than restati
   full gold is too loud.
 - **The two-dark rule is intentional:** apps run true black and charcoal; the website runs the
   blue-tinted ramp. Never flatten one into the other.
-- **Ramps are rules, not lists.** App neutrals are one pure-grey ramp between black and white;
+- **Ramps are rules, not lists.** App neutrals are one pure-gray ramp between black and white;
   the website is that ramp with a blue lift; **Records** is that ramp with a warm one. Steps
   are modulations, and a modulation is not a brand color.
 - **Alpha modulates, it never mints.** A dark may be thinned; it may not be re-hued.

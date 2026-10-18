@@ -3,7 +3,7 @@
 refresh_profile.py — check every repo in the ecosystem against the identity manifest.
 
 Lives in rnv-brand alongside engine/brand.py. Brand tokens are the machine source
-for colour and type; profile.json is the machine source for facts about the person
+for color and type; profile.json is the machine source for facts about the person
 and the products. Same rule: import it, never hardcode.
 
 WHY THIS EXISTS
@@ -353,7 +353,7 @@ class Report:
 # exemption plumbing
 # --------------------------------------------------------------------------
 def exempt_entries(entry: dict) -> list[dict]:
-    """Normalise exempt[] to dicts. A bare string is the legacy unbounded form;
+    """Normalize exempt[] to dicts. A bare string is the legacy unbounded form;
     it keeps working, and the ledger names it so it can be tightened."""
     out = []
     for e in entry.get("exempt", []):
@@ -428,7 +428,7 @@ def number_word(n):
 
 def render_phrase(template, value):
     """Substitute a figure into a match phrase: {value} the figure as written,
-    {word} its spelling, {Word} the spelling capitalised for a sentence start.
+    {word} its spelling, {Word} the spelling capitalized for a sentence start.
 
     THE PHRASE IS DERIVED FROM THE VALUE SO THE TWO CANNOT DRIFT APART IN CONFIG.
     `match` moves with `value` has been a standing rule since August and was
@@ -864,7 +864,7 @@ def lint_documents(cfg, docx_dir, rep):
     that no schedule provides.
 
     Renamed 2026-08-12 from check_docx, and its scope label from "resumes" to
-    "documents". The manifest stopped modelling the personal resume variants that
+    "documents". The manifest stopped modeling the personal resume variants that
     day; the tool kept the vocabulary, which is the same thing one layer down.
     Whatever you point this at is a document, and the lint has no opinion about
     what kind.
@@ -1398,7 +1398,7 @@ def verify_resolver_table(cfg, rep, workdir: Path):
     thing is merely mentioned (this table) -- practices 4.5's fifth instance.
 
     THREE COMPARISONS, BECAUSE THE TWO INCIDENTS FAILED DIFFERENTLY. Every
-    RNV_BRAND key has a row (a whole colour cannot be omitted). Every name in the
+    RNV_BRAND key has a row (a whole color cannot be omitted). Every name in the
     table is a key (the register cannot document a name that falls through to
     CSS). Every name's row value equals RNV_BRAND[name] (the dark-gold drift).
     Both directions, per practices 3.3.
@@ -1946,7 +1946,7 @@ def verify_facts(cfg, rep, workdir: Path):
         # this check existed it had no reader, so it drifted silently inside the
         # file whose job is preventing silent drift. This checker never edits,
         # by contract, so the finding carries the exact replacement value and a
-        # human commits it — the same division of labour as every other check.
+        # human commits it — the same division of labor as every other check.
         recorded = spec.get("floor_observed")
         if recorded is not None:
             if floor > recorded:
