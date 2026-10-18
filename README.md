@@ -14,10 +14,15 @@ compares values, never names.
 
     python engine/brand.py --css web > tokens.css   # website surface (the ramp)
     python engine/brand.py --css app > tokens.css   # desktop surface
+    python engine/brand.py --font-faces /fonts/ > fonts.css   # @font-face rules for engine/fonts/, served at /fonts/
 
 From Python:
 
-    from engine.brand import RNV_BRAND, WEB, APP, STATUS, emit_css
+    from engine.brand import RNV_BRAND, WEB, APP, STATUS, emit_css, fonts_dir, font_faces
+
+The brand's five faces ship in `engine/fonts/`, one `woff2` file for every role, weight and style
+`TYPE` names. A consumer serves that folder and passes its URL to `font_faces()`. Why, and what the
+guard on the folder does and does not check: `BRAND_TYPE.md`, *The font files*.
 
 ## Who owns what
 
@@ -52,6 +57,9 @@ A value is stated once, here. `BRAND_COLORS.md` points at it rather than restati
 
 None, deliberately. The source is visible for transparency; no reuse rights
 are granted. All rights reserved.
+
+**The font files in `engine/fonts/` are the exception, and they are not ours.** Each face is under
+the SIL Open Font License 1.1, whose text sits beside its files and ships with them.
 
 The human-readable deep-dive is `BRAND_COLORS.md`, in this repo; the identity system is the
 RNVizion Brand Book.
