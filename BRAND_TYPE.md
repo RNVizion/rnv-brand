@@ -3,7 +3,17 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-10-18 (rev 12 — **the brand's faces now ship with the brand.** Chris ruled on
+Last locked: 2026-10-18 (rev 13 — **the site serves the brand's files, and `/card/`'s exemption has
+nothing left to exempt.** `rnvizion.github.io@6daf066` moved every page that asked Google for a face,
+nineteen of them, to one stylesheet of the site's own over a copy of `engine/fonts/`. The checker
+learned first, at `rnv-brand@8225e89`, that such a stylesheet requests the families its rules
+declare, and now compares the copy with the source: the files byte for byte, each served family's
+license, and the rules against `--font-faces`. **So `/card/` no longer carries a font link of its
+own**, and its bullet below is rewritten as the decision's record while `profile.json` drops
+`type_register.no_canonical_link` in the same change (v1.3.6) — the two are one exemption, as they
+were for `aiii/` at rev 11. **Run through the real `verify_type` before either moved:** with the entry
+gone, 0 findings at the site's head and *"font link differs from the 17 pages that share one
+string"* on both card pages at `81f9626`, the commit before. rev 12 — **the brand's faces now ship with the brand.** Chris ruled on
 2026-10-18 that the files every surface draws are held here, in `engine/fonts/`, and reach a
 consumer through the pin that already brings it the colors. Two surfaces asked for it. The corpus
 demo drew Gradio's own font files, whose 600 weight holds 3 of the 95 printable ASCII characters,
@@ -183,9 +193,18 @@ Gradio's Hugging Face header asks Google for two faces of its own. That request 
 for Gradio's header, and no file here or setting in the demo removes it. The site's embed of the
 demo and the Hugging Face page do not make it.
 
-**Who takes them.** The corpus demo, for its body and code roles, by Chris's ruling of 2026-10-18;
-the site, by the same ruling, through the Brand Architect. **Until a surface serves these files,
-nothing draws them**, and this section says so rather than counting a ruling as a consumer.
+**Who takes them.** **The site, since `rnvizion.github.io@6daf066`**: a copy in
+`assets/webfonts/` and one stylesheet written by `--font-faces /assets/webfonts/`, linked from every
+page that used to ask Google. **The corpus demo**, for its body and code roles, by the same ruling,
+once its chat moves its pin and lands the change; until then it draws Gradio's files.
+
+**A copy is checked against the source.** `verify_type` follows every font stylesheet a page links,
+and where its rules declare a brand family it compares three things: each file the rules name,
+byte for byte, against `engine/fonts/`; each served family's license beside them; and the rules,
+parsed, against `--font-faces` for the folder they are served from, so a comment above the rules is
+allowed. Broken seven ways on 2026-10-18 and named each time. **Its boundary:** it reads what the
+stylesheet names, so a file in the folder that no rule names is not compared, and a surface that
+requests the faces some other way — `rnv-live` imports `@fontsource` — is outside it.
 
 ---
 
@@ -569,11 +588,17 @@ different pipeline.
 
 ## Exemptions a guard must not flag as drift
 
-- **`/card/` does not carry the canonical font link, by decision.** It requests exactly the three
-  faces and four weights it draws and nothing else. The rule is *a page requests every face it
-  draws and no face it doesn't*; the chrome pages share one string only because they happen to
-  draw all five — and *how many* share it is a count that moves when a page ships, so it is not
-  written here. Read it from the pages; `verify_type` computes the set on every run.
+- **`/card/` carried a font link of its own from August until 2026-10-18, by decision, and the
+  exemption retired when the site moved off Google.** The card requested exactly the three faces
+  and four weights it draws, so its Google link differed from the chrome pages' and
+  `profile.json`'s `type_register.no_canonical_link` listed both card pages. **At
+  `rnvizion.github.io@6daf066` every page links the same stylesheet**, `/assets/webfonts/fonts.css`,
+  and the rule — *a page requests every face it draws and no face it doesn't* — now holds at
+  download time: the stylesheet declares every face, and a browser fetches only the files the
+  page's text uses, four on the card and six or seven on a chrome page by the Brand Architect's
+  measurement. **The bullet and the manifest entry retired in one change** (rev 13, v1.3.6), verified
+  on the real checker: 0 findings with the entry gone at the site's head, and the two card pages
+  named at `81f9626`, the commit before.
 - **`aiii/` — decision #18's condition fired on 2026-09-28, and its exemption retired with it.**
   From 2026-08-15 the page declared `--font-mark` and never used it: it carried no site nav, so
   there was no wordmark to set in the mark face, the Montserrat request was removed, and a comment
