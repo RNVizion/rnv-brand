@@ -8,7 +8,14 @@ Chris's ruling of that day, from a reviewed word list: *colour* to *color*, *gre
 the rest. No value, figure or ruling moved, so the revision did not, and `pyproject.toml`'s major
 did not. Two quotations of earlier text keep the spelling they were written in.
 
-Last locked: 2026-10-05 (rev 44 — **the blues' account of their own making carried three figures from
+Last locked: 2026-10-19 (rev 45 — **the notation rule is armed, and three figures were in the wrong
+metric.** The checker's `check_hex_case` now reads each desktop app's color file and `brand_map.json`,
+and `engine/brand.py`, on every sweep, and fails by name on a hex literal with a capital letter. It
+started clean, because the apps' chat had lowered its last six capitalized values the same day (#66 A).
+See *Notation is lowercase*. **And the light text variants' table measured in ΔE76 and judged against
+this register's 8.40 bar, which is CIEDE2000**, the slip the measurement rules name. Re-measured on
+`rnv-color-mcp`: CIEDE2000 3.0610, 3.1243 and 3.1223. The conclusion holds by a wide margin; the
+figures now match the bar. rev 44 — **the blues' account of their own making carried three figures from
 ingredient lists it did not name, and one conclusion the published recipe does not support.** Found
 by `rnv-color-mcp`, which reproduced both recipes on its engine and then tried the sentences beside
 them. `#968e9b`, recorded as the `lab` blend of *the same four ingredients*, is three of them — no
@@ -1001,14 +1008,16 @@ registered `hover-light` `#eeeeee` and `pressed-light` `#e0e0e0` **below** it, a
 and nothing re-ran it** — a derived value whose input moved, which is the orphan class except the
 value still resolves and reads fine.
 
-| | was | now | ΔE76 |
+| | was | now | ΔE (CIEDE2000) |
 |---|---|---|---|
-| `success-text-light` | `#8a6581` | **`#825d79`** | 3.20 |
-| `warning-text-light` | `#976633` | **`#8e5e2b`** | 3.27 |
-| `error-text-light` | `#b84e58` | **`#ae4650`** | 3.28 |
+| `success-text-light` | `#8a6581` | **`#825d79`** | 3.07 |
+| `warning-text-light` | `#976633` | **`#8e5e2b`** | 3.13 |
+| `error-text-light` | `#b84e58` | **`#ae4650`** | 3.13 |
 
 **All three move well under this register's own 8.40 *clearly different* bar**, so they stay the same
 three colors to look at, and the color-blind separation is unharmed — worst simulated pair 17.06.
+The figures are rounded up, because 8.40 is a ceiling. **Until rev 45 this table printed ΔE76, 3.20,
+3.27 and 3.28**: measured in one metric and judged in another. The conclusion held.
 
 **The floor is `#e8e8e8` and the reason is one boundary rather than two.** Walking to `#e0e0e0` would
 cover the pressed plate but would put the status text floor there while `BRAND_DARK_GOLD_DEEP`'s
@@ -2111,7 +2120,17 @@ they disagreed, folding was the only workable comparison — a case-sensitive gu
 produced hundreds of findings on its first run and been switched off. Against zero findings the
 reasoning inverts: an exact comparison *enforces* the convention, where a folding one passes on
 either notation and stops catching a regression. **Nothing caught the day the apps and
-`brand.py` disagreed**, which is the argument for arming it.
+`brand.py` disagreed**, which was the argument for arming it.
+
+**Armed 2026-10-19, by Chris's ruling of that day.** `check_hex_case` in the checker reads, on every
+sweep: the file each desktop app's `brand_map.json` names as `color_file`; every string in that map,
+since the apps' sync writes the color file from it; and `engine/brand.py`. It fails by name on any
+string literal that is wholly a hex color and has a capital letter. **A comment, a docstring or a
+sentence quoting a capitalized value passes**, which is why it could start clean while two app
+comments quote one. It started clean after the apps' chat ruled that app-owned sample data is held to
+this rule (#66 A, 2026-10-18) and lowered the last six values. **What it does not read:** hex anywhere
+else in an app, and a repository that drops its `brand_map.json`, which also breaks that app's own
+sync. **This section's rule is wider than the check**, so the rest of it stays a rule.
 
 ---
 
