@@ -95,6 +95,12 @@ identifier across its own repos is not positioned to align anyone else's.
 #
 # NOTHING CAUGHT THE DAY THE TWO SIDES DISAGREED. Not a checker failure -- no
 # checker was ever pointed at notation. Same shape as type before R2.
+#
+# SINCE 2026-10-19 ONE IS. check_hex_case in scripts/refresh_profile.py reads
+# this file, each app's color file and each app's brand_map.json on every
+# sweep, case-sensitively, and fails by name. It judges string literals that
+# are wholly a hex color, so a comment is outside it. The rule above is wider
+# than the check and stays a rule for the rest.
 # ------------------------------------------------------ how stamps are written
 # EVERY DATE IN THIS FILE IS THE CLOCK OF THE COMMIT THAT SHIPPED ITS SUBJECT,
 # not the day someone wrote the comment. Where the commit is known it is cited
@@ -1806,8 +1812,10 @@ STATUS = {
     # BELOW #e8e8e8 NO BRAND TEXT OF ANY FAMILY IS CARRIED. The pressed plate
     # carries no running text, consistently, in both families.
     #
-    # THE MOVE IS SMALL AND THEY STAY THE SAME THREE COLORS: dE76 3.20 / 3.27 /
-    # 3.28 against this register's own 8.40 "clearly different" bar. The
+    # THE MOVE IS SMALL AND THEY STAY THE SAME THREE COLORS: CIEDE2000 3.07 /
+    # 3.13 / 3.13, rounded up because 8.40 is a ceiling, against this register's
+    # own 8.40 "clearly different" bar. Until register rev 45 this read dE76
+    # 3.20 / 3.27 / 3.28: one metric measured, the other judged. The
     # color-blind separation is unharmed -- worst simulated pair 17.06.
     #
     # THE SENTENCE THAT PROMPTED THIS WAS ALSO WRONG AND IS CORRECTED BELOW. The
