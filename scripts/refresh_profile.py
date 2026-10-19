@@ -848,6 +848,96 @@ def check_thresholds(cfg, root, rep, scope):
     rep.checks += 1
 
 
+# Any hex color spelled as a whole string: 3, 4, 6 or 8 digits.
+HEX_COLOR = re.compile(r"#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})")
+
+
+def _hex_literals(text):
+    """(line, value) for every string literal in Python source that is wholly a
+    hex color. Comments are not literals, and a hex inside a sentence is not
+    wholly one, so a comment or docstring QUOTING a capitalized value passes.
+
+    tokenize, NOT ast, and the reason was measured: on 2026-10-19 the palette
+    manager's color file used the `type X = ...` statement, which ast cannot
+    parse below Python 3.12. tokenize reads strings and comments without
+    parsing the grammar, so an app moving to a newer Python than the runner's
+    does not take this check down with it."""
+    import ast
+    import tokenize
+    for tok in tokenize.generate_tokens(io.StringIO(text).readline):
+        if tok.type != tokenize.STRING:
+            continue
+        try:
+            value = ast.literal_eval(tok.string)
+        except (ValueError, SyntaxError):
+            continue   # an f-string piece or a bytes literal: not a color constant
+        if isinstance(value, str) and HEX_COLOR.fullmatch(value):
+            yield tok.start[0], value
+
+
+def check_hex_case(cfg, root, rep, scope):
+    """Hex is lower case in a color source, and this says so by name when it is not.
+
+    Ruled 2026-08-14 and 2026-09-25 for the engine, extended to app-owned sample
+    data by the apps' chat on 2026-10-18 (#66 A), and made a check by Chris on
+    2026-10-19. Six capitalized values were lowered first, so this started clean.
+
+    WHAT IT READS, discovered rather than listed. In any repository with a
+    brand_map.json at its root: the file that map names as `color_file`, and
+    every string in the map itself, because the apps' sync writes the color file
+    from it. In any repository with engine/brand.py: that file. Only string
+    literals that are wholly a hex color are judged (see _hex_literals).
+
+    WHAT IT DOES NOT. Hex anywhere else in an app; a comment, which the engine's
+    own rule also covers and this does not; and a repository that deletes its
+    brand_map.json, which drops out with no finding. That last one also breaks
+    the app's own sync, so the app sees it first.
+
+    The value is printed, against Domain 2's withhold-the-value rule, on
+    purpose: that rule exists because republishing a private value is the harm.
+    Every repository this reads is fetched anonymously, so it is public, and a
+    color is the finding, not a secret.
+
+    Runs from run_repo for every repository, not from CHECKS: a new CHECKS key
+    runs on no repository until all fourteen manifest entries name it."""
+    targets = []
+    bm = root / "brand_map.json"
+    if bm.exists():
+        try:
+            bmap = json.loads(bm.read_text(encoding="utf-8"))
+        except (ValueError, UnicodeDecodeError) as e:
+            rep.fail(scope, "brand_map.json",
+                     f"does not parse ({e.__class__.__name__}); its color file was not checked for hex case")
+            bmap = None
+        if isinstance(bmap, dict):
+            for path, s in _json_strings(bmap):
+                if isinstance(s, str) and HEX_COLOR.fullmatch(s) and s != s.lower():
+                    rep.fail(scope, f"brand_map.json {path}",
+                             f'hex "{s}" has capital letters; color sources write hex in lower case (#66 A)')
+            cf = bmap.get("color_file")
+            if not isinstance(cf, str) or not cf.endswith(".py"):
+                rep.fail(scope, "brand_map.json",
+                         "names no Python `color_file`, so no color file was checked for hex case")
+            elif not (root / cf).is_file():
+                rep.fail(scope, cf, "brand_map.json names this as the color file and it does not exist")
+            else:
+                targets.append(cf)
+    if (root / "engine/brand.py").is_file():
+        targets.append("engine/brand.py")
+    for rel in targets:
+        try:
+            found = list(_hex_literals((root / rel).read_text(encoding="utf-8")))
+        except Exception as e:   # undecodable, or source tokenize cannot read
+            rep.fail(scope, rel, f"could not be read for hex case ({e.__class__.__name__}); not checked")
+            continue
+        for line, value in found:
+            if value != value.lower():
+                rep.fail(scope, f"{rel}:{line}",
+                         f'hex "{value}" has capital letters; color sources write hex in lower case (#66 A)')
+    if bm.exists() or targets:
+        rep.checks += 1
+
+
 CHECKS = {
     "retired": check_retired, "contact": check_contact, "renames": check_renames,
     "bio": check_bio, "facts": check_facts, "products": check_products,
@@ -2349,6 +2439,8 @@ def run_repo(cfg, name, root, rep, only=None):
         fn = CHECKS.get(g)
         if fn:
             fn(cfg, root, rep, name)
+    if not only or "hex" in only:
+        check_hex_case(cfg, root, rep, name)
 
 
 def main():
