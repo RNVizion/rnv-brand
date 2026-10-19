@@ -73,6 +73,7 @@ import fnmatch
 import io
 import json
 import datetime
+import posixpath
 import re
 import subprocess
 import sys
@@ -1097,15 +1098,19 @@ def _resolve_family(cls, blocks, tokens):
     return None
 
 
-def _requests_family(text, family):
-    """Does this file actually LOAD the face, by any of the three mechanisms?
+def _requests_family(text, family, linked_families=()):
+    """Does this file actually LOAD the face, by any of the four mechanisms?
 
-    The site requests through a Google Fonts link, rnv-live through an
-    @fontsource npm import, and a self-contained page could use @font-face. All
-    three are the same rule wearing different syntax, which is why this asks the
-    question rather than looking for one shape.
+    A Google Fonts link, an @fontsource npm import as rnv-live uses, an
+    @font-face in the page itself, and -- since 2026-10-18 -- a stylesheet of the
+    surface's own whose @font-face rules declare the family. The caller follows
+    that link and passes the families the file declares; see _own_stylesheets.
+    All four are the same rule wearing different syntax, which is why this asks
+    the question rather than looking for one shape.
     """
     f = family.strip().strip('"\'').lower()
+    if any(f == x.strip().strip('"\'').lower() for x in linked_families):
+        return True
     for line in text.splitlines():
         low = line.lower()
         if f not in low:
@@ -1115,6 +1120,170 @@ def _requests_family(text, family):
             return True
     return f in re.sub(r"(?s)<style.*?</style>", " ", text).lower() and (
         "fonts.googleapis.com" in text.lower() or "@fontsource" in text.lower())
+
+
+# A STYLESHEET OF THE SURFACE'S OWN IS A FOURTH WAY TO REQUEST A FACE. Since
+# rnv-brand@44bd11d the brand's faces ship as files in engine/fonts/, and a site
+# serves a copy and links one stylesheet of @font-face rules. A page that links
+# it requests every family those rules declare -- and only those: following the
+# link to the file is the point, because a check that accepted any link to a
+# file called fonts.css would pass a page whose stylesheet had dropped the mark's
+# face. Asked for by the Brand Architect on 2026-10-18, measured there first:
+# without this, every page that draws the mark failed the moment the site moved
+# off Google, while the face loaded.
+_LINK_TAG = re.compile(r"<link\b[^>]*>", re.I)
+_FONT_FACE = re.compile(r"@font-face\s*\{([^}]*)\}", re.I)
+
+
+def _attr(tag, name):
+    m = re.search(r"\b" + name + r"""\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))""", tag, re.I)
+    return None if not m else (m.group(2) or m.group(3) or m.group(4) or "")
+
+
+def _own_stylesheets(root, page_rel, body):
+    """[(href, path relative to root or None, text or None)] for every stylesheet
+    the page links from its own repository. A link to another host is not one.
+
+    A root-relative href resolves against the repository root, which is the site
+    root on a GitHub Pages site; a relative one resolves against the page's
+    folder. A path that names no file in the tree comes back with text None, so
+    a caller can say the link points at nothing rather than reading it as absent.
+    """
+    out = []
+    for tag in _LINK_TAG.findall(body):
+        if "stylesheet" not in (_attr(tag, "rel") or "").lower():
+            continue
+        href = _attr(tag, "href") or ""
+        if not href or re.match(r"(?i)^([a-z][a-z0-9+.-]*:)?//", href):
+            continue
+        clean = href.split("#", 1)[0].split("?", 1)[0]
+        if clean.startswith("/"):
+            rel_s = posixpath.normpath(clean.lstrip("/"))
+        else:
+            rel_s = posixpath.normpath(posixpath.join(posixpath.dirname(page_rel), clean))
+        if rel_s.startswith(".."):
+            out.append((href, None, None))
+            continue
+        path = root / rel_s
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore") if path.is_file() else None
+        except OSError:
+            text = None
+        out.append((href, rel_s, text))
+    return out
+
+
+def _font_faces_in(css):
+    """[{family, style, weight, src, unicode-range}] for each @font-face rule.
+
+    Parsed rather than compared as bytes, so a comment at the top of a generated
+    stylesheet -- which says where it came from, and should -- is not a finding.
+    """
+    css = re.sub(r"(?s)/\*.*?\*/", " ", css)
+    faces = []
+    for block in _FONT_FACE.findall(css):
+        decls = {}
+        for part in block.split(";"):
+            if ":" in part:
+                k, v = part.split(":", 1)
+                decls[k.strip().lower()] = " ".join(v.split())
+        decls["font-family"] = decls.get("font-family", "").strip("\"' ")
+        faces.append(decls)
+    return faces
+
+
+def _check_font_copy(name, root, css_rel, css_text, rep):
+    """A surface's copy of the brand's font files is rnv-brand's, byte for byte.
+
+    A COPY IS A SECOND CANONICAL ENTRY. engine/fonts/ is the source; a site that
+    serves the files serves a copy, and a copy that falls behind draws the old
+    face with nothing reading wrong. Three comparisons, each with one meaning:
+
+      1. Every font file the stylesheet names exists in the repository and is
+         byte-identical to the file of the same name in this tree's engine/fonts/.
+      2. The license of every family it serves sits beside the files, identical,
+         because the SIL OFL travels with the fonts by its own terms.
+      3. Its @font-face rules are the ones engine/brand.py --font-faces writes for
+         the folder the files are served from -- parsed, so a comment saying
+         where the file came from is allowed.
+
+    Returns the number of comparisons made. It reads what the stylesheet names
+    and nothing else, so a font file in the folder that no rule names is not
+    compared, and a surface that requests the faces some other way is outside it.
+    """
+    fonts = REPO_ROOT / "engine" / "fonts"
+    if not fonts.is_dir():
+        rep.fail("type", "engine/fonts", "not found in this checker's tree, so no "
+                 "surface's copy of the brand's font files could be compared")
+        return 0
+    faces = _font_faces_in(css_text)
+    where = f"{name}/{css_rel}"
+    served_dirs, families, compared = set(), set(), 0
+    for face in faces:
+        for url in re.findall(r"url\(\s*['\"]?([^'\")]+)['\"]?\s*\)", face.get("src", "")):
+            if re.match(r"(?i)^([a-z][a-z0-9+.-]*:)?//", url):
+                rep.fail("type", where, f"an @font-face rule for {face['font-family']} "
+                         f"loads from another host; the brand's faces are served "
+                         f"from the surface's own copy of engine/fonts/")
+                continue
+            rel = (posixpath.normpath(url.lstrip("/")) if url.startswith("/") else
+                   posixpath.normpath(posixpath.join(posixpath.dirname(css_rel), url)))
+            fname = Path(rel).name
+            served_dirs.add(posixpath.dirname(rel))
+            families.add(face["font-family"])
+            compared += 1
+            src = fonts / fname
+            mine = root / rel
+            if not src.is_file():
+                rep.fail("type", where, f"serves {fname}, which is not one of "
+                         f"rnv-brand's font files")
+            elif not mine.is_file():
+                rep.fail("type", where, f"names {rel}, which is not in the "
+                         f"repository, so that face does not load")
+            elif mine.read_bytes() != src.read_bytes():
+                rep.fail("type", f"{name}/{rel}", f"differs from rnv-brand's "
+                         f"engine/fonts/{fname}; the copy has fallen behind or "
+                         f"been edited. Copy the folder again")
+    # One license per family served, named the way engine/fonts/ names it.
+    for d in sorted(served_dirs):
+        for fam in sorted(families):
+            lic = "OFL-" + fam.replace(" ", "-") + ".txt"
+            compared += 1
+            ours, theirs = fonts / lic, root / d / lic
+            if not ours.is_file():
+                rep.fail("type", "engine/fonts", f"has no {lic}, so the license "
+                         f"a surface must carry for {fam} could not be compared")
+            elif not theirs.is_file():
+                rep.fail("type", f"{name}/{d}", f"serves {fam} without {lic}; the "
+                         f"SIL Open Font License travels with the files")
+            elif theirs.read_bytes() != ours.read_bytes():
+                rep.fail("type", f"{name}/{d}/{lic}", "differs from rnv-brand's copy")
+    if len(served_dirs) == 1:
+        prefix = "/" + next(iter(served_dirs)).strip("/") + "/"
+        try:
+            r = subprocess.run([sys.executable, str(REPO_ROOT / "engine" / "brand.py"),
+                                "--font-faces", prefix], capture_output=True, text=True, timeout=30)
+            expected = _font_faces_in(r.stdout) if r.returncode == 0 else None
+        except Exception:
+            expected = None
+        compared += 1
+        if expected is None:
+            rep.fail("type", where, "engine/brand.py --font-faces did not run, so "
+                     "this stylesheet's rules were not compared")
+        else:
+            key = lambda f: tuple(sorted(f.items()))
+            have, want = sorted(map(key, faces)), sorted(map(key, expected))
+            if have != want:
+                missing = len([w for w in want if w not in have])
+                extra = len([h for h in have if h not in want])
+                rep.fail("type", where, f"@font-face rules differ from what "
+                         f"engine/brand.py --font-faces {prefix} writes: {missing} "
+                         f"missing or changed, {extra} not the emitter's. Regenerate "
+                         f"it; a comment above the rules is allowed")
+    elif len(served_dirs) > 1:
+        rep.fail("type", where, "serves the brand's fonts from more than one "
+                 "folder, so its rules cannot be compared with the emitter's")
+    return compared
 
 
 def _check_tracking(cls, blocks, expected, selectors):
@@ -1595,7 +1764,12 @@ def verify_type(cfg, rep, workdir: Path):
          with a live example: rnv-live rendered the brand mark in JetBrains Mono
          at 700 until 2026-08-16, four revisions after decision #15 retired the
          wordmark from mono, and nothing reported it.
-      2. The mark face drawn but never requested. **The direction matters and it
+      2. The mark face drawn but never requested. A page requests a face by a
+         Google Fonts link, an @fontsource import, an @font-face of its own, or
+         -- since 2026-10-18 -- a linked stylesheet of its own repository whose
+         @font-face rules declare the family; the link is followed to the file
+         and the file is read, so a stylesheet that dropped the face fails.
+         **The direction matters and it
          was nearly built backwards.** Loading a face and not drawing it is a
          wasted request that renders fine -- aiii/ did exactly that from
          2026-08-15 until rnvizion.github.io@48228b7 gave it the site nav, per
@@ -1603,12 +1777,19 @@ def verify_type(cfg, rep, workdir: Path):
          a face without loading it puts the wordmark in a fallback and is
          visibly wrong. Arm the second.
       3. The canonical font link drifting on one page out of the set that shares
-         it. No stored copy: the set defines itself, so there is nothing to go
-         stale. Pages the register exempts are excluded first.
+         it -- a Google Fonts URL, or the href of a font stylesheet of the site's
+         own. No stored copy: the set defines itself, so there is nothing to go
+         stale. Pages the register exempts are excluded first. When no page
+         links either, it says so rather than comparing nothing in silence.
       4. F13 -- any page redefining `--font-body` away from the body face, which
          must fail even on an initiative page permitted to *use* another face in
          its `body` selector. The two conditions read different layers, and a
          token-only check would pass a page while verifying nothing.
+      5. A surface's copy of the brand's font files falling behind rnv-brand's.
+         Every font stylesheet a page links, whose rules declare a brand family,
+         is compared: the files it names byte for byte against engine/fonts/,
+         each family's license beside them, and its rules, parsed, against
+         engine/brand.py --font-faces. See _check_font_copy for its boundary.
     """
     reg = cfg.get("type_register")
     if not reg:
@@ -1652,7 +1833,11 @@ def verify_type(cfg, rep, workdir: Path):
                      f"type_register rules tracking for .{sel}, which is not in "
                      f"mark_selectors, so nothing will ever be compared against it")
 
-    links, checked = {}, 0
+    # The brand's families, from the emitter's own font tokens, so a stylesheet
+    # of web fonts that are not the brand's is not compared against engine/fonts/.
+    brand_families = {v.strip().strip('"\'').lower() for k, v in tokens.items()
+                      if k.startswith("--rnv-font-")}
+    links, checked, fonts_compared = {}, 0, 0
     for name in [r for r in cfg["repos"] if not r.startswith("_")]:
         root, why = fetch_repo(name, workdir)
         if root is None:
@@ -1660,10 +1845,21 @@ def verify_type(cfg, rep, workdir: Path):
                      f"could not fetch ({why}); no mark on this surface was "
                      f"verified. {MISS_HINT}")
             continue
+        font_sheets = {}
         for relpath, body in text_files(root):
             if not relpath.endswith((".html", ".astro")):
                 continue
             where = f"{name}/{relpath}"
+            own = _own_stylesheets(root, relpath, body)
+            linked = set()
+            for href, rel_css, css in own:
+                fams = {f["font-family"] for f in _font_faces_in(css)} if css else set()
+                linked |= fams
+                if fams:
+                    font_sheets.setdefault(rel_css, css)
+                    if relpath not in exempt_link and not any(
+                            relpath.endswith(e) for e in exempt_link):
+                        links.setdefault(f"<link href=\"{href}\">", []).append(where)
             blocks = css_declarations(body)
             local = dict(tokens)
             for decls in blocks.values():
@@ -1706,11 +1902,14 @@ def verify_type(cfg, rep, workdir: Path):
                         cls, blocks, mark_tracking, selectors)):
                     rep.fail("type", where,
                              f"<{tag} class=\"{cls}\"> {_tracking_finding}")
-                elif not _requests_family(body, mark_family):
+                elif not _requests_family(body, mark_family, linked):
+                    dangling = [h for h, r, t in own if t is None]
                     rep.fail("type", where,
                              f"draws {mark_family} and never requests it, so the "
                              f"mark renders in a fallback face. Loading without "
-                             f"drawing is harmless; this is the other direction")
+                             f"drawing is harmless; this is the other direction"
+                             + (f". It links {', '.join(dangling)}, which is not "
+                                f"a file in the repository" if dangling else ""))
 
             if relpath not in exempt_link and not any(
                     relpath.endswith(e) for e in exempt_link):
@@ -1724,6 +1923,15 @@ def verify_type(cfg, rep, workdir: Path):
                              f"An initiative page may USE another face in its "
                              f"body selector; it may not redefine the token")
 
+        for rel_css, css in sorted(font_sheets.items()):
+            declared = {f["font-family"].lower() for f in _font_faces_in(css)}
+            if declared & brand_families:
+                fonts_compared += _check_font_copy(name, root, rel_css, css, rep)
+
+    if not links:
+        rep.note("type", "-",
+                 "no page links a font stylesheet or a Google Fonts URL, so the "
+                 "font-link comparison compared nothing")
     if len(links) > 1:
         ranked = sorted(links.items(), key=lambda kv: -len(kv[1]))
         for link, pages in ranked[1:]:
@@ -1734,7 +1942,7 @@ def verify_type(cfg, rep, workdir: Path):
     if checked == 0:
         rep.note("type", "-",
                  "no surface in the ecosystem renders the mark; nothing compared")
-    rep.checks += 1
+    rep.checks += 1 + (1 if fonts_compared else 0)
 
 
 def verify_tokens(cfg, rep, workdir: Path):
