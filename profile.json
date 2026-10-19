@@ -1,6 +1,6 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "_updated_note": "STALE FOR THREE WEEKS AND CAUGHT BY A CONSUMER CITING IT, 2026-09-02. This field read 2026-08-12 while version had moved to 1.3.1 and the manifest had been edited many times -- a header date asserting a freshness the body did not have, in the file that publishes the rule against exactly that. A reader Built-from-ing against it would have cited a three-week-old state as current. CITE THE VERSION, NOT THIS FIELD: version moves when the contents move and this one moves when someone remembers.",
   "updated": "2026-09-29",
   "_resumes_out_of_scope": "2026-08-12, v1.3.0. The .docx resume variants are PERSONAL documents, handed directly to people, and they carry the personal cell. They are deliberately not modeled here: no appears_in list names them, no fact claims to appear on them, and nothing in this manifest describes their contents. This is a scope decision, not an oversight -- do not re-add 'resumes' to an appears_in list. TWO DIFFERENT ARTIFACTS SHARE THE WORD: resume/index.html in rnvizion.github.io is the PUBLIC web resume, it carries no phone number, and it stays fully checked -- see facts.eval_cases.sources. Verify the one that serves. scripts/refresh_profile.py --docx still exists as a local, opt-in, recordless tool a human can point at their own files; it stores nothing and no workflow passes that flag.",
@@ -516,7 +516,7 @@
     "engine/brand.py": [
       "BRAND_COLORS.md or BRAND_TYPE.md may now disagree with the source, and nothing checks prose against prose. Change both in the same commit or delete one of them.",
       "rnv-live rebuilds src/styles/tokens.css from this file on deploy. Confirm the rebuild actually ran rather than assuming it did.",
-      "If TYPE weights moved: the canonical font link on ten site pages plus the post template, and font.sh, request weights that this file no longer rules.",
+      "If TYPE weights or files moved: the site serves a copy of engine/fonts/ and a stylesheet written by --font-faces, and both must be copied and regenerated; verify_type fails the copy until they are. font.sh fetches the raster generators' TTFs separately and is not compared.",
       "If a palette value moved: the five desktop apps hold their own copies, deferred to their color refactor."
     ],
     "profile.json": [
@@ -548,10 +548,6 @@
     "mark_selectors": {
       "_comment": "THE MARK IS A ROLE AND TEXT ALONE CANNOT IDENTIFY IT. The brand name also appears as an author byline on eight blog files, in page titles, and in the footer's long form; those are mentions of the name, not renderings of the mark, and the register's Labels row permits them in mono. A class list is required alongside the exact-text test because a check cannot infer the role from the contents -- the contents are the brand name either way. Same argument as F13's single-member allowlist: an inferred scope is a hole.",
       "selectors": ["logo", "mark", "wordmark"]
-    },
-    "no_canonical_link": {
-      "_comment": "Pages the register exempts from the shared font-link string, so the link-drift check does not report a decision as drift. THE RULE IS: a page requests every face it draws and no face it doesn't; the chrome pages share one string only because they happen to draw all five. /card/ requests only the three faces and four weights it draws. aiii/ was listed here from 2026-08-15 (Montserrat trimmed because it drew no mark) until v1.3.3: rnvizion.github.io@48228b7 gave the page the site nav, so it draws the mark, requests the face, and its link is byte-identical to the chrome set's -- nothing left to exempt, and verify_type reported 0 findings with the entry gone and a named failure at the commit before. Retired in the same commit as BRAND_TYPE.md rev 11's bullet; the two are one exemption. Each entry here is a decision recorded in BRAND_TYPE.md, not a value tolerated.",
-      "paths": ["card/index.html", "card/print/index.html"]
     }
   },
   "protected": {
