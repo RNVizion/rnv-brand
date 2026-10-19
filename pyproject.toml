@@ -23,7 +23,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rnv-brand"
-version = "44.1.0"          # major = the color register revision, so `pip show` answers "which rev?"
+version = "45.0.0"          # major = the color register revision, so `pip show` answers "which rev?"
 description = "The RNVizion brand register: the colors, the type and its font files, and the rules that derive them."
 requires-python = ">=3.10"
 dependencies = []           # deliberately none -- see the note above
