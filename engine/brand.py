@@ -84,11 +84,14 @@ identifier across its own repos is not positioned to align anyone else's.
 # 2026-10-18 they did: every app keeps its colors, palettes included, in
 # utils/colors.py, which its brand_map.json names as `color_file`. A guard now
 # reads one path per app. MEASURED THAT DAY, A GUARD SCOPED THAT WAY WOULD NOT
-# START CLEAN: six capitalized values sit in two apps' color files, every one
-# marked app-owned -- five history samples in rnv-color-mixer and one pattern
-# example in rnv-text-transformer. Whether app-owned sample data is held to the
-# notation rule is the apps' question, and it is routed. Outside the color
-# files, the Python of the five apps held 34 that day.
+# HAVE STARTED CLEAN: six capitalized values sat in two apps' color files, every
+# one marked app-owned -- five history samples in rnv-color-mixer and one pattern
+# example in rnv-text-transformer. The apps' chat ruled the same day that
+# app-owned sample data is held to the notation rule (#66 A), and lowered all six
+# through each app's brand_map.json: rnv-color-mixer@b4c2c18 and
+# rnv-text-transformer@520c11e, 2026-10-19. Read at all five heads that day, no
+# color file defines a capitalized hex; two comments quote one. Outside the
+# color files, the Python of the five apps held 34 on 2026-10-18.
 #
 # NOTHING CAUGHT THE DAY THE TWO SIDES DISAGREED. Not a checker failure -- no
 # checker was ever pointed at notation. Same shape as type before R2.
