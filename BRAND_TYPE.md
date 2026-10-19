@@ -3,7 +3,15 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-10-18 (rev 13 — **the site serves the brand's files, and `/card/`'s exemption has
+Last locked: 2026-10-19 (rev 14 — **the corpus demo draws the brand's files, and a fallback is
+written bare.** At `rnv-ask-the-corpus@4e5d808`, 18 October, the demo moved its pin to `db7dba0`
+and serves `fonts_dir()`. rev 13 said it had not: it was built from the demo as it stood on
+11 October and landed thirteen minutes after the demo moved, so it was stale on arrival. **And this
+project's own recipe for the demo wrote the system and generic tiers inside Gradio's
+`gr.themes.Font`, which quotes them**, and a quoted `system-ui` names a font no device has. The
+recipe's measurement could not see it, because every glyph drew in the brand face and no fallback was
+reached. The corpus chat found it before landing and wrapped only the faces. The stack rule below now
+says so. rev 13 — **the site serves the brand's files, and `/card/`'s exemption has
 nothing left to exempt.** `rnvizion.github.io@6daf066` moved every page that asked Google for a face,
 nineteen of them, to one stylesheet of the site's own over a copy of `engine/fonts/`. The checker
 learned first, at `rnv-brand@8225e89`, that such a stylesheet requests the families its rules
@@ -195,8 +203,10 @@ demo and the Hugging Face page do not make it.
 
 **Who takes them.** **The site, since `rnvizion.github.io@6daf066`**: a copy in
 `assets/webfonts/` and one stylesheet written by `--font-faces /assets/webfonts/`, linked from every
-page that used to ask Google. **The corpus demo**, for its body and code roles, by the same ruling,
-once its chat moves its pin and lands the change; until then it draws Gradio's files.
+page that used to ask Google. **The corpus demo, since `rnv-ask-the-corpus@4e5d808`**, for its body
+and code roles, by the same ruling: its pin at `db7dba0`, `fonts_dir()` served through Gradio's static
+paths, and `font_faces()` ahead of its own stylesheet. Its chat measured eight configurations, both
+rendering modes at two widths on a Light and a Dark device, and found no glyph in a device face.
 
 **A copy is checked against the source.** `verify_type` follows every font stylesheet a page links,
 and where its rules declare a brand family it compares three things: each file the rules name,
@@ -379,7 +389,11 @@ describes a class**, because the artifact is checkable.
   needing a separate decision.
 - **Fallback chains run three tiers:** brand → system → generic. Two-tier chains satisfy the first
   rule but degrade to the browser default rather than the OS face. Both are legal; only one is
-  graceful.
+  graceful. **The system and generic tiers are CSS keywords and are written bare.** Quoted,
+  `"system-ui"` names a font called *system-ui*, which no device has, so the tier drops without an
+  error and the chain degrades one step further than it reads. A wrapper that quotes every name it is
+  given — Gradio's `gr.themes.Font` is one — takes the brand faces only. Found by the corpus chat
+  in this project's recipe for the demo, before `rnv-ask-the-corpus@4e5d808` landed.
 - **One token vocabulary: `--font-{role}`, with `--font-mark` added.** Three vocabularies were live
   for the same five roles — the main pages, `aiii/`'s shortened set, and the `--rnv-font-{role}`
   set emitted by `brand.py` that **no page consumes**.
