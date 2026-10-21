@@ -3,7 +3,15 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-10-19 (rev 14 — **the corpus demo draws the brand's files, and a fallback is
+Last locked: 2026-10-20 (rev 15 — **the display face takes the corpus demo's page heading, and
+display headings now have a weight and a tracking rule.** The operator ruled in the corpus chat on
+2026-10-19 that the demo's page heading, and only it, takes `TYPE["display"]`. It landed at
+`rnv-ask-the-corpus@9098d0a`, so the demo now takes three roles, and *Who takes them* said two. The
+heading kept Gradio's 600 and normal tracking, so the corpus chat asked for a weight and a tracking.
+**Measured on the site at `rnvizion.github.io@34de289`: every display heading on the brand's pages
+is set at 500, and tracking tightens as size grows.** Chris ruled on 2026-10-20 that the demo's
+26-pixel heading takes 500 and `-0.02em`, the rung for its size. See *Display headings*. rev 14 —
+**the corpus demo draws the brand's files, and a fallback is
 written bare.** At `rnv-ask-the-corpus@4e5d808`, 18 October, the demo moved its pin to `db7dba0`
 and serves `fonts_dir()`. rev 13 said it had not: it was built from the demo as it stood on
 11 October and landed thirteen minutes after the demo moved, so it was stale on arrival. **And this
@@ -204,7 +212,7 @@ demo and the Hugging Face page do not make it.
 **Who takes them.** **The site, since `rnvizion.github.io@6daf066`**: a copy in
 `assets/webfonts/` and one stylesheet written by `--font-faces /assets/webfonts/`, linked from every
 page that used to ask Google. **The corpus demo, since `rnv-ask-the-corpus@4e5d808`**, for its body
-and code roles, by the same ruling: its pin at `db7dba0`, `fonts_dir()` served through Gradio's static
+and code roles, and **since `9098d0a` the display role for its page heading alone**, by the same ruling: its pin at `db7dba0`, `fonts_dir()` served through Gradio's static
 paths, and `font_faces()` ahead of its own stylesheet. Its chat measured eight configurations, both
 rendering modes at two widths on a Light and a Dark device, and found no glyph in a device face.
 
@@ -223,7 +231,7 @@ requests the faces some other way — `rnv-live` imports `@fontsource` — is ou
 | Role | Face | Weight / axis | Where it lives |
 |---|---|---|---|
 | **Mark** | **Montserrat** | **900 (Black)** | The RNVizion mark at every size and in every medium; initiative lockup letterforms; IG aphorism cards and carousels |
-| Display | Bricolage Grotesque | variable, 300–800 | Site headings, blog titles, OG share titles, the name block on résumé cards |
+| Display | Bricolage Grotesque | variable, 300–800 | Site headings, blog titles, OG share titles, the name block on résumé cards, the corpus demo's page heading |
 | Emphasis | Instrument Serif | italic **and roman** | Pull lines, deks, the italicized signature phrases, the card back — **and the blog drop cap, which is roman** |
 | Labels, kickers, long form | JetBrains Mono | 400 / 500 / 600 / 700 | The tracked long form beneath a mark, uppercase tracked kickers, footers, captions, **and inline code in prose — see below** |
 | Body | Inter | 400 / 500 / 600 | Running text |
@@ -274,6 +282,41 @@ verified on `main`. **Running text is a bigger visible surface than the mark**: 
 characters of nav; this was every paragraph on the two pages most people see first.
 
 ---
+
+### Display headings: 500, and tracking by size — ruled 2026-10-20
+
+**Every display heading on the brand's pages is set at weight 500.** Measured at
+`rnvizion.github.io@34de289`: fifteen distinct selectors set in Bricolage Grotesque, from the
+front page's hero to a card's title and a stat value, every one at 500. The only 600s are on `aiii/`, the initiative
+page, which is an exception by decision (see *The initiative-page exception*). **A display heading
+takes 500 unless a ruling says otherwise.**
+
+**Tracking tightens as the heading grows**, in rungs:
+
+| Heading set at | Tracking | On the site |
+|---|---|---|
+| about 4.5–6.5rem at its largest | **`-0.04em`** | the front page's hero, the contact heading, the blog's and the demos' heroes |
+| about 2.2–3.6rem | **`-0.03em`** | page titles: posts, the résumé, a demo's page, section titles, stat values |
+| about 1.4–2rem | **`-0.02em`** | a post's section heads, project and card titles |
+| about 1rem | **`-0.01em`** | a demo's act headings |
+
+**A heading takes the rung for its own size, never a value copied from a heading of another size.**
+That is the second way a type change fails silently (*a value carries across sizes that should
+not*), and it was the first suggestion on the table: the corpus demo's heading could have copied the
+front page's hero at `-0.04em`, which is tuned for type up to four times its size.
+
+**Negative tracking here does not contradict the mark's positive values.** The mark's rule is about
+Montserrat Black in a wordmark, where a negative value was a monospace correction carried onto the
+wrong face. These are a proportional display face at heading sizes, where large type set tight is
+the ordinary direction, and *small type wants more space, not less* still holds: the rungs loosen
+toward zero as the size falls.
+
+**The corpus demo's page heading, ruled by Chris on 2026-10-20: 500 and `-0.02em`.** It is set at
+26 pixels, 1.625rem, the same rung as the site's card titles at 1.65rem. Its file declares the face's
+full weight range, 300 to 800, so 500 is drawn from the brand's file rather than synthesized.
+
+**This is a rule, not a check.** The values are written by hand in each surface's CSS, on the site
+as in the demo, and nothing compares them.
 
 ## The mark
 
