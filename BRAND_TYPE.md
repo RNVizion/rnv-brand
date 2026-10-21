@@ -3,7 +3,16 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-10-20 (rev 15 — **the display face takes the corpus demo's page heading, and
+Last locked: 2026-10-20 (rev 16 — **the share images draw from the brand's files, and every heading
+in a corpus answer takes the display face.** At `rnvizion.github.io@beeeb34` the three raster
+generators read the site's copy of `engine/fonts/` instead of TTFs that `font.sh` fetched from
+`google/fonts` at `main`, unpinned. `font.sh` is deleted, with its CI step and its devcontainer
+call, and a missing font now stops a generator by name instead of drawing a default face. The
+Brand Architect built it and rendered all nineteen share images pixel-identical both ways. **And
+decision #38** (the operator, 2026-10-19 and 20) puts every heading in a corpus answer in the display
+face at 500, with tracking by size by Chris's ruling of 2026-10-20, so h3 and below take `-0.01em`
+and not the `-0.02em` the decision first named. See *Display headings*. rev 15 — **the display face
+takes the corpus demo's page heading, and
 display headings now have a weight and a tracking rule.** The operator ruled in the corpus chat on
 2026-10-19 that the demo's page heading, and only it, takes `TYPE["display"]`. It landed at
 `rnv-ask-the-corpus@9098d0a`, so the demo now takes three roles, and *Who takes them* said two. The
@@ -212,7 +221,9 @@ demo and the Hugging Face page do not make it.
 **Who takes them.** **The site, since `rnvizion.github.io@6daf066`**: a copy in
 `assets/webfonts/` and one stylesheet written by `--font-faces /assets/webfonts/`, linked from every
 page that used to ask Google. **The corpus demo, since `rnv-ask-the-corpus@4e5d808`**, for its body
-and code roles, and **since `9098d0a` the display role for its page heading alone**, by the same ruling: its pin at `db7dba0`, `fonts_dir()` served through Gradio's static
+and code roles, and **since `9098d0a` the display role for its page heading**, by the same ruling.
+**Decision #38 widens that to every heading in an answer**; ruled, and not on the demo's `main` at
+`rnv-ask-the-corpus@27b9efc`: its pin at `db7dba0`, `fonts_dir()` served through Gradio's static
 paths, and `font_faces()` ahead of its own stylesheet. Its chat measured eight configurations, both
 rendering modes at two widths on a Light and a Dark device, and found no glyph in a device face.
 
@@ -231,7 +242,7 @@ requests the faces some other way — `rnv-live` imports `@fontsource` — is ou
 | Role | Face | Weight / axis | Where it lives |
 |---|---|---|---|
 | **Mark** | **Montserrat** | **900 (Black)** | The RNVizion mark at every size and in every medium; initiative lockup letterforms; IG aphorism cards and carousels |
-| Display | Bricolage Grotesque | variable, 300–800 | Site headings, blog titles, OG share titles, the name block on résumé cards, the corpus demo's page heading |
+| Display | Bricolage Grotesque | variable, 300–800 | Site headings, blog titles, OG share titles, the name block on résumé cards, the corpus demo's headings |
 | Emphasis | Instrument Serif | italic **and roman** | Pull lines, deks, the italicized signature phrases, the card back — **and the blog drop cap, which is roman** |
 | Labels, kickers, long form | JetBrains Mono | 400 / 500 / 600 / 700 | The tracked long form beneath a mark, uppercase tracked kickers, footers, captions, **and inline code in prose — see below** |
 | Body | Inter | 400 / 500 / 600 | Running text |
@@ -314,6 +325,24 @@ toward zero as the size falls.
 **The corpus demo's page heading, ruled by Chris on 2026-10-20: 500 and `-0.02em`.** It is set at
 26 pixels, 1.625rem, the same rung as the site's card titles at 1.65rem. Its file declares the face's
 full weight range, 300 to 800, so 500 is drawn from the brand's file rather than synthesized.
+
+**The corpus demo's answer headings, decision #38.** The operator ruled on 2026-10-19 and 2026-10-20
+that every heading in an answer takes the display face at 500, and Chris ruled on 2026-10-20 that
+their tracking follows this ladder. At Gradio 6.22.0's default `text_md` sizes, read from its
+stylesheet:
+
+| Heading | Size | Tracking |
+|---|---|---|
+| page heading, answer h1 | 26px | `-0.02em` |
+| answer h2 | 22px | `-0.02em` |
+| answer h3 | 16px | `-0.01em` |
+| answer h4, h5 | about 15px | `-0.01em` |
+
+**22px is 1.375rem, just under the 1.4rem the rung's description starts at.** The rungs are read
+from the site and are approximate; 22px is far nearer that rung than the 1rem one, and the Brand
+Architect recorded it the same way. **h6 is not ruled**: Gradio sets it no size, so it falls to the
+browser's default, below the lowest rung, and whether an answer can draw one at all is the corpus
+chat's to find out.
 
 **This is a rule, not a check.** The values are written by hand in each surface's CSS, on the site
 as in the demo, and nothing compares them.
@@ -632,14 +661,30 @@ This mattered immediately. The site handoff reached eleven HTML pages and stoppe
 ecosystem — were drawing the wordmark in JetBrains Mono from three Python generators the note
 never mentioned.
 
-**`font.sh` (repo root) fetches three faces** into `assets/fonts/`: `BricolageGrotesque.ttf`,
-`JetBrainsMono.ttf`, `Montserrat.ttf`. **Instrument Serif is deliberately not fetched** (F9), so no
-raster surface can use it; `font.sh` carries what `scripts/` draws, and the roster of five lives
-here.
+**The generators draw from the brand's own files, since `rnvizion.github.io@beeeb34`, 2026-10-20.**
+`generate_og.py`, `generate_site_og.py` and `generate_project_card.py` load three of the `woff2`
+files in the site's `assets/webfonts/`, the copy of `engine/fonts/` the site serves:
+`bricolage-grotesque-latin-opsz-normal`, `jetbrains-mono-latin-500-normal` and
+`montserrat-latin-900-normal`. **That copy is the one `verify_type` compares**, byte for byte, because
+the site's font stylesheet names all three. `OG_FONT_DIR` still overrides the folder.
 
-**The raster side fails silently too.** `load_font()` falls back to `ImageFont.load_default()` on a
-missing file with no error — a bitmap face, not even a system one. Same shape as the CSS fallback,
-different pipeline.
+**What it retired.** Until then `font.sh` fetched three TTFs into `assets/fonts/` from `google/fonts`
+at `main`, unpinned, so the share images drew from files nothing here compared and that could change
+upstream with no commit anywhere. It lived at the repository root until 2026-08-24 and in `scripts/`
+after; this register said *repo root* for two months after it moved. **Measured by the Brand
+Architect before it landed:** all nineteen share images render pixel-identical from either set.
+`assets/fonts/` stays ignored, so an old checkout's TTFs are never committed and nothing reads them.
+
+**The raster side no longer fails silently.** `load_font()` used to fall back to
+`ImageFont.load_default()` on a missing file, with no error: a bitmap face, not even a system one.
+Since `beeeb34` it stops by name on a missing file, and on a variable font that offers none of the
+weights asked for. **Instrument Serif is in the folder and no generator loads it** (F9).
+
+**One boundary, measured 2026-10-20: each generator loads the Latin file of its face only.** A
+browser falls back to the Latin Extended file for a character the Latin file lacks; PIL draws from
+one file and cannot. None of the three loaded files has `→`, `←`, `↔`, `●`, `✓`, `ł`, `š` or `ā`,
+so a share-image title carrying one draws a missing glyph. No current page title does. The fix, if
+one is wanted, is the site's.
 
 ---
 
@@ -770,7 +815,8 @@ build.
     - **Values are parsed, not compared as text.** `/card/` writes `.06em` and the nav writes
       `0.09em`; the leading zero is formatting. A string compare reports drift where none exists —
       the whitespace problem one level down, in the value rather than the declaration.
-  - **The three raster generators are still outside it entirely** — Python drawing with PIL, no
+  - **The three raster generators' files are inside it since `rnvizion.github.io@beeeb34`**, as part
+    of the site's copy, and **their drawing is still outside it** — Python drawing with PIL, no
     markup to parse. Their 1.8px is held true by the three-file coupling and, since 2026-08-16, by a
     prompt: a change to this document now prints the coupled manual work into the run summary. **A
     prompt, not a guard** — it does not verify the generators were updated and must never claim to.
@@ -794,7 +840,7 @@ The working scan that carried these items is superseded by this file. Outcomes p
 | F6 | `generate_site_og.py`'s spaced `R N V I Z I O N` | Closed on evidence — the mark; face, case and spacing all fixed |
 | F7 | One token vocabulary | Ruled — `--font-{role}` plus `--font-mark` |
 | F8 | One weight-axis standard per face | Ruled — yes, nothing synthesized |
-| F9 | Does `font.sh` fetch Instrument Serif? | Closed — no, by design |
+| F9 | Does `font.sh` fetch Instrument Serif? | Closed — no, by design. `font.sh` retired 2026-10-20; the generators read the site's copy of `engine/fonts/`, which holds Instrument Serif, and none loads it |
 | F10 | Mark tracking | **Superseded** — the single `+0.033em` gave way to the two-value system above |
 | F11 | Type fact in `profile.json` | Open — R1 + R2 |
 | F12 | `BRAND_COLORS.md` typography block | Closed — retired rev 14, now points here |
