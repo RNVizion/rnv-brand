@@ -3,7 +3,17 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-10-20 (rev 16 — **the share images draw from the brand's files, and every heading
+Last locked: 2026-10-20 (rev 17 — **the answer headings are on the demo, h6 is ruled, the demo's
+Hugging Face header is off, and the share images stop on a character their file cannot draw.**
+Decision #38 landed at `rnv-ask-the-corpus@336cc99`, with h6 ruled like h5 in the corpus chat the
+same day. **Rev 16 said an h6 falls to the browser's default size; it does not.** Gradio's reset
+gives every heading `font-size: inherit`, so an h6 drew as body text, 14 pixels at 400. Rev 16 read
+Gradio's `.prose` rules and not its reset, and stated the result as fact. The same batch clears the
+page's Space id, so the header and its request to Google are gone, and this register's sentence that
+nothing in the demo could remove them was wrong from that commit. At `rnvizion.github.io@b798f55` the
+three generators check every string they draw against the file they draw it in. See *Display
+headings*, *What this does not fix* and *Type is owed to every publicly seen surface*. rev 16 —
+**the share images draw from the brand's files, and every heading
 in a corpus answer takes the display face.** At `rnvizion.github.io@beeeb34` the three raster
 generators read the site's copy of `engine/fonts/` instead of TTFs that `font.sh` fetched from
 `google/fonts` at `main`, unpinned. `font.sh` is deleted, with its CI step and its devcontainer
@@ -214,16 +224,19 @@ needs a font parser and `engine/brand.py` is standard library only. The 95-of-95
 above is a dated reading, not a check.
 
 **What this does not fix.** At the corpus demo's own `.hf.space` address, opened as the top window,
-Gradio's Hugging Face header asks Google for two faces of its own. That request is Gradio's, made
-for Gradio's header, and no file here or setting in the demo removes it. The site's embed of the
-demo and the Hugging Face page do not make it.
+Gradio draws a Hugging Face header that asks Google for two faces of its own. **Nothing in
+`rnv-brand` removes it.** **A setting in the demo does, since `rnv-ask-the-corpus@336cc99`, by the
+operator's ruling of 2026-10-20**: `app.py` clears `Blocks.space_id`, so the page's config carries no
+Space id and Gradio draws no header. It fails at import if Gradio stops reading that attribute, and
+the corpus chat's eval and deploy read the served config for it. That guard is theirs. The site's
+embed of the demo and the Hugging Face page never made the request.
 
 **Who takes them.** **The site, since `rnvizion.github.io@6daf066`**: a copy in
 `assets/webfonts/` and one stylesheet written by `--font-faces /assets/webfonts/`, linked from every
 page that used to ask Google. **The corpus demo, since `rnv-ask-the-corpus@4e5d808`**, for its body
 and code roles, and **since `9098d0a` the display role for its page heading**, by the same ruling.
-**Decision #38 widens that to every heading in an answer**; ruled, and not on the demo's `main` at
-`rnv-ask-the-corpus@27b9efc`: its pin at `db7dba0`, `fonts_dir()` served through Gradio's static
+**Decision #38 widens that to every heading in an answer**, on the demo's `main` since
+`rnv-ask-the-corpus@336cc99`. The same contract serves both: its pin at `db7dba0`, `fonts_dir()` served through Gradio's static
 paths, and `font_faces()` ahead of its own stylesheet. Its chat measured eight configurations, both
 rendering modes at two widths on a Light and a Dark device, and found no glyph in a device face.
 
@@ -336,13 +349,29 @@ stylesheet:
 | page heading, answer h1 | 26px | `-0.02em` |
 | answer h2 | 22px | `-0.02em` |
 | answer h3 | 16px | `-0.01em` |
-| answer h4, h5 | about 15px | `-0.01em` |
+| answer h4 | 15.4px | `-0.01em` |
+| answer h5 | 14.7px | `-0.01em` |
+| answer h6 | 14px | `-0.01em` |
 
 **22px is 1.375rem, just under the 1.4rem the rung's description starts at.** The rungs are read
 from the site and are approximate; 22px is far nearer that rung than the 1rem one, and the Brand
-Architect recorded it the same way. **h6 is not ruled**: Gradio sets it no size, so it falls to the
-browser's default, below the lowest rung, and whether an answer can draw one at all is the corpus
-chat's to find out.
+Architect recorded it the same way.
+
+**h6 is ruled like h5**, by the operator in the corpus chat on 2026-10-20: the display face at 500
+and `-0.01em`, at its own 14 pixels. Gradio gives every heading `font-size: inherit` and
+`font-weight: inherit` in its reset and sets h6 nothing after, so an h6 in an answer drew as body
+text before the ruling. 14 pixels is below the 1rem rung, as h4 and h5 are; the ruling takes the
+rung anyway. **Rev 16 said an h6 falls to the browser's default size.** That was read from Gradio's
+`.prose` rules without its reset, and is corrected here.
+
+**Landed at `rnv-ask-the-corpus@336cc99`, 2026-10-20.** The corpus chat measured it in both rendering
+modes at two widths on a Light and a Dark device: the values above in all eight, every heading glyph
+from the Bricolage file. Two things in it are the mechanism, not the rule. **The weight carries
+`!important`**, because Gradio sets h1 to h5's weight in a rule that ties with the demo's and, on the
+server, comes after it; without it h1 to h5 stayed at 600. **The tracking is set per heading level,
+for the sizes Gradio 6.22.0 gives each level**, so a Gradio release that moved a level's size would
+leave it on its old rung until someone moves it. The sizes are Gradio's, and nothing here or there
+checks that they still match the table.
 
 **This is a rule, not a check.** The values are written by hand in each surface's CSS, on the site
 as in the demo, and nothing compares them.
@@ -683,8 +712,17 @@ weights asked for. **Instrument Serif is in the folder and no generator loads it
 **One boundary, measured 2026-10-20: each generator loads the Latin file of its face only.** A
 browser falls back to the Latin Extended file for a character the Latin file lacks; PIL draws from
 one file and cannot. None of the three loaded files has `→`, `←`, `↔`, `●`, `✓`, `ł`, `š` or `ā`,
-so a share-image title carrying one draws a missing glyph. No current page title does. The fix, if
-one is wanted, is the site's.
+so a share-image title carrying one would draw a missing glyph. No current page title does.
+
+**Since `rnvizion.github.io@b798f55`, 2026-10-20, a generator stops by name instead.** Each of the
+three wraps Pillow's `ImageDraw.text`, so every string it draws is checked against the character map
+of the file it is drawn in, and a character the file lacks stops the run with the file, the
+character and the text. Whitespace is not checked. The Brand Architect built it on the operator's
+ruling. **Read here at that commit, on a copy:** a post title with `→`, one with `Ł` and `ź`, a
+tagline with `✓` and a project title with `→` each stopped by name and wrote no image; every post's
+image and both site cards rendered, and the site cards byte-identical to the committed files.
+**It is the site's guard, run by the site's build, not this register's**: `verify_type` does not run
+it. It says whether a glyph exists, not how the image looks.
 
 ---
 
@@ -817,7 +855,8 @@ build.
       the whitespace problem one level down, in the value rather than the declaration.
   - **The three raster generators' files are inside it since `rnvizion.github.io@beeeb34`**, as part
     of the site's copy, and **their drawing is still outside it** — Python drawing with PIL, no
-    markup to parse. Their 1.8px is held true by the three-file coupling and, since 2026-08-16, by a
+    markup to parse. Since `b798f55` the site's own build stops on a character a loaded file cannot
+    draw; that guard is the site's, and says nothing about tracking or layout. Their 1.8px is held true by the three-file coupling and, since 2026-08-16, by a
     prompt: a change to this document now prints the coupled manual work into the run summary. **A
     prompt, not a guard** — it does not verify the generators were updated and must never claim to.
 - **[confirm/fill] A formal mark spec** — clearspace, minimum sizes, ratios. Deferred until the
