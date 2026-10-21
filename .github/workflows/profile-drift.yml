@@ -133,12 +133,36 @@ jobs:
       # fails the job stops here, `surfaces` is skipped rather than successful,
       # and every issue-lifecycle condition below is guarded on `outcome` and
       # correctly does nothing.
+      #
+      # A FORCED PUSH. Until 2026-10-21 this step asked one question,
+      # `git cat-file -e "$BEFORE:profile.json"`, and read a failure as "the file
+      # did not exist then". After a forced push the commit before it is on no
+      # branch, so a full clone does not hold it, the question failed for that
+      # reason, and the step passed having compared nothing, naming the wrong
+      # cause. Measured 2026-10-20: GitHub still serves a commit that is on no
+      # branch to a fetch that names it in full. So the step fetches it, then
+      # asks the two questions separately. A commit that cannot be fetched fails
+      # the step: a guard that could not compare does not pass by default, and
+      # the name says why.
       - name: Refuse a manifest version regression
         if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
         env:
           BEFORE: ${{ github.event.before }}
+          FORCED_PUSH: ${{ github.event.forced }}
         run: |
           set -euo pipefail
+          if [ "$FORCED_PUSH" = "true" ]; then
+            echo "This push was forced; comparing against the commit main held before it, $BEFORE."
+          fi
+          if ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            echo "$BEFORE is not in this checkout; fetching it by name."
+            git fetch --quiet --no-tags --depth=1 origin "$BEFORE" || true
+          fi
+          if ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            echo "error: the commit main held before this push, $BEFORE, could not be read, so" \
+                 "the version was not compared. The guard is not passing by default." >&2
+            exit 1
+          fi
           if ! git cat-file -e "$BEFORE:profile.json" 2>/dev/null; then
             echo "profile.json did not exist at $BEFORE; nothing to compare."
             exit 0
@@ -190,7 +214,14 @@ jobs:
         if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
         run: |
           set -euo pipefail
-          files=$(git diff --name-only "${{ github.event.before }}" HEAD || true)
+          # The guard above has made sure the commit before this push is here, so
+          # a diff that fails is a fault, not an empty push. It used to end in
+          # `|| true`, which turned a forced push into "nothing changed": no facts
+          # pass on an engine change and no prompt.
+          if ! files=$(git diff --name-only "${{ github.event.before }}" HEAD); then
+            echo "error: could not diff against ${{ github.event.before }}." >&2
+            exit 1
+          fi
           echo "$files"
           {
             echo "files<<EOF"
