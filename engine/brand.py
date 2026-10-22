@@ -787,9 +787,9 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 # register's own recorded failure is a note that gave one distance and read as
 # though all of them had been checked.
 #
-#   STATUS.warning            #a2703c   0.00   app dialogs
-#   STATUS.success            #926c89   0.39   app dialogs
-#   STATUS.error              #c75b64   1.18   app dialogs
+#   STATUS.warning            #a2703c   0.00   drawn nowhere
+#   STATUS.success            #926c89   0.39   the picker's PASS label
+#   STATUS.error              #c75b64   1.18   picker FAIL; corpus toast icon
 #   BRAND_DARK_GOLD           #8c7337   2.39   app, light mode
 #   RECORDS.ink-faint         #6f6c64   5.54   records
 #   STATUS.success-text-light #825d79   5.54   app, light mode
@@ -827,7 +827,14 @@ BRAND_BLACK = "#1a1a1a"  # brand black (charcoal)
 # IT IS A BRAND COLOR, AND WHAT IT LACKS IS A LIGHT-SURFACE PARTNER. No teal
 # value clears 4.5 on both #1a1a1a and #f5f5f5 -- the ceiling for any color on
 # both is 3.9954 -- so it cannot anchor a ramp on both grounds the way gold and
-# blue do, and that derivation has not been done.
+# blue do.
+#
+# AND LIGHTNESS ALONE CANNOT MAKE THE PARTNER (measured 2026-10-22). #00b0a0
+# sits on the edge of sRGB, red at 0, so holding its a and b there is no darker
+# color at all: place_lightness refuses even L* 64.5. A darker teal must give up
+# chroma -- at most 78% of it where it first clears 4.5 on #f5f5f5, 74% on
+# #e8e8e8 -- and how much to give up is a choice. A partner is a ruling, not a
+# derivation still owed. BRAND_COLORS.md rev 46.
 #
 # THIS SENTENCE PREVIOUSLY READ "not promoted to a third brand hue today", and a
 # careful reader with the file open took it as a MEMBERSHIP statement about the
@@ -1260,15 +1267,16 @@ WEB = {
     # broadcast, and the ring, fill, halo and breath below are all specified
     # against that one component.
     #
-    # A SECOND SUBJECT IS ALREADY ASKING. rnv-icon-builder paints a folder-watcher
-    # label from STATUS_ACTIVE_COLOR, and this file's own test -- "status is the
+    # A SECOND SUBJECT ASKED. rnv-icon-builder painted a folder-watcher label
+    # from STATUS_ACTIVE_COLOR, and this file's own test -- "status is the
     # result of a user's action; a signal is the state of something the BRAND
     # RUNS" -- makes a watcher a signal, not a status. It has no value here.
     #
-    # IT IS NOT REGISTERED YET AND THE REASON IS COUNT, NOT PRINCIPLE. There is
-    # exactly ONE live paint site in the five applications: rnv-icon-builder's
-    # settings dialog. rnv-color-picker declares STATUS_ACTIVE_COLOR, exports it
-    # in __all__, and reads it nowhere. One consumer does not earn a brand value.
+    # THE APPS ANSWERED IT INSIDE THE STATUS FAMILY (read 2026-10-22). Both
+    # apps removed STATUS_ACTIVE_COLOR; the icon builder's label reads its
+    # palette's status_active, success-text in dark and success-text-light in
+    # light. So no consumer asks for a signal value today, and one consumer
+    # would not earn one anyway.
     #
     # WHAT WOULD HAVE TO BE DECIDED IF IT DID, enumerated so the decision is not
     # made piecemeal later:
@@ -1395,7 +1403,11 @@ RECORDS = {
     "gold-dim": _rgba(BRAND_GOLD, GOLD_DIM_ALPHA),
 }
 
-# ---------------------------------------------------------- status (app)
+# ------------------------------------------- status (apps, and one web surface)
+# Drawn by the picker (success and error fills, the text variants), three more
+# apps (text variants only) and the corpus demo (STATUS["error"], the error
+# toast's icon, since rnv-ask-the-corpus@f8be85d). Read 2026-10-22. The heading
+# said "app" until BRAND_COLORS.md rev 46.
 # RULED 2026-08-13. The brand now issues one answer for app status semantics,
 # and the answer is BOOTSTRAP'S SET. The previous comment here said the brand
 # "neither owns them nor varies them, and issues no ruling on what red means" --
@@ -1470,6 +1482,18 @@ STATUS = {
     # both under the register's own "clearly different" threshold. It passes by
     # 0.3 on one bar and 0.7 on the other, and that thinness is deliberate: the
     # gold has to read in all three.
+    #
+    # NOT REPRODUCED, 2026-10-22. The simulation behind "passes by 0.3" was not
+    # recorded. Under Vienot 1999, Machado 2009 and Brettel 1997 (DaltonLens
+    # 0.1.5, CIEDE2000) the fills' worst pair, warning against error under
+    # deuteranopia, is 7.7-8.2: under 8.40 in all three.
+    #
+    # RULED 2026-10-22, CHRIS: A STATUS IS NEVER SHOWN BY COLOR ALONE. A word or
+    # an icon always carries it, until the brand has a core base that knows it
+    # by its colors, slogans and logos -- a judgment, so the rule ends by his
+    # ruling, never by inference. The values stand. The picker's rating scale,
+    # meant to be learned until color carries it alone, keeps its words until
+    # then. BRAND_COLORS.md rev 46.
     #
     # THE MIX IS PROVENANCE, NOT A LIVE FORMULA, and the difference matters.
     # Held as a rule, the ratio becomes an edit anyone can make, and retuning it
@@ -1731,8 +1755,10 @@ STATUS = {
     # THIS MOVES VALUES FIVE APPLICATIONS MIRROR. That is the cost of moving a
     # base, and it is the correct cost: the alternative is a text color that no
     # longer belongs to its fill.
-    # ALIAS TARGET FOR AN "ACTIVE" LABEL. rnv-icon-builder holds
-    # STATUS_ACTIVE_COLOR = STATUS_SUCCESS and paints it with `color:` -- as TEXT,
+    # ALIAS TARGET FOR AN "ACTIVE" LABEL, ruled 2026-09-04. HISTORY since both
+    # apps removed the name: the icon builder's label now reads success-text
+    # per mode. What follows is why. rnv-icon-builder held
+    # STATUS_ACTIVE_COLOR = STATUS_SUCCESS and painted it with `color:` -- as TEXT,
     # on BRAND_BLACK. THE FLOOR THERE IS 4.5, NOT 3.0, AND THE ALIAS BREAKS ON THE
     # DAY THE APPS ADOPT THIS FAMILY:
     #
@@ -1815,8 +1841,12 @@ STATUS = {
     # THE MOVE IS SMALL AND THEY STAY THE SAME THREE COLORS: CIEDE2000 3.07 /
     # 3.13 / 3.13, rounded up because 8.40 is a ceiling, against this register's
     # own 8.40 "clearly different" bar. Until register rev 45 this read dE76
-    # 3.20 / 3.27 / 3.28: one metric measured, the other judged. The
-    # color-blind separation is unharmed -- worst simulated pair 17.06.
+    # 3.20 / 3.27 / 3.28: one metric measured, the other judged. This went on
+    # "color-blind separation is unharmed -- worst simulated pair 17.06"; that
+    # figure is WITHDRAWN at register rev 46, no simulation named and no reading
+    # reproducing it. Under Vienot, Machado and Brettel the worst pair of these
+    # three, warning against error under deuteranopia, is 7.3-7.7, against
+    # 7.4-7.9 before the re-walk: moved by about 0.1, and under 8.40 both times.
     #
     # THE SENTENCE THAT PROMPTED THIS WAS ALSO WRONG AND IS CORRECTED BELOW. The
     # error-text-light entry recorded "on #e8e8e8 4.6100 pass" and the ruling
@@ -1832,26 +1862,24 @@ STATUS = {
     # BRAND_COLORS.md: a derived value is publishable without being permanent,
     # and the source emits it so nobody re-derives it by hand.
     #
-    #   rule    hold hue and saturation, raise lightness only
+    #   rule    the status family's: hold hue and chroma, move L* only
+    #   from    STATUS["error"] #c75b64, L* 52.45
     #   target  4.5:1 on the WORST dark ground the value lands on, APP card
-    #   walk    L 0.50 #d92637 2.93 · 0.55 #dd3b4b 3.28 · 0.58 #df4857 3.56
-    #           L 0.60 #e1515f 3.79 · 0.62 #e25a67 4.03 · 0.65 #e56b77 4.58 <-
+    #   walk    L* 0.5 a step; the last four:
+    #           58.45 #d96b73 4.31 · 58.95 #da6c74 4.36 · 59.45 #dc6d75 4.43
+    #           59.95 #dd6f77 4.52 <-
     #   taken   the first step that clears, not the first that looks right
     #
-    # MEASURED, cross-checked against rnv-color-mcp rather than trusted:
-    #   4.58:1 on APP card, 5.55 panel, 6.70 window -- AA normal text passes.
-    #   3.13:1 on white -- AA normal text FAILS, which is why `error` above
-    #   stays as-is for light mode. This is a dark-theme value, not a
-    #   replacement. Same shape as BRAND_GOLD / BRAND_DARK_GOLD: one color, two grounds.
-    #   CIEDE2000 25.92 from signal-live, "clearly different" -- the error text
-    #   and the live wine cannot be confused, which was the open question when
-    #   red was chosen for the live signal.
+    # MEASURED 2026-10-22, the walk's last three placements and the card ratio
+    # cross-checked on rnv-color-mcp: 4.52 on APP card, 5.48 panel, 6.61 window
+    # -- AA normal text passes. 3.17 on white -- FAILS, which is why light mode
+    # takes error-text-light. CIEDE2000 25.79 from signal-live, "clearly
+    # different", so the error text and the live wine cannot be confused.
     #
-    # NOT made Records-conformant. Forcing R > G > B swung it to #e56d3c, burnt
-    # orange, CIEDE2000 far off the base -- a different color wearing the right
-    # lightness. The tint rules govern the neutral ramps; #dc3545 is a borrowed
-    # platform value that never conformed to either register, and a derived
-    # variant that conforms while its base does not makes the pair incoherent.
+    # UNTIL BRAND_COLORS.md rev 46 THIS SHOWED #e56b77's WALK: hue and
+    # saturation held in HSL, from Bootstrap's #dc3545, 4.58 on the card. That
+    # value retired with its base, and the comment beside its successor kept
+    # describing it -- the desktop-app chat found it on 2026-10-19.
     "error-text": "#dd6f77",         # card 4.52
     # LIGHT-MODE ERROR TEXT, published 2026-08-24 because three applications had
     # already derived it independently under TWO identifiers -- STATUS_ERROR_LIGHT

@@ -8,7 +8,22 @@ Chris's ruling of that day, from a reviewed word list: *colour* to *color*, *gre
 the rest. No value, figure or ruling moved, so the revision did not, and `pyproject.toml`'s major
 did not. Two quotations of earlier text keep the spelling they were written in.
 
-Last locked: 2026-10-19 (rev 45 — **the notation rule is armed, and three figures were in the wrong
+Last locked: 2026-10-22 (rev 46 — **six passages caught up with the apps, one figure is
+withdrawn, and the status family's color-blind claim does not hold under any named simulation.**
+No value moves. Asked by the desktop-app chat on 2026-10-19, every claim read at the five apps'
+heads of 2026-10-22: *white on the dark gold* is a ruling of Chris's, not a fix still owed; *dark
+pressed* is closed, every app pressing to the accent itself; `STATUS_ACTIVE_COLOR` is gone from both
+apps that held it; the status fills are drawn by the picker and the corpus demo, not by "app
+dialogs"; the `error-text` walk in `engine/brand.py` showed the retired `#e56b77` and is re-run for
+`#dd6f77`; and the teal's light partner cannot be made by moving lightness alone. **The figure *worst
+simulated pair 17.06* is withdrawn**: no simulation was named and no reading reproduces it. Measuring
+it found that the worst status pair, `warning` against `error` under deuteranopia, sits at 7.3–8.2
+across the three sets and three simulations, under this register's 8.40 bar, where the derivation
+said the mix passed every bar. **Chris ruled the same day that a status is never shown by color
+alone**: a word or an icon always carries it, until the brand has a base that knows it by its
+colors, slogans and logos. No value moves. See *The status family's worst pair is under 8.40*. Also recorded: the
+main button's transition exemption (Chris, 2026-09-01 and 2026-10-22), and the status family's
+consumers. rev 45 — **the notation rule is armed, and three figures were in the wrong
 metric.** The checker's `check_hex_case` now reads each desktop app's color file and `brand_map.json`,
 and `engine/brand.py`, on every sweep, and fails by name on a hex literal with a capital letter. It
 started clean, because the apps' chat had lowered its last six capitalized values the same day (#66 A).
@@ -852,11 +867,30 @@ because it is a **pressed state rather than a plate**.
 **`#e8e8e8` is not retired.** It keeps its role as `GOLD_TEXT_GROUND_FLOOR` and stops being a surface
 any application paints — the right end state for a boundary.
 
+### Text holds 4.5 in every state but one — ruled 2026-09-01 and 2026-10-22
+
+**Every control's text clears 4.5 at rest, on hover and pressed, except the main black-and-white
+button's hover and pressed.** Chris exempted that button's transitions on 1 September; on 22 October
+he ruled the exemption reaches the main button only (the desktop chat's #74 A). As its plate crosses,
+its label dims for the length of a press: black on `APP["border"]` `#333333` reads 1.66, and black on
+the ink grid's `#444444` reads 2.15. **No other control or dialog button is exempt**, so status text
+does not sit on `APP["panel-hover"]` `#3a3a3a`, where the three dark `-text` values read 3.58 to
+3.64. All five apps guard both, in `tests/test_main_button_transitions.py` and
+`tests/test_status_off_the_hover.py`. **A rule here, and a check there**: nothing in this repository
+compares it.
+
 **The ladder is checked, not transcribed.** `_light_ladder_matches_dark_shares()` runs at import and
 fails if either ladder's anchors move without the other being re-derived. Both ends are load-bearing:
 dark is anchored on `BRAND_BLACK`, light on a hover plate that has already moved once.
 
 ### The RNV status family, ruled 2026-09-03 — chosen, not borrowed
+
+**Who draws it, read 2026-10-22.** The fills: `success` and `error` in `rnv-color-picker` only, as
+its PASS and FAIL labels in black ink; `error` also in `rnv-ask-the-corpus`, as the error toast's icon
+since `f8be85d`, the first web surface to read this family; `warning` nowhere. The text variants: in
+the picker, the icon builder, the palette manager and the text transformer, each drawing only those
+it shows (the desktop chat's map, #41). `rnv-color-mixer` draws none, by its ruling #78 A. **The family
+is not an app-only family any more**, which is why `engine/brand.py`'s heading no longer says *app*.
 
 **The old `success` / `warning` / `error` were Bootstrap 4 defaults.** This register half-said so
 already of the red: *"a borrowed platform value that never conformed to either register."* Two
@@ -887,7 +921,45 @@ be solved inside it.**
 because the ramp must stay perceptually even — an sRGB blend goes muddy through the middle and the
 midpoint would not be one. **50% is the deepest mix that passes every bar**; at 60% the worst
 color-blind pair drops to 6.8 and the nearest registered value to 7.4, both under this register's
-own *clearly different* threshold.
+own *clearly different* threshold. **That sentence is not reproduced at rev 46; see below.**
+
+#### The status family's worst pair is under 8.40 — measured 2026-10-22
+
+**Under every named simulation, `warning` and `error` are under the *clearly different* bar for a
+deuteranope**, in all three sets. Viénot 1999, Machado 2009 and Brettel 1997 through DaltonLens
+0.1.5, CIEDE2000, worst pair in each set, truncated to one decimal; Machado's deuteranopia matrix
+was also applied by hand, with the same result to within 0.2:
+
+| set | deuteranopia | tritanopia (Machado, Brettel) | protanopia |
+|---|---|---|---|
+| fills `#926c89` `#a2703c` `#c75b64` | **7.7–8.2** | 7.9–8.9 | 14.2–15.2 |
+| `-text` `#ad85a3` `#bc8752` `#dd6f77` | **7.5–7.9** | 7.7–8.5 | 14.4–15.5 |
+| `-text-light` `#825d79` `#8e5e2b` `#ae4650` | **7.3–7.7** | 7.4–8.9 | 14.7–15.6 |
+
+**The derivation said 50% passes every bar by 0.3.** That figure came from a simulation that was not
+recorded, which is the failure rev 44 recorded for the blues' three figures. Simulations differ by
+about one unit, so a 0.3 margin in one was always inside the spread of the others. Under
+achromatopsia the three read as one gray, by construction; *the family cannot rank* already says so.
+
+#### A status is never shown by color alone — ruled by Chris, 2026-10-22
+
+**A word or an icon always carries a status, and its color never carries it alone.** Chris chose this
+over re-mixing the family when the measurement above came in. So the values stand, and the
+separation the bar asks for comes from the word, not the hue.
+
+**It holds until the brand has a core base that knows it by its colors, slogans and logos**, in his
+words. That is a judgment about an audience, not a figure a check can read, so **the rule ends by his
+ruling and never by inference.**
+
+**What it reaches:** every surface that shows a status — the fills, the text variants, and anything
+drawn from them. **The picker's rating scale is included.** Its four hues are meant to be learned so
+that color eventually carries severity alone (*The consumer that asked for the ordinal ruling is not
+using it*), and that last step, the word coming off, waits for this rule to lift.
+
+**As read on 2026-10-22, the known status surfaces comply.** The text variants are words. The
+picker's two fills carry PASS and FAIL. Gradio's error toast on the corpus demo prints its title and
+message beside the icon. **This is a rule here, not a check**: nothing in this repository can tell
+whether a status on another surface has its word beside it.
 
 **The mix is provenance, not a live formula.** Held as a rule, the ratio becomes an edit anyone can
 make, and retuning it would silently change what *error* looks like — the same argument that
@@ -974,8 +1046,12 @@ register's own four-channel failure in another family.
 **by design** — that is the published ruling that none of the three clears 4.5 as text. An alias onto
 a fill is a fill used as text, and it survived only while the fill was not really a fill.
 
-**One live paint site in the five applications.** `rnv-color-picker` declares `STATUS_ACTIVE_COLOR`,
-exports it in `__all__`, and reads it nowhere.
+**Both apps have since removed the name** (read 2026-10-22). `rnv-color-picker` dropped it, unread,
+at `e28a49a`. `rnv-icon-builder`'s folder-watcher label reads its palette's `status_active` key, which
+is `success-text` in dark and `success-text-light` in light, read per mode and redrawn on a switch;
+its tests now fail if the name returns. **The ruling above stands as the record of why**: the alias
+pointed at a fill, and the label now draws a text value. Until rev 46 this section described the
+name as live.
 
 ### Open question: this family describes one subject
 
@@ -983,8 +1059,10 @@ exports it in `__all__`, and reads it nowhere.
 *running / partly running / not running* — the ring, fill, halo and breath are all specified against
 that one component.
 
-**A second subject is already asking.** A folder watcher is a signal by this register's own test — *a
-signal is the state of something the brand runs* — and it has no value here.
+**A second subject asked, and the apps answered it inside the status family.** A folder watcher is a
+signal by this register's own test — *a signal is the state of something the brand runs* — and it has
+no value here. The icon builder draws its label in `success-text`, a status value, so no consumer is
+asking for a signal value today.
 
 **It is not registered yet, and the reason is count rather than principle.** One consumer does not
 earn a brand value. **What would have to be decided if it did:**
@@ -1015,7 +1093,11 @@ value still resolves and reads fine.
 | `error-text-light` | `#b84e58` | **`#ae4650`** | 3.13 |
 
 **All three move well under this register's own 8.40 *clearly different* bar**, so they stay the same
-three colors to look at, and the color-blind separation is unharmed — worst simulated pair 17.06.
+three colors to look at. **This line went on *the color-blind separation is unharmed — worst simulated
+pair 17.06*, and that figure is withdrawn at rev 46.** It named no simulation and no pair, and no
+reading reproduces it. Measured under three named simulations, the re-walk moved the worst pair by
+about 0.1, and that pair was under the bar before and after: see *The status family's worst pair is
+under 8.40*.
 The figures are rounded up, because 8.40 is a ceiling. **Until rev 45 this table printed ΔE76, 3.20,
 3.27 and 3.28**: measured in one metric and judged in another. The conclusion held.
 
@@ -1216,9 +1298,9 @@ one distance and read as though all of them had been checked.
 
 | | | | surface |
 |---|---|---|---|
-| `STATUS.warning` | `#a2703c` | **0.00** | app dialogs |
-| `STATUS.success` | `#926c89` | 0.39 | app dialogs |
-| `STATUS.error` | `#c75b64` | 1.18 | app dialogs |
+| `STATUS.warning` | `#a2703c` | **0.00** | drawn nowhere |
+| `STATUS.success` | `#926c89` | 0.39 | the picker's PASS label |
+| `STATUS.error` | `#c75b64` | 1.18 | the picker's FAIL label; the corpus demo's error toast icon |
 | `BRAND_DARK_GOLD` | `#8c7337` | 2.39 | app, light mode |
 | `RECORDS.ink-faint` | `#6f6c64` | 5.54 | records |
 | `STATUS.success-text-light` | `#825d79` | 5.54 | app, light mode |
@@ -1303,6 +1385,14 @@ drafted that as a definitional contradiction before it was corrected.
 **A sentence a careful reader gets backwards is worth ten words of disambiguation.** It now says the
 color lacks a light-surface partner — no teal clears 4.5 on both `#1a1a1a` and `#f5f5f5`, ceiling
 3.9954 — rather than that it was withheld from anything.
+
+**The partner is not unfinished work: lightness alone cannot make it.** Measured 2026-10-22. The
+blue's partner held a and b and moved L\* (`place_lightness`, 60.06 to 44.28). `#00b0a0` sits on the
+edge of sRGB, red at 0, so at its own a and b **there is no darker color at all**: `rnv-color-mcp`
+refuses even L\* 64.5, 0.13 below the teal. A darker teal must give up chroma. At its hue the most
+chroma sRGB allows is 78% of the teal's where it first clears 4.5 on `#f5f5f5` (L\* 47.3,
+`#007e73`), and 74% on the light text floor `#e8e8e8` (L\* 44.4, `#00766b`), CIEDE2000 16.6 and 19.8
+from the teal. **How much chroma to give up is a choice, so a partner is a ruling, not a derivation.**
 
 ### Publish what was requested, not what was achieved — 2026-09-14
 
@@ -1665,6 +1755,10 @@ value, in the same spirit as the two tint censuses above — a derived value is 
 being permanent, and the source emits it so nobody re-derives it by hand.
 
 It reads **4.58:1 on a card**, 5.55 on panel, 6.70 on window, and **3.13:1 on white**, which fails.
+*(History. Those are `#e56b77`'s figures, by the HSL rule of the day. The value is `#dd6f77` since
+2026-09-04, by the status family's rule: hue and chroma held, lightness moved, first step past 4.5 on
+the card. Its walk and figures are in `engine/brand.py` beside it since rev 46: card 4.52, panel 5.48,
+window 6.61, white 3.17.)*
 That is why `error` stays `#dc3545` for light mode: one color, two grounds, the same shape as
 `GOLD` and `DARK_GOLD`. Cross-checked through `rnv-color-mcp` rather than trusted to arithmetic.
 
@@ -1942,11 +2036,12 @@ a wrong name is visible in a diff and a wrong value is not. Same shape as the
 
 **Light pressed is an alias, not a value.** No darker pressed shade keeps black text on light.
 
-**Dark pressed is OPEN and this register does not rule it.** `rnv-text-transformer` derives
-`lighten(BRAND_GOLD, -23)`; `rnv-color-picker` returns pressed to the accent in both modes. Both are
-legible as fills — black reads 8.79 on the derivative and 11.35 on the accent — so it is not a
-contrast question but whether a pressed state must be *visibly distinct*. Until ruled, either is
-permitted and an app should say which. **Hand-writing the value is not.**
+**Dark pressed is closed: a pressed gold control is the accent itself, in both modes.** Read at the
+five apps' heads on 2026-10-22: every app that presses a gold control presses it to `#d2bc93` in dark
+and `#8c7337` in light, as a name (`BRAND_GOLD_PRESSED = BRAND_GOLD`) or as the accent directly.
+`rnv-text-transformer`'s `lighten(BRAND_GOLD, -23)`, `#bba57c`, is retired there, and its own comment
+says so. **Until rev 46 this read that dark pressed was open, because two apps disagreed**; they no
+longer do. Black reads 11.35 on the accent. **Hand-writing a pressed value is still not permitted.**
 
 **Hand-written variants are what this replaces.** They existed in every app as literals and **no two
 agreed on method**: `#dcc9a3` at `+10/+13/+16`, `#b7a480` at `−27/−24/−19`, both hue-shifting,
@@ -2029,16 +2124,20 @@ fail and are still not permitted.
 because the old value could not carry text; it could not carry a border either, which the rule did
 not know.
 
-**TEXT ON GOLD: BLACK IS PREFERRED, WHITE IS PERMITTED WHERE IT SERVES A DELIBERATE INVERSION.**
-At `#8c7337`, black is 4.6226 and white is 4.5429 — **both clear the 4.5 floor.** Black remains the
-default and the better number. **The condition is the value:** at `#b19145` white measured 2.9976
+**TEXT ON GOLD: WHITE ON THE DARK GOLD, BLACK ON THE BRIGHT GOLD — ruled by Chris, 2026-10-11 and
+2026-10-13.** He ruled white on the dark gold the brand's look on 11 October (*"Keep this is a core
+look identity for my brand"*) and the pairing on 13 October, in the desktop-app chat's rulings
+(item 4, then item 32). All five apps paint it and guard it, the picker in `tests/test_ink_rule.py` and the other four in
+`tests/test_ink_on_the_golds.py`.
+At `#8c7337`, black is 4.6226 and white is 4.5429 — **both clear the 4.5 floor**, so black is the
+better number and white is the ruled one: the ink is a decision, not a measurement. Until rev 46
+this paragraph said black was the default. **The condition is the value:** at `#b19145` white measured 2.9976
 and was *not* permitted, which was a compliance failure rather than a style choice. Ruled at the
 request of `rnv-text-transformer`, which asked rather than choosing silently.
 
-At `#8c7337`, black is 4.6226 and white is 4.5429. Black stays
-correct and this rule survives the value change untouched. **Three apps paint white on the gold fill
-against it** — `rnv-icon-builder`, `rnv-color-picker` and `rnv-text-transformer` — and that is a
-separate fix, not something the value change licenses.
+At `#8c7337`, black is 4.6226 and white is 4.5429. **Until rev 46 this read that three apps paint
+white on the gold fill against the rule, and that it was a fix still owed.** It was five apps by the
+time of the ruling, and the ruling made it the rule.
 
 **A third artifact carried a fourth version of this.** `rnv-text-transformer/docs/RNV_Brand_Color_System.md`
 holds its own contrast table: six of seven rows wrong, five understating harmlessly and one
