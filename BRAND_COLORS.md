@@ -8,7 +8,14 @@ Chris's ruling of that day, from a reviewed word list: *colour* to *color*, *gre
 the rest. No value, figure or ruling moved, so the revision did not, and `pyproject.toml`'s major
 did not. Two quotations of earlier text keep the spelling they were written in.
 
-Last locked: 2026-10-22 (rev 46 — **six passages caught up with the apps, one figure is
+Last locked: 2026-10-26 (rev 47 — **text on a see-through accent is measured on what it lies on,
+and moving the accent costs 142 image files.** No value moves. The desktop-app chat asked which ink
+goes on an alpha of the gold, after the icon builder's drop zone put the solid gold's ink on its tint
+at 1.39 and 1.26 (Chris's #99 A, 25 October). *Alpha* now says: text on an alpha is held to 4.5 on
+the composite it actually makes, in each mode, and over a picture on both bounds of that composite,
+the alpha over black and over white. Measured that way, two other see-through golds in the apps read
+under the floor. And the gold section records what moving the accent would cost: the code in ten
+lines, and 142 image files in the five apps redrawn by hand. rev 46 — **six passages caught up with the apps, one figure is
 withdrawn, and the status family's color-blind claim does not hold under any named simulation.**
 No value moves. Asked by the desktop-app chat on 2026-10-19, every claim read at the five apps'
 heads of 2026-10-22: *white on the dark gold* is a ruling of Chris's, not a fix still owed; *dark
@@ -348,6 +355,14 @@ tool primitives, or one product's call.
 |---|---|---|---|
 | Brand gold | `#d2bc93` | 210, 188, 147 | **The accent on black and dark surfaces.** Site, social, OG cards, wordmark, every app's dark theme |
 | Brand dark gold | `#8c7337` | 140, 115, 55 | **The accent on light surfaces.** Every app's light theme; also gold's shade on dark, where full gold is too loud. Was `#b19145` until 2026-08-17 (`1003a6c`) — the contrast table below records why it moved and what it cost |
+
+**Moving the accent costs more than the code.** In the apps the accent moves in about ten lines,
+because each app's color file is written from its `brand_map.json` by `tools/sync_colors.py`, and a
+test fails on a hand edit. **Its pixels do not move.** Read at the five apps' heads on 2026-10-26, 142
+image files carry the gold, 118 of them distinct by bytes: button art, icons and backgrounds. Each app
+lists its own in `ACCENT_IMAGES.md`, written by `tools/accent_images.py` and guarded by a test.
+Shaded art is redrawn by hand (Chris's #84); flat art could be recolored. **Count those files before
+proposing a new accent**, because the hex is the cheap part.
 
 **The split is confirmed by the code, not just declared.** In the apps, the dark theme's accent
 is `#d2bc93` and the light theme's is `#8c7337`, without exception across all five; `#b19145`
@@ -1655,6 +1670,45 @@ new color and needs a decision, which is the whole reason the rule exists.
 The corollary wherever transparency meets state: **alpha carries the mode, value carries the
 state.** A hover that raises opacity instead of value inverts direction depending on what
 sits behind it.
+
+#### Text on an alpha is measured on what it lies on — 2026-10-26
+
+**A see-through accent is not the accent.** What a reader sees is the accent composited over what
+lies under it, so text on it is held to 4.5 on that composite, in each mode, and takes whichever ink
+the composite needs. `text-on-gold` is the solid gold's ink and says nothing about an alpha of it.
+This is *measure against the ground the value actually sits on*, applied where the ground is a blend.
+**Raised by the icon builder's drop zone**: the gold at `0x33` in dark and `0x4C` in light, with the
+solid gold's ink on it, black at 1.39 on `#2a261d` and white at 1.26 on `#ebe4d8`. Chris ruled it a
+fault on 25 October (the desktop chat's #99 A), and since `rnv-icon-builder@edbbb3c` it takes the
+window's ink: 11.10 in dark, 16.62 in light.
+
+**Over a picture, the worst case is bounded, so it is measured rather than assumed.** In image mode
+an alpha lies over a picture of any color. A color's luminance rises with each of its channels, so
+every composite falls between two: the alpha over black and the alpha over white. **An alpha carries
+text over a picture only when its ink clears 4.5 against both, and is lighter than both or darker
+than both.** If it does not, the surface fills solid in image mode. The drop zone fails it — its
+window ink reads 1.22 over white — so in image mode it fills solid gold with black ink, at 11.35. A
+heavier alpha can pass: the text transformer's drag highlight, gold at `0xBF` with black ink, reads
+6.47 over black and 13.42 over white.
+
+**Measured 2026-10-26**, from the code at each app's head, the composite computed in 8 bits, not
+rendered. Where the widget's own ground was not read, the range covers the grounds that mode paints:
+
+| surface | alpha and ink | dark | light | image, worst |
+|---|---|---|---|---|
+| icon builder drop zone | gold `0x33`/`0x4C`, the window's ink | 11.10 | 16.62 | solid, 11.35 |
+| text transformer drag highlight | gold `0xBF`, black | 6.47–7.37 | 13.06–13.42 | 6.47 |
+| text transformer find highlight | accent `0x50`, the field's ink | 5.18–8.15 | 13.14–14.09 | **3.36: fails** |
+| mixer harmony description | `accent_ink` `0x19`, `accent_ink` | 6.33–10.10 | **4.49 on `#f5f5f5`** | not measured |
+
+**The find highlight fails over a bright picture.** The field alone, black at `0xAB`, carries its
+text over any picture, worst 5.58; adding the gold lifts the composite toward the text. **The
+harmony description sits at the floor in light mode.** It is on the dialog's own `#f5f5f5`, and
+reads 4.49 by the exact blend and 4.46 to 4.53 depending on how each channel rounds, so a render
+settles it. Both are the apps' to fix, and were routed to the desktop chat.
+
+**This is a rule, not a check.** Nothing in this repository computes a composite, so nothing here
+finds the next alpha that carries text.
 
 ---
 
