@@ -8,7 +8,13 @@ Chris's ruling of that day, from a reviewed word list: *colour* to *color*, *gre
 the rest. No value, figure or ruling moved, so the revision did not, and `pyproject.toml`'s major
 did not. Two quotations of earlier text keep the spelling they were written in.
 
-Last locked: 2026-10-26 (rev 47 — **text on a see-through accent is measured on what it lies on,
+Last locked: 2026-10-29 (rev 48 — **the two see-through golds that read under the floor are
+fixed in the apps.** No value moves. rev 47 measured the text transformer's find highlight at 3.36 in
+image mode and the mixer's harmony description at 4.49 in light mode, and routed both. Chris ruled
+both on 26 October in the desktop chat: the find highlight takes the gold at `0xA0` with black text
+in image mode (101 B), and the wash drops from `0x19` to `0x10` in every mode (102 A). Landed at
+`rnv-text-transformer@e902d2e` and `rnv-color-mixer@7a88826`, each with a test, and every figure
+reproduced here. The table under *Text on an alpha* now shows them. rev 47 — **text on a see-through accent is measured on what it lies on,
 and moving the accent costs 142 image files.** No value moves. The desktop-app chat asked which ink
 goes on an alpha of the gold, after the icon builder's drop zone put the solid gold's ink on its tint
 at 1.39 and 1.26 (Chris's #99 A, 25 October). *Alpha* now says: text on an alpha is held to 4.5 on
@@ -1698,14 +1704,24 @@ rendered. Where the widget's own ground was not read, the range covers the groun
 |---|---|---|---|---|
 | icon builder drop zone | gold `0x33`/`0x4C`, the window's ink | 11.10 | 16.62 | solid, 11.35 |
 | text transformer drag highlight | gold `0xBF`, black | 6.47–7.37 | 13.06–13.42 | 6.47 |
-| text transformer find highlight | accent `0x50`, the field's ink | 5.18–8.15 | 13.14–14.09 | **3.36: fails** |
-| mixer harmony description | `accent_ink` `0x19`, `accent_ink` | 6.33–10.10 | **4.49 on `#f5f5f5`** | not measured |
+| text transformer find highlight | accent `0x50`, the field's ink | 5.18–8.15 | 13.14–14.09 | was 3.36; now `0xA0`, black: 4.73 |
+| mixer harmony description | `accent_ink` `0x10` (was `0x19`), `accent_ink` | 8.39 on `#1a1a1a` | 4.71 on `#f5f5f5` (was 4.49) | as dark, 8.39 |
 
-**The find highlight fails over a bright picture.** The field alone, black at `0xAB`, carries its
-text over any picture, worst 5.58; adding the gold lifts the composite toward the text. **The
-harmony description sits at the floor in light mode.** It is on the dialog's own `#f5f5f5`, and
-reads 4.49 by the exact blend and 4.46 to 4.53 depending on how each channel rounds, so a render
-settles it. Both are the apps' to fix, and were routed to the desktop chat.
+**Two of them read under the floor on 2026-10-26, and both are fixed.**
+- **The find highlight failed over a bright picture.** The field alone, black at `0xAB`, carries its
+  text over any picture, worst 5.58, and adding the gold at `0x50` lifted the composite toward the
+  light text, 3.36. **Ruled 101 B by Chris, 26 October**: in image mode a match is the gold at
+  `0xA0` with black text, 4.73 over a black picture and 7.15 over a white one, so it passes this
+  section's rule. Dark and light keep `0x50` and the field's ink. Landed at
+  `rnv-text-transformer@e902d2e`, held by `tests/test_find_highlight_reads.py`.
+- **The harmony description sat at the floor in light mode**, 4.49 by the exact blend. Rendered in
+  the app it read 4.492 on the wash `#e9e7e1`, a fail. **Ruled 102 A by Chris, 26 October**: the
+  wash goes from `0x19` to `0x10` in every mode, 4.71 in light and 8.39 in dark. Image mode styles
+  the panel as dark, on an opaque ground. Landed at `rnv-color-mixer@7a88826`, held by
+  `tests/test_harmony_description_reads.py`, which reads the wash from a render.
+
+Both figures were reproduced here from the code on 2026-10-29. Qt truncates a composite's channels,
+which is why the dark figure is 8.39 and not the 8.36 that rounding gives.
 
 **This is a rule, not a check.** Nothing in this repository computes a composite, so nothing here
 finds the next alpha that carries text.
