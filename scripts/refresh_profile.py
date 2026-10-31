@@ -651,10 +651,10 @@ def check_phones_on_surfaces(cfg, root, rep, scope):
     """Any phone-shaped string on a surface must be the brand routing number.
 
     Deliberately folded into check_contact rather than registered as its own
-    CHECKS key. Every one of the fourteen repos names its check groups
+    CHECKS key. Every repo in the manifest names its check groups
     explicitly, so run_repo's `list(CHECKS)` default never applies — a new
     registry key would appear armed in the source and run on exactly zero
-    surfaces until fourteen manifest entries opted in. Coverage that depends on
+    surfaces until every manifest entry opted in. Coverage that depends on
     remembering is the failure mode this file exists to catch.
     """
     allowed = permitted_phones(cfg) or set()
@@ -899,7 +899,7 @@ def check_hex_case(cfg, root, rep, scope):
     color is the finding, not a secret.
 
     Runs from run_repo for every repository, not from CHECKS: a new CHECKS key
-    runs on no repository until all fourteen manifest entries name it."""
+    runs on no repository until every manifest entry names it."""
     targets = []
     bm = root / "brand_map.json"
     if bm.exists():
@@ -1447,8 +1447,8 @@ def verify_expiring(cfg, rep, workdir: Path):
     figure nobody had updated.
 
     NOT A `CHECKS` MEMBER. Each entry carries its own `repo`, so it is not
-    repo-shaped, and a new registry key would run on zero surfaces until fourteen
-    manifest entries opted in. Unconditional in the facts pass, same dispatch as
+    repo-shaped, and a new registry key would run on zero surfaces until every
+    manifest entry opted in. Unconditional in the facts pass, same dispatch as
     verify_tokens and verify_type.
     """
     block = cfg.get("expiring_surfaces") or {}
@@ -1840,8 +1840,8 @@ def verify_threshold_prose(cfg, rep, workdir: Path):
 def verify_type(cfg, rep, workdir: Path):
     """R2. Every rendering of the mark uses the mark face, and requests it.
 
-    NOT A `CHECKS` MEMBER, for the same two reasons as verify_tokens. Every one
-    of the fourteen repos names its check groups explicitly, so a new registry
+    NOT A `CHECKS` MEMBER, for the same two reasons as verify_tokens. Every repo
+    in the manifest names its check groups explicitly, so a new registry
     key runs on zero surfaces while reading armed in the source. And this is not
     repo-shaped: it compares surfaces against a register and an emitter, which is
     verify_facts' shape rather than run_repo's. **Surfaces are discovered** -- any
@@ -2051,7 +2051,7 @@ def verify_tokens(cfg, rep, workdir: Path):
     role rename on the 15th were both this exact shape, and both were caught by
     running this comparison BY HAND. This is that comparison, automated.
 
-    NOT A `CHECKS` MEMBER, DELIBERATELY. Every one of the fourteen repos names
+    NOT A `CHECKS` MEMBER, DELIBERATELY. Every repo in the manifest names
     its check groups explicitly, so a new registry key runs on zero surfaces
     while reading armed in the source. This is also not repo-shaped: it compares
     one source file against every consumer of it, which is verify_facts' shape,

@@ -250,7 +250,7 @@ jobs:
       - name: Verify facts against source
         id: facts
         # Normally skipped on push, so a one-line manifest edit does not wait on
-        # fourteen fetches. ENGINE CHANGES ARE THE EXCEPTION and it is not a
+        # a fetch of every repo. ENGINE CHANGES ARE THE EXCEPTION and it is not a
         # convenience: emit_css derives CSS property names from this file's keys,
         # so a rename here renames a custom property in rnv-live's stylesheet.
         # verify_tokens is the only thing that catches it and waiting until

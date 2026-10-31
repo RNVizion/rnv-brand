@@ -1,8 +1,8 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "_updated_note": "STALE FOR THREE WEEKS AND CAUGHT BY A CONSUMER CITING IT, 2026-09-02. This field read 2026-08-12 while version had moved to 1.3.1 and the manifest had been edited many times -- a header date asserting a freshness the body did not have, in the file that publishes the rule against exactly that. A reader Built-from-ing against it would have cited a three-week-old state as current. CITE THE VERSION, NOT THIS FIELD: version moves when the contents move and this one moves when someone remembers.",
-  "updated": "2026-09-29",
+  "updated": "2026-10-31",
   "_resumes_out_of_scope": "2026-08-12, v1.3.0. The .docx resume variants are PERSONAL documents, handed directly to people, and they carry the personal cell. They are deliberately not modeled here: no appears_in list names them, no fact claims to appear on them, and nothing in this manifest describes their contents. This is a scope decision, not an oversight -- do not re-add 'resumes' to an appears_in list. TWO DIFFERENT ARTIFACTS SHARE THE WORD: resume/index.html in rnvizion.github.io is the PUBLIC web resume, it carries no phone number, and it stays fully checked -- see facts.eval_cases.sources. Verify the one that serves. scripts/refresh_profile.py --docx still exists as a local, opt-in, recordless tool a human can point at their own files; it stores nothing and no workflow passes that flag.",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
@@ -406,6 +406,20 @@
         "contact",
         "renames"
       ]
+    },
+    "rnv-monitors": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames"
+      ]
+    },
+    "rnv-site-tests": {
+      "checks": [
+        "retired",
+        "contact",
+        "renames"
+      ]
     }
   },
   "retired": [
@@ -500,13 +514,21 @@
   },
   "phone_exemptions": [
     {
-      "_comment": "Bounded exactly like the retirement exemptions, and deliberately WITHOUT a value field. Naming a number here to permit it would publish it, which is the failure this whole block exists to prevent. A path and a count are enough: occurrence two has to be a deliberate edit. Keyed on repo as well as path, because a bare relative path is ambiguous across fourteen repos and the retirement ledger already carries that ambiguity. NEVER write an example number into a reason string here -- the manifest audit reads its own prose and will trip on it, correctly.",
+      "_comment": "Bounded exactly like the retirement exemptions, and deliberately WITHOUT a value field. Naming a number here to permit it would publish it, which is the failure this whole block exists to prevent. A path and a count are enough: occurrence two has to be a deliberate edit. Keyed on repo as well as path, because a bare relative path is ambiguous across the repos and the retirement ledger already carries that ambiguity. NEVER write an example number into a reason string here -- the manifest audit reads its own prose and will trip on it, correctly.",
       "repo": "rnv-text-transformer",
       "path": "core/regex_patterns.py",
       "max": 1,
       "reason": "Reserved-fictional placeholder inside a regex example. The NANP sets a range aside for exactly this purpose and it is not a routable number. Measured as the only non-contact phone shape across all fourteen repos.",
       "added": "2026-08-12",
       "verified": "2026-08-12"
+    },
+    {
+      "repo": "rnv-site-tests",
+      "path": "tests/test_harness.py",
+      "max": 1,
+      "reason": "Reserved-fictional placeholder in a test that the link filter drops tel: links. The NANP sets the range aside for exactly this purpose and it is not a routable number. The only phone shape in the repository when it joined repos.",
+      "added": "2026-10-31",
+      "verified": "2026-10-31"
     }
   ],
   "coupled_manual_work": {
