@@ -8,6 +8,15 @@ a rewrite cannot keep the signature. Every commit except the
 33 that held the number has the same tree under both IDs, so a pin can
 move to its twin and install exactly what it installed before.
 
+The commits that 2026-10-20's narrow fold replaced are in neither column,
+because they had left main the day before this rewrite ran. afc2b06 and
+c80b2c3 were folded into one commit, 332902b, by a forced update from f2361ca;
+the commits after c80b2c3 up to f2361ca were uploads of the fold's own scripts
+and changed nothing else. c80b2c3 and 332902b share tree f471f1f3, so c80b2c3's twin is e849c8c,
+332902b's row below. afc2b06's tree held the wrong file and no commit on main
+carries it. Their full IDs are not recorded here. Found by the RNV Dashboard
+chat, 2026-10-31, because three documents cite c80b2c3.
+
 Old ID, new ID, oldest first:
 
 f5ee2ee6e88398f0a1e8596b06c4951a41175418 78a8c7937fda53863209eaa98a16a82dad12e782
