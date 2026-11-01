@@ -11,8 +11,12 @@ Usage:
     python engine/brand.py --css web > tokens.css     # website surface
     python engine/brand.py --css app > tokens.css     # desktop surface
     python engine/brand.py --css records > tokens.css # notes, releases, initiatives
-    # or, from Python:
-    from engine.brand import RNV_BRAND, WEB, APP, RECORDS, STATUS, emit_css
+    # or, from Python, once installed:
+    from rnv_brand.brand import RNV_BRAND, WEB, APP, RECORDS, STATUS, emit_css
+
+Installed, this module is rnv_brand.brand. It is also reachable as engine.brand,
+the name it had until 48.1.0, for the consumers that have not moved yet; that
+name is the same module, and it goes once none uses it. README.md says why.
 
 Register discipline (BRAND_COLORS.md rev 8, 2026-08-10). PERMANENT holds the
 the values the brand commits to on any medium, print included -- the count is

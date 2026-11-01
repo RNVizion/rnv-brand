@@ -51,6 +51,7 @@ on:
     paths:
       - "pyproject.toml"
       - "engine/**"
+      - "compat/**"
       - ".github/workflows/package-build.yml"
   workflow_dispatch:
 

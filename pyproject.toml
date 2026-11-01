@@ -1,7 +1,8 @@
 # Makes the register pip-installable. engine/brand.py is standard library
 # only: no dependencies, pure data and pure functions.
 #
-# A consumer pins a commit,
+# A consumer imports it as rnv_brand.brand (engine.brand also works; see
+# compat/engine/brand.py) and pins a commit,
 #
 #     rnv-brand @ git+https://github.com/RNVizion/rnv-brand@<sha>
 #
@@ -23,7 +24,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rnv-brand"
-version = "48.0.0"          # major = the color register revision, so `pip show` answers "which rev?"
+version = "48.1.0"          # major = the color register revision, so `pip show` answers "which rev?"
 description = "The RNVizion brand register: the colors, the type and its font files, and the rules that derive them."
 requires-python = ">=3.10"
 dependencies = []           # deliberately none -- see the note above
@@ -39,11 +40,24 @@ dependencies = []           # deliberately none -- see the note above
 Homepage = "https://github.com/RNVizion/rnv-brand"
 
 [tool.setuptools]
-# engine.fonts holds no Python. It is listed because Python treats any folder
+# THE REGISTER INSTALLS AS `rnv_brand`, FROM THE engine/ FOLDER. Ruled by Chris,
+# 2026-11-01. `engine` is a generic top-level name, and a consumer with its own
+# `engine` package shadows ours: rnv-color-mcp has one, and from its folder
+# `import engine.brand` failed with ModuleNotFoundError. The source stays at
+# engine/brand.py because the checker, rnv-live's deploy and rnv-color-mcp's
+# currency check all read that path; only the installed name moved.
+#
+# `engine` is still installed, from compat/engine/, so the eight consumers that
+# import engine.brand keep working. Its brand module IS rnv_brand.brand, not a
+# copy. Each consumer moves its import when it next moves its pin, and then
+# `engine` is removed: README.md, "Importing it".
+#
+# rnv_brand.fonts holds no Python. It is listed because Python treats any folder
 # inside a package as importable, and setuptools warns, which the build watch
 # turns red, when such a folder ships without being named here. Measured
 # 2026-10-18 on setuptools 84.0.0: one warning with it absent, none with it here.
-packages = ["engine", "engine.fonts"]
+packages = ["rnv_brand", "rnv_brand.fonts", "engine"]
+package-dir = { "rnv_brand" = "engine", "engine" = "compat/engine" }
 
 [tool.setuptools.package-data]
 # py.typed marks the package as typed. The registers (BRAND_COLORS.md,
@@ -51,9 +65,9 @@ packages = ["engine", "engine.fonts"]
 # and reads the reasoning in this repository, at the commit it pins.
 #
 # THE FONT FILES ARE, with each family's license beside them, because a
-# consumer serves them from where the wheel installed them: engine.fonts_dir().
+# consumer serves them from where the wheel installed them: fonts_dir().
 # The SIL Open Font License travels with the fonts by its own terms, and it is
 # the fonts' license, not this repository's. Added 2026-10-18, minor version 1:
 # the colors did not move, so the major did not.
-engine = ["py.typed"]
-"engine.fonts" = ["*.woff2", "OFL-*.txt"]
+rnv_brand = ["py.typed"]
+"rnv_brand.fonts" = ["*.woff2", "OFL-*.txt"]

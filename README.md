@@ -18,7 +18,23 @@ compares values, never names.
 
 From Python:
 
-    from engine.brand import RNV_BRAND, WEB, APP, STATUS, emit_css, fonts_dir, font_faces
+    from rnv_brand.brand import RNV_BRAND, WEB, APP, STATUS, emit_css, fonts_dir, font_faces
+
+### Importing it
+
+**Installed, the register is `rnv_brand.brand`.** Until 48.1.0 it was `engine.brand`, and that
+name still works: it is the same module object, not a copy, so values, functions and
+`fonts_dir()` are identical either way. It is kept so that no consumer breaks the day this
+lands. **A consumer moves its import to `rnv_brand` when it next moves its pin**, and once
+none uses `engine.brand` the old name is removed in a release of its own.
+
+Why the move, ruled by Chris on 2026-11-01: `engine` is a generic top-level name, and a
+consumer that has its own `engine` package shadows this one. `rnv-color-mcp` has one; from its
+folder, `import engine.brand` raised `ModuleNotFoundError` with this package installed.
+
+**The source has not moved.** It is still `engine/brand.py` in this repository, because the
+drift checker, `rnv-live`'s deploy and `rnv-color-mcp`'s currency check read that path, and
+`python engine/brand.py` still runs it. Only the name it installs under changed.
 
 The brand's five faces ship in `engine/fonts/`, one `woff2` file for every role, weight and style
 `TYPE` names. A consumer serves that folder and passes its URL to `font_faces()`. Why, and what the
