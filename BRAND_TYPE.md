@@ -3,7 +3,11 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-10-20 (rev 17 — **the answer headings are on the demo, h6 is ruled, the demo's
+Last locked: 2026-11-01 (rev 18 — **the desktop apps take the body and mono faces, and `rnv-live`
+draws from the brand's files.** Two rulings by Chris, 1 November, after a scan of every public
+asset found the apps' interface in Arial, Segoe UI, Consolas and Courier, and `rnv-live`'s body text
+in the visitor's own face: it asks for Inter and never loads it. The section *Type is owed to every
+publicly seen surface* now says how each applies, and what was measured first. rev 17 — **the answer headings are on the demo, h6 is ruled, the demo's
 Hugging Face header is off, and the share images stop on a character their file cannot draw.**
 Decision #38 landed at `rnv-ask-the-corpus@336cc99`, with h6 ruled like h5 in the corpus chat the
 same day. **Rev 16 said an h6 falls to the browser's default size; it does not.** Gradio's reset
@@ -696,6 +700,50 @@ files in the site's `assets/webfonts/`, the copy of `engine/fonts/` the site ser
 `bricolage-grotesque-latin-opsz-normal`, `jetbrains-mono-latin-500-normal` and
 `montserrat-latin-900-normal`. **That copy is the one `verify_type` compares**, byte for byte, because
 the site's font stylesheet names all three. `OG_FONT_DIR` still overrides the folder.
+
+### The desktop apps take the body and mono faces — ruled 2026-11-01
+
+**Ruled by Chris: the five desktop apps set their interface in `TYPE["body"]`, Inter, and their code
+and fixed-width text in `TYPE["mono"]`, JetBrains Mono.** The mark stays Montserrat 900. This is F5
+applied to a medium it already covered: the rendering technology is not an exemption, and the apps
+are publicly seen.
+
+**What they use today**, read at their heads on 1 November: Arial in the screen picker, the font
+loaders and the config defaults; Segoe UI on the picker's copy and paste buttons; Consolas in the
+transformer's compare and regex dialogs; Courier in the font loaders; and Pillow falling back to
+`arial.ttf` in the picker and the mixer. Each bundles `resources/fonts/Montserrat-Black.ttf`, one
+file in all five, **with no license beside it**, which the SIL Open Font License requires wherever
+the font is redistributed.
+
+**Measured on Qt 6.12.0, PyQt6, 1 November: Qt loads this register's `woff2` files directly.**
+`QFontDatabase.addApplicationFont` on each file in `engine/fonts/`:
+- `Inter` at 400 and 600, and `JetBrains Mono` at 400 and 700, resolve exactly by family name.
+- **Montserrat 900 registers under the family name `Montserrat Thin`**, style Black, weight 900:
+  Fontsource's cut keeps the variable font's default instance in the name table. Asking Qt for
+  `Montserrat` falls to another face. **Ask for the family `addApplicationFont` reports, never a
+  typed name.**
+- Bricolage Grotesque registers as `Bricolage Grotesque 96pt ExtraBold`, for the same reason. No app
+  draws the display face today.
+
+**How the files reach a built app is the desktop chat's design, not this register's.** The apps
+install `rnv-brand` at test time and write their colors from it, so the fonts need the same path: a
+copy written from the pinned commit, each family's license beside it, and a test that fails when
+the copy and the pin disagree, the way `test_colors_in_sync.py` does for colors.
+
+### `rnv-live` draws from the brand's files — confirmed 2026-11-01
+
+**Confirmed by Chris: the ruling of 18 October covers `rnv-live`.** Its faces come from npm
+`@fontsource` packages at `^` version ranges, not from `engine/fonts/`. Read at `rnv-live@59b687c`:
+- **Its body text is in the visitor's own face.** `body` sets `var(--rnv-font-body)`, which emits
+  `"Inter"`, and the page imports Montserrat, Bricolage Grotesque, JetBrains Mono and Instrument Serif,
+  but not Inter.
+- **Its display headings are off the ladder.** `h1, h2` at 700 and `.pillar-title` and `.item h3` at
+  600, with no tracking, where *Display headings: 500, and tracking by size* rules 500. Fontsource's
+  static files at 400, 600 and 700 have no 500 to draw. `engine/fonts/` carries the variable file,
+  300 to 800.
+
+**The fix is `rnv-live`'s**: serve `engine/fonts/` from the commit its deploy already checks out,
+write the rules with `--font-faces`, and drop the npm packages. Routed to the Brand Architect.
 
 **What it retired.** Until then `font.sh` fetched three TTFs into `assets/fonts/` from `google/fonts`
 at `main`, unpinned, so the share images drew from files nothing here compared and that could change

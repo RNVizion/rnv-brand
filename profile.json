@@ -1,8 +1,8 @@
 {
   "_comment": "Machine source for RNVizion identity facts, the sibling of engine/brand.py. Brand tokens are colors and type; these are the facts about the person and the products. Same rule applies: import it, never hardcode. Change a fact HERE first, then run refresh_profile.py --all to find every surface that disagrees. ARCHIVES: docs/eval-history/ preserves dated eval reports and must keep retired phrases verbatim; retirement checks skip it wholesale via ARCHIVE_EXCLUDE in refresh_profile.py, and the ledger prints that exclusion every sweep. No per-phrase exemptions are needed there, ever -- if a future retirement fails under docs/eval-history/, the checker regressed; do not add an exemption to quiet it.",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "_updated_note": "STALE FOR THREE WEEKS AND CAUGHT BY A CONSUMER CITING IT, 2026-09-02. This field read 2026-08-12 while version had moved to 1.3.1 and the manifest had been edited many times -- a header date asserting a freshness the body did not have, in the file that publishes the rule against exactly that. A reader Built-from-ing against it would have cited a three-week-old state as current. CITE THE VERSION, NOT THIS FIELD: version moves when the contents move and this one moves when someone remembers.",
-  "updated": "2026-10-31",
+  "updated": "2026-11-01",
   "_resumes_out_of_scope": "2026-08-12, v1.3.0. The .docx resume variants are PERSONAL documents, handed directly to people, and they carry the personal cell. They are deliberately not modeled here: no appears_in list names them, no fact claims to appear on them, and nothing in this manifest describes their contents. This is a scope decision, not an oversight -- do not re-add 'resumes' to an appears_in list. TWO DIFFERENT ARTIFACTS SHARE THE WORD: resume/index.html in rnvizion.github.io is the PUBLIC web resume, it carries no phone number, and it stays fully checked -- see facts.eval_cases.sources. Verify the one that serves. scripts/refresh_profile.py --docx still exists as a local, opt-in, recordless tool a human can point at their own files; it stores nothing and no workflow passes that flag.",
   "identity": {
     "_comment": "Contact and handles. Byte-identical everywhere they appear.",
@@ -571,6 +571,58 @@
       "_comment": "THE MARK IS A ROLE AND TEXT ALONE CANNOT IDENTIFY IT. The brand name also appears as an author byline on eight blog files, in page titles, and in the footer's long form; those are mentions of the name, not renderings of the mark, and the register's Labels row permits them in mono. A class list is required alongside the exact-text test because a check cannot infer the role from the contents -- the contents are the brand name either way. Same argument as F13's single-member allowlist: an inferred scope is a hole.",
       "selectors": ["logo", "mark", "wordmark"]
     }
+  },
+  "web_colors": {
+    "_comment": "Every color on these surfaces is a register value; check_web_colors fails on any other, by name, at the line (Chris, 2026-11-01). A register color at any alpha counts. Adding a surface arms it for that repository. Exemptions are bounded and carry the value, because a color is not a secret.",
+    "surfaces": [
+      {
+        "repo": "rnvizion.github.io",
+        "globs": ["**/*.html", "**/*.css", "**/*.svg"],
+        "generators": ["scripts/generate_*.py"]
+      },
+      {
+        "repo": "rnv-live",
+        "globs": ["src/**/*.astro", "src/**/*.css"]
+      }
+    ],
+    "exemptions": [
+      {
+        "repo": "rnvizion.github.io",
+        "path": "card/print/index.html",
+        "value": "#555555",
+        "max": 1,
+        "reason": "The print preview's backdrop, behind the card on screen. It is not printed and is not the brand's. Left for the Brand Architect to keep or move; if moved, this exemption reads as unused and goes.",
+        "added": "2026-11-01",
+        "verified": "2026-11-01"
+      },
+      {
+        "repo": "rnvizion.github.io",
+        "path": "scripts/generate_og.py",
+        "value": "#14141c",
+        "max": 1,
+        "reason": "GRID, the share images' barely-there grid line, (20, 20, 28). Not a register value: 0.59 CIEDE2000 from RECORDS['surface'] #13131c. Found by this check on its first run. Left for the Brand Architect to move onto the register or ask for it to be registered; either way this exemption then reads as unused and goes.",
+        "added": "2026-11-01",
+        "verified": "2026-11-01"
+      },
+      {
+        "repo": "rnvizion.github.io",
+        "path": "scripts/generate_project_card.py",
+        "value": "#14141c",
+        "max": 1,
+        "reason": "The same GRID as scripts/generate_og.py; see its reason.",
+        "added": "2026-11-01",
+        "verified": "2026-11-01"
+      },
+      {
+        "repo": "rnvizion.github.io",
+        "path": "scripts/generate_site_og.py",
+        "value": "#14141c",
+        "max": 1,
+        "reason": "The same GRID as scripts/generate_og.py; see its reason.",
+        "added": "2026-11-01",
+        "verified": "2026-11-01"
+      }
+    ]
   },
   "protected": {
     "_comment": "Strings that look like the renamed repos but must NEVER be rewritten. Hugging Face Space IDs are deliberately exempt from the rnv- prefix. EACH ENTRY IS AN EXEMPTION AND IS AUDITED LIKE ONE: report_protected warns on a complete sweep when a string appears in no file outside this list. The Space ID moved from a workflow repo_id= to scripts/deploy_space.py on 2026-09-17 and this list protected the vanished line for twelve days; the entry now names the line that exists.",

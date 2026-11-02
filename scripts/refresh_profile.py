@@ -938,6 +938,209 @@ def check_hex_case(cfg, root, rep, scope):
         rep.checks += 1
 
 
+# --- web colors: every color on a declared web surface is a register value ---
+
+_REGISTER_COLORS: dict | None = None
+
+
+def _register_colors(rep, scope) -> set | None:
+    """Every hex value engine/brand.py defines, lower case, six digits. Read once.
+
+    Run the way verify_resolver_table runs it: a subprocess in the engine's own
+    folder, so the checker stays standard library only and reads the register
+    at this commit, not an installed one. None, with a FAIL, if it cannot run."""
+    global _REGISTER_COLORS
+    if _REGISTER_COLORS is not None:
+        return _REGISTER_COLORS["values"]
+    engine_dir = REPO_ROOT / "engine"
+    code = (
+        "import json, re, brand\n"
+        "out = set()\n"
+        "def walk(o):\n"
+        "    if isinstance(o, str):\n"
+        "        if re.fullmatch(r'#[0-9a-fA-F]{6}', o): out.add(o.lower())\n"
+        "    elif isinstance(o, dict): [walk(v) for v in o.values()]\n"
+        "    elif isinstance(o, (list, tuple)): [walk(v) for v in o]\n"
+        "for n in dir(brand):\n"
+        "    if not n.startswith('_'): walk(getattr(brand, n))\n"
+        "print(json.dumps(sorted(out)))\n")
+    try:
+        r = subprocess.run([sys.executable, "-c", code], cwd=engine_dir,
+                           capture_output=True, text=True, timeout=30)
+        values = set(json.loads(r.stdout)) if r.returncode == 0 else None
+    except Exception:  # noqa: BLE001 -- any failure to read the register is a FAIL
+        values = None
+    if not values:
+        rep.fail(scope, "engine/brand.py",
+                 "could not run the engine to read the register's colors; "
+                 "no web surface's colors were compared")
+        return None
+    _REGISTER_COLORS = {"values": values}
+    return values
+
+
+_WEB_HEX = re.compile(r"(?<![\w&/=%-])#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})(?![\w-])")
+_WEB_RGB = re.compile(r"\brgba?\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})")
+_WEB_HSL = re.compile(r"\bhsla?\(", re.I)
+_WEB_COMMENTS = re.compile(r"/\*.*?\*/|<!--.*?-->", re.S)
+
+
+def _blank_comments(text: str) -> str:
+    """CSS and HTML comments replaced by spaces, newlines kept, so a comment
+    that quotes an old value is not judged and every line number still holds."""
+    return _WEB_COMMENTS.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), text)
+
+
+def _six(h: str) -> str:
+    h = h.lower()
+    if len(h) in (3, 4):
+        h = "".join(c * 2 for c in h)
+    return "#" + h[:6]
+
+
+def _web_color_literals(text: str):
+    """(line, written, six-digit base) for every color a page or stylesheet draws.
+
+    Hex in any of its four lengths, and rgb()/rgba() with three integer channels;
+    the alpha is not judged, because a register color at any alpha is still the
+    register's color (BRAND_COLORS.md, Alpha). hsl() and a named CSS color are
+    not read: the second boundary in check_web_colors' docstring."""
+    clean = _blank_comments(text)
+    for i, line in enumerate(clean.split("\n"), 1):
+        for m in _WEB_HEX.finditer(line):
+            pre = line[:m.start()]
+            if pre.endswith("url(") or re.search(r"(?:href|src)\s*=\s*[\"']$", pre):
+                continue   # a fragment reference such as url(#grad), not a color
+            yield i, m.group(0), _six(m.group(1))
+        for m in _WEB_RGB.finditer(line):
+            rgb = tuple(int(x) for x in m.groups())
+            if max(rgb) > 255:
+                yield i, m.group(0), None
+                continue
+            yield i, m.group(0) + ")", "#%02x%02x%02x" % rgb
+
+
+def _generator_colors(source: str):
+    """(line, written, base) for the module-level colors of an image generator.
+
+    A generator holds the brand as UPPER_CASE constants: a hex string, or an RGB
+    tuple of three or four integers from 0 to 255. Read with ast, so a margin or
+    a size written inside a function is never mistaken for a color."""
+    import ast
+    tree = ast.parse(source)
+    for node in tree.body:
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        if not any(isinstance(t, ast.Name) and t.id.isupper() for t in targets):
+            continue
+        v = node.value
+        if isinstance(v, ast.Constant) and isinstance(v.value, str) and HEX_COLOR.fullmatch(v.value):
+            yield node.lineno, v.value, _six(v.value[1:])
+        elif isinstance(v, ast.Tuple) and len(v.elts) in (3, 4) and all(
+                isinstance(e, ast.Constant) and isinstance(e.value, int) and 0 <= e.value <= 255
+                for e in v.elts):
+            rgb = tuple(e.value for e in v.elts[:3])
+            yield node.lineno, str(tuple(e.value for e in v.elts)), "#%02x%02x%02x" % rgb
+
+
+def check_web_colors(cfg, root, rep, scope):
+    """Every color on a declared web surface is one the register holds.
+
+    Ruled by Chris, 2026-11-01, as the first step toward the site drawing its
+    colors from the register: the scan of that day found 572 color literals on
+    rnvizion.github.io, every one but a print backdrop a register value, and none
+    of them drawn from the register. Nothing compared them, so a value moved in
+    engine/brand.py would leave the site behind with no finding anywhere. This
+    makes that a FAIL, by name, at the line. It is the "no check compares a hex
+    value against engine/brand.py" gap closed for the surfaces it names, and only
+    for those.
+
+    WRITTEN INSIDE-OUT. It permits the register's values and fails on anything
+    else, so a value it has never seen fails too. A color at any alpha counts as
+    its base: rgba(210,188,147,0.25) is the gold. Short and eight-digit hex are
+    read as their six-digit base.
+
+    WHAT IT READS. The repositories in profile.json's web_colors.surfaces, each
+    file matching that entry's globs, plus each `generators` glob, read with ast
+    for module-level UPPER_CASE hex strings and RGB tuples. CSS and HTML comments
+    are blanked first, line numbers kept.
+
+    WHAT IT DOES NOT. A surface not listed; hsl() and named CSS colors, which
+    neither listed surface uses today; colors inside raster images; a color a
+    script computes at run time. And it holds values, not roles: the right
+    register value in the wrong place passes.
+
+    EXEMPTIONS are bounded like every other exemption here, {repo, path, value,
+    max, reason}, and the value is named because a color is the finding, not a
+    secret (check_hex_case says the same). An exemption used more than `max`
+    times fails; one used zero times warns, because the reason it was granted is
+    gone and it should go too.
+
+    Runs from run_repo for every repository, not from CHECKS: a new CHECKS key
+    runs on no repository until every manifest entry names it."""
+    block = cfg.get("web_colors")
+    if not isinstance(block, dict):
+        return
+    surfaces = [s for s in block.get("surfaces", []) if s.get("repo") == scope]
+    if not surfaces:
+        return
+    reg = _register_colors(rep, scope)
+    if reg is None:
+        return
+    exempt = [e for e in block.get("exemptions", []) if e.get("repo") == scope]
+    used = {id(e): 0 for e in exempt}
+    rep.checks += 1
+    read = matched = 0
+    for s in surfaces:
+        files = {}
+        for g in s.get("globs", []):
+            for p in root.glob(g):
+                if p.is_file():
+                    files[p.relative_to(root).as_posix()] = "web"
+        for g in s.get("generators", []):
+            for p in root.glob(g):
+                if p.is_file():
+                    files[p.relative_to(root).as_posix()] = "generator"
+        if not files:
+            rep.fail(scope, ", ".join(s.get("globs", []) + s.get("generators", [])),
+                     "web_colors names this surface and no file matched; nothing was compared")
+            continue
+        matched += len(files)
+        for rel, kind in sorted(files.items()):
+            try:
+                text = (root / rel).read_text(encoding="utf-8")
+                found = list(_web_color_literals(text) if kind == "web" else _generator_colors(text))
+            except Exception as e:  # undecodable, or a generator ast cannot parse
+                rep.fail(scope, rel, f"could not be read for colors ({e.__class__.__name__}); not checked")
+                continue
+            read += 1
+            for line, written, base in found:
+                if base is not None and base in reg:
+                    continue
+                hit = next((e for e in exempt if e.get("path") == rel
+                            and _six(str(e.get("value", "")).lstrip("#")) == base), None)
+                if hit is not None:
+                    used[id(hit)] += 1
+                    if used[id(hit)] <= int(hit.get("max", 0)):
+                        continue
+                    rep.fail(scope, f"{rel}:{line}",
+                             f"{written} is exempt at most {hit.get('max')} time(s) here and this is "
+                             f"occurrence {used[id(hit)]}; a second use is a deliberate edit")
+                    continue
+                what = "not a color the register can hold" if base is None else f"{base} is not a register value"
+                rep.fail(scope, f"{rel}:{line}",
+                         f"{written}: {what}. Every color on this surface is one engine/brand.py "
+                         f"holds (Chris, 2026-11-01); use the register's value, or register this one")
+    for e in exempt:
+        if used[id(e)] == 0:
+            rep.warn(scope, e.get("path", "?"),
+                     f"web_colors exempts {e.get('value')} here and it was not used; "
+                     f"the reason it was granted is gone, so remove the exemption")
+    if matched and read == 0:
+        rep.fail(scope, "web_colors", "named surfaces exist and no file could be read; nothing was compared")
+
+
 CHECKS = {
     "retired": check_retired, "contact": check_contact, "renames": check_renames,
     "bio": check_bio, "facts": check_facts, "products": check_products,
@@ -2441,6 +2644,8 @@ def run_repo(cfg, name, root, rep, only=None):
             fn(cfg, root, rep, name)
     if not only or "hex" in only:
         check_hex_case(cfg, root, rep, name)
+    if not only or "colors" in only:
+        check_web_colors(cfg, root, rep, name)
 
 
 def main():
