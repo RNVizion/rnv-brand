@@ -1466,6 +1466,74 @@ def _own_stylesheets(root, page_rel, body):
     return out
 
 
+# A STYLESHEET THE DEPLOY WRITES IS A FIFTH WAY TO REQUEST A FACE. Asked for by
+# the Brand Architect's site chat on 2026-11-01, measured there first: rnv-live
+# serves engine/fonts/ from the rnv-brand checkout its deploy already makes, and
+# writes the rules at deploy with `brand.py --font-faces`, so the repository holds
+# no copy and the page's link, an Astro expression, names a file that exists only
+# in the build. Following the link found nothing and failed the mark as never
+# requested, while the face loaded. verify_tokens settled the same shape for the
+# tokens rnv-live writes at deploy: compare against what the emitter emits, not
+# a file the repository never holds.
+#
+# RECOGNIZED BY THE WORKFLOW LINE, NOT BY THE FILE NAME. A link counts only when
+# a workflow in the same repository runs `brand.py --font-faces ARG > PATH` and
+# the link's path is PATH or ends it, and the families counted are the ones the
+# emitter declares when run here with ARG. A workflow that writes the rules and
+# never mentions engine/fonts is a FAIL: the rules would name files nothing
+# copied. WHAT IT TRUSTS: that the step runs. A deploy that fails, or copies the
+# fonts from another commit, is outside it, as a failed tokens step is outside
+# verify_tokens. Such a link is also left out of the font-link string
+# comparison: the generator holds it, not a string shared with other pages.
+_DEPLOY_FONT_FACES = re.compile(r"brand\.py\s+--font-faces\s+(\S+)\s*>\s*(\S+)")
+_HREF_EXPRESSION = re.compile(r"""^\{[^}]*?["']([^"']+)["'][^}]*\}$""")
+_GENERATED_FAMILIES: dict = {}
+
+
+def _deploy_font_sheets(root):
+    """({path the deploy writes: the --font-faces argument}, copies engine/fonts?)."""
+    sheets, copies = {}, False
+    wf = root / ".github" / "workflows"
+    if wf.is_dir():
+        for p in sorted(wf.glob("*.y*ml")):
+            text = p.read_text(encoding="utf-8", errors="ignore")
+            copies = copies or "engine/fonts" in text
+            for m in _DEPLOY_FONT_FACES.finditer(text):
+                sheets[posixpath.normpath(m.group(2).strip("'\""))] = m.group(1).strip("'\"")
+    return sheets, copies
+
+
+def _generated_sheet(href, sheets):
+    """The deploy output a stylesheet link names, or None.
+
+    The href is a path, or an expression wrapping one string literal, as Astro's
+    {withBase('fonts/fonts.css')}. Its path matches an output that is the same
+    path or ends with it, so public/fonts/fonts.css answers fonts/fonts.css."""
+    m = _HREF_EXPRESSION.match(href.strip())
+    lit = (m.group(1) if m else href.strip()).split("#", 1)[0].split("?", 1)[0]
+    lit = re.sub(r"^(?:\./|/)+", "", lit)
+    if not lit or "{" in lit:
+        return None
+    for out in sheets:
+        o = re.sub(r"^(?:\./|/)+", "", out)
+        if o == lit or o.endswith("/" + lit):
+            return out
+    return None
+
+
+def _generated_families(arg):
+    """The families `brand.py --font-faces ARG` declares, run from this commit."""
+    if arg not in _GENERATED_FAMILIES:
+        try:
+            r = subprocess.run([sys.executable, str(REPO_ROOT / "engine" / "brand.py"),
+                                "--font-faces", arg], capture_output=True, text=True, timeout=30)
+            fams = {f["font-family"] for f in _font_faces_in(r.stdout)} if r.returncode == 0 else set()
+        except Exception:  # noqa: BLE001 -- no families is reported by the caller as a FAIL
+            fams = set()
+        _GENERATED_FAMILIES[arg] = fams
+    return _GENERATED_FAMILIES[arg]
+
+
 def _font_faces_in(css):
     """[{family, style, weight, src, unicode-range}] for each @font-face rule.
 
@@ -2139,13 +2207,30 @@ def verify_type(cfg, rep, workdir: Path):
                      f"verified. {MISS_HINT}")
             continue
         font_sheets = {}
+        deploy_sheets, deploy_copies = _deploy_font_sheets(root)
+        if deploy_sheets and not deploy_copies:
+            rep.fail("type", f"{name}/.github/workflows",
+                     "writes @font-face rules with brand.py --font-faces and never "
+                     "copies engine/fonts, so the rules name files nothing serves")
         for relpath, body in text_files(root):
             if not relpath.endswith((".html", ".astro")):
                 continue
             where = f"{name}/{relpath}"
             own = _own_stylesheets(root, relpath, body)
-            linked = set()
+            linked, generated = set(), set()
             for href, rel_css, css in own:
+                if css is None and deploy_sheets:
+                    out = _generated_sheet(href, deploy_sheets)
+                    if out is not None:
+                        fams = _generated_families(deploy_sheets[out])
+                        if not fams:
+                            rep.fail("type", where,
+                                     f"links {href}, which the deploy writes with brand.py "
+                                     f"--font-faces, and the emitter declared no family; "
+                                     f"nothing was counted as requested")
+                        linked |= fams
+                        generated.add(href)
+                        continue
                 fams = {f["font-family"] for f in _font_faces_in(css)} if css else set()
                 linked |= fams
                 if fams:
@@ -2196,7 +2281,7 @@ def verify_type(cfg, rep, workdir: Path):
                     rep.fail("type", where,
                              f"<{tag} class=\"{cls}\"> {_tracking_finding}")
                 elif not _requests_family(body, mark_family, linked):
-                    dangling = [h for h, r, t in own if t is None]
+                    dangling = [h for h, r, t in own if t is None and h not in generated]
                     rep.fail("type", where,
                              f"draws {mark_family} and never requests it, so the "
                              f"mark renders in a fallback face. Loading without "

@@ -3,7 +3,13 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-11-01 (rev 18 — **the desktop apps take the body and mono faces, and `rnv-live`
+Last locked: 2026-11-01 (rev 19 — **a heading between two rungs takes its role's, and a stylesheet
+the deploy writes counts as a request.** The site chat built `rnv-live`'s move to this register's font
+files and measured it, and it holds the change until the checker can see it: the page links the
+rules as an Astro expression, `{withBase('fonts/fonts.css')}`, to a file written at deploy by
+`brand.py --font-faces`, and `verify_type` followed the link, found no file, and failed the mark as
+never requested. `verify_type` now counts such a link by the workflow line that writes it. Chris
+ruled the same day that `rnv-live`'s title, at 2.1rem, takes the page-title rung. rev 18 — **the desktop apps take the body and mono faces, and `rnv-live`
 draws from the brand's files.** Two rulings by Chris, 1 November, after a scan of every public
 asset found the apps' interface in Arial, Segoe UI, Consolas and Courier, and `rnv-live`'s body text
 in the visitor's own face: it asks for Inter and never loads it. The section *Type is owed to every
@@ -327,6 +333,11 @@ takes 500 unless a ruling says otherwise.**
 | about 2.2–3.6rem | **`-0.03em`** | page titles: posts, the résumé, a demo's page, section titles, stat values |
 | about 1.4–2rem | **`-0.02em`** | a post's section heads, project and card titles |
 | about 1rem | **`-0.01em`** | a demo's act headings |
+
+**A heading between two rungs takes the rung of its role.** Ruled by Chris, 2026-11-01, for
+`rnv-live`'s `h1` at 2.1rem, which sits exactly between *about 1.4–2rem* and *about 2.2–3.6rem*, so
+size alone cannot place it. It is that page's title, so it takes the page-title rung, `-0.03em`.
+Recorded at the rule in `rnv-live` too; this is where the next reader looks.
 
 **A heading takes the rung for its own size, never a value copied from a heading of another size.**
 That is the second way a type change fails silently (*a value carries across sizes that should
@@ -744,6 +755,22 @@ the copy and the pin disagree, the way `test_colors_in_sync.py` does for colors.
 
 **The fix is `rnv-live`'s**: serve `engine/fonts/` from the commit its deploy already checks out,
 write the rules with `--font-faces`, and drop the npm packages. Routed to the Brand Architect.
+
+**Built and measured by the site chat, 1 November, and held for the checker.** A deploy step copies
+`engine/fonts/*`, licenses included, into `public/fonts/` and writes `public/fonts/fonts.css` with
+`brand.py --font-faces ./`; the page drops its seven `@fontsource` imports and the four packages and
+links `{withBase('fonts/fonts.css')}`. Rendered at 1280 and 390 wide: Inter 400 loads, the headings
+draw at 500 from the variable file with the ladder's tracking, and the wordmark is unchanged.
+**Nothing is committed to `rnv-live`, so there is no copy to compare**, the design this register
+routed.
+
+**`verify_type` counts that link as a request since rev 19.** It reads the repository's workflows
+for `brand.py --font-faces ARG > PATH`; a link whose path is PATH, or ends it, requests every family
+the emitter declares when run with ARG at this commit. A workflow that writes the rules and never
+copies `engine/fonts` fails by name. Such a link is left out of the font-link string comparison,
+because the generator holds it, not a string shared with other pages. **What it trusts:** that the
+step runs. The two bullets above describe `rnv-live` as it is until that change lands, and retire
+with it.
 
 **What it retired.** Until then `font.sh` fetched three TTFs into `assets/fonts/` from `google/fonts`
 at `main`, unpinned, so the share images drew from files nothing here compared and that could change
