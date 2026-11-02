@@ -3,7 +3,11 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-11-01 (rev 19 — **a heading between two rungs takes its role's, and a stylesheet
+Last locked: 2026-11-01 (rev 20 — **`rnv-live` draws from the brand's files, and `verify_type` reads
+the command, not a mention of it.** The site chat's change landed at `rnv-live@f7b14be`, so the two
+bullets that described the old page are retired here, as rev 19 said they would be. And the site chat
+found, on its real workflow, that the check counted the copy from any mention of `engine/fonts`,
+comments included: a comment naming the folder passed a deploy whose `cp` line was gone. rev 19 — **a heading between two rungs takes its role's, and a stylesheet
 the deploy writes counts as a request.** The site chat built `rnv-live`'s move to this register's font
 files and measured it, and it holds the change until the checker can see it: the page links the
 rules as an Astro expression, `{withBase('fonts/fonts.css')}`, to a file written at deploy by
@@ -743,20 +747,18 @@ the copy and the pin disagree, the way `test_colors_in_sync.py` does for colors.
 
 ### `rnv-live` draws from the brand's files — confirmed 2026-11-01
 
-**Confirmed by Chris: the ruling of 18 October covers `rnv-live`.** Its faces come from npm
-`@fontsource` packages at `^` version ranges, not from `engine/fonts/`. Read at `rnv-live@59b687c`:
-- **Its body text is in the visitor's own face.** `body` sets `var(--rnv-font-body)`, which emits
-  `"Inter"`, and the page imports Montserrat, Bricolage Grotesque, JetBrains Mono and Instrument Serif,
-  but not Inter.
-- **Its display headings are off the ladder.** `h1, h2` at 700 and `.pillar-title` and `.item h3` at
-  600, with no tracking, where *Display headings: 500, and tracking by size* rules 500. Fontsource's
-  static files at 400, 600 and 700 have no 500 to draw. `engine/fonts/` carries the variable file,
-  300 to 800.
+**Confirmed by Chris: the ruling of 18 October covers `rnv-live`.** Until `rnv-live@f7b14be` its
+faces came from npm `@fontsource` packages at `^` version ranges. Read at `59b687c`, that left its body
+text in the visitor's own face, because the page never imported Inter, and its display headings at
+700 and 600 with no tracking, because Fontsource's static files had no 500 to draw.
 
-**The fix is `rnv-live`'s**: serve `engine/fonts/` from the commit its deploy already checks out,
-write the rules with `--font-faces`, and drop the npm packages. Routed to the Brand Architect.
+**Landed at `rnv-live@f7b14be`, 1 November**, built and measured by the site chat and held until the
+checker could see it. Read here at that commit: the four `@fontsource` packages are gone from
+`package.json` and the lockfile; `h1, h2`, `.pillar-title` and `.item h3` are at 500; the `h1` at
+2.1rem takes `-0.03em`, the `h2` at 1.5rem `-0.02em`, and the two titles `-0.01em`; the wordmark is
+unchanged, Montserrat 900 at `0.09em`; and the surfaces pass and `verify_type` are clean.
 
-**Built and measured by the site chat, 1 November, and held for the checker.** A deploy step copies
+**What the site chat measured before landing:** A deploy step copies
 `engine/fonts/*`, licenses included, into `public/fonts/` and writes `public/fonts/fonts.css` with
 `brand.py --font-faces ./`; the page drops its seven `@fontsource` imports and the four packages and
 links `{withBase('fonts/fonts.css')}`. Rendered at 1280 and 390 wide: Inter 400 loads, the headings
@@ -767,10 +769,13 @@ routed.
 **`verify_type` counts that link as a request since rev 19.** It reads the repository's workflows
 for `brand.py --font-faces ARG > PATH`; a link whose path is PATH, or ends it, requests every family
 the emitter declares when run with ARG at this commit. A workflow that writes the rules and never
-copies `engine/fonts` fails by name. Such a link is left out of the font-link string comparison,
+copies `engine/fonts` fails by name. **Both searches read commands, not mentions, since rev 20**:
+comments are removed first, by YAML's rule and the shell's, a `#` that opens a line or follows
+whitespace outside quotes; and the copy counts only as a `cp`, `rsync`, `install` or `Copy-Item`
+command naming `engine/fonts`. Until then a comment naming the folder passed a deploy whose `cp`
+line was gone, and a commented-out `--font-faces` line read as a stylesheet the deploy writes. Such a link is left out of the font-link string comparison,
 because the generator holds it, not a string shared with other pages. **What it trusts:** that the
-step runs. The two bullets above describe `rnv-live` as it is until that change lands, and retire
-with it.
+step runs.
 
 **What it retired.** Until then `font.sh` fetched three TTFs into `assets/fonts/` from `google/fonts`
 at `main`, unpinned, so the share images drew from files nothing here compared and that could change

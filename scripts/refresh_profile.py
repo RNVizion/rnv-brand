@@ -1480,14 +1480,41 @@ def _own_stylesheets(root, page_rel, body):
 # a workflow in the same repository runs `brand.py --font-faces ARG > PATH` and
 # the link's path is PATH or ends it, and the families counted are the ones the
 # emitter declares when run here with ARG. A workflow that writes the rules and
-# never mentions engine/fonts is a FAIL: the rules would name files nothing
-# copied. WHAT IT TRUSTS: that the step runs. A deploy that fails, or copies the
+# never copies engine/fonts is a FAIL: the rules would name files nothing
+# copied. BOTH SEARCHES READ COMMANDS, NOT MENTIONS (the site chat, 2026-11-01,
+# on the real workflow): comments are removed first, and the copy counts only
+# as a cp, rsync, install or Copy-Item command naming engine/fonts. Until then a
+# comment naming the folder passed a deploy whose cp line was gone. WHAT IT TRUSTS: that the step runs. A deploy that fails, or copies the
 # fonts from another commit, is outside it, as a failed tokens step is outside
 # verify_tokens. Such a link is also left out of the font-link string
 # comparison: the generator holds it, not a string shared with other pages.
 _DEPLOY_FONT_FACES = re.compile(r"brand\.py\s+--font-faces\s+(\S+)\s*>\s*(\S+)")
 _HREF_EXPRESSION = re.compile(r"""^\{[^}]*?["']([^"']+)["'][^}]*\}$""")
 _GENERATED_FAMILIES: dict = {}
+_COPIES_FONTS = re.compile(r"\b(?:cp|rsync|install|Copy-Item)\b[^\n]*engine/fonts")
+
+
+def _yaml_without_comments(text):
+    """The workflow with every comment removed, line for line.
+
+    A comment starts at a # that opens the line or follows whitespace, outside
+    single or double quotes. That is YAML's rule, and in a `run:` block the
+    shell's too, so a step described in a comment is not read as the step."""
+    out = []
+    for line in text.split("\n"):
+        quote, prev, cut = None, " ", len(line)
+        for i, ch in enumerate(line):
+            if quote:
+                if ch == quote:
+                    quote = None
+            elif ch in "'\"":
+                quote = ch
+            elif ch == "#" and prev in " \t":
+                cut = i
+                break
+            prev = ch
+        out.append(line[:cut])
+    return "\n".join(out)
 
 
 def _deploy_font_sheets(root):
@@ -1496,8 +1523,8 @@ def _deploy_font_sheets(root):
     wf = root / ".github" / "workflows"
     if wf.is_dir():
         for p in sorted(wf.glob("*.y*ml")):
-            text = p.read_text(encoding="utf-8", errors="ignore")
-            copies = copies or "engine/fonts" in text
+            text = _yaml_without_comments(p.read_text(encoding="utf-8", errors="ignore"))
+            copies = copies or bool(_COPIES_FONTS.search(text))
             for m in _DEPLOY_FONT_FACES.finditer(text):
                 sheets[posixpath.normpath(m.group(2).strip("'\""))] = m.group(1).strip("'\"")
     return sheets, copies
