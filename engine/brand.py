@@ -1144,6 +1144,37 @@ APP = {
     "text-on-gold": TRUE_BLACK,
 }
 
+
+def gray(n: int) -> str:
+    """A step on the ink grid: gray(n) = n * 0x11, n in 0..15. BRAND_COLORS.md, The ink grid.
+
+    The rule as code, so a step is computed rather than typed. It governs inks and
+    edges, never surfaces; see the APP comment above."""
+    if not isinstance(n, int) or isinstance(n, bool) or not 0 <= n <= 15:
+        raise ValueError(f"gray(n) takes an integer from 0 to 15, not {n!r}")
+    return "#%02x%02x%02x" % ((n * 0x11,) * 3)
+
+
+# THE INK GRID'S STEPS THAT MORE THAN ONE CONSUMER DRAWS, NAMED BY STEP. Ruled by
+# Chris, 2026-11-01 (#104). All five apps owned these five themselves, one value
+# in five places, each with the reason "gray(n) on the register's ink grid, which
+# the register states as a rule and does not name". They are named by step, not
+# by role, because the same step does different jobs in different apps: gray(4)
+# is a pressed button in one and a chrome edge in another. No value moved.
+#
+# A STEP ENTERS HERE BY DECISION, as a color enters PERMANENT: when a consumer
+# draws it. gray(1), gray(2), gray(7), gray(9), gray(11) are on the grid and
+# unnamed because nothing draws them. The three steps APP holds by role, border
+# gray(3), text-dim gray(10) and text gray(13), stay under their roles and are
+# held to the grid by the check below.
+GRAY = {f"gray-{n}": gray(n) for n in (4, 5, 6, 8, 12)}
+
+for _key, _n in (("border", 3), ("text-dim", 10), ("text", 13)):
+    if APP[_key] != gray(_n):
+        raise AssertionError(
+            f'APP["{_key}"] is {APP[_key]}, off the ink grid: BRAND_COLORS.md rules it '
+            f"gray({_n}) {gray(_n)}. Move it back, or rule the grid again first.")
+
 # ---------------------------------------------- website palette (the ramp)
 WEB = {
     # ONE-INDEXED, WITH NO bg-1, because that is what the eleven published

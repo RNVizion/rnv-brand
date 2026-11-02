@@ -8,7 +8,13 @@ Chris's ruling of that day, from a reviewed word list: *colour* to *color*, *gre
 the rest. No value, figure or ruling moved, so the revision did not, and `pyproject.toml`'s major
 did not. Two quotations of earlier text keep the spelling they were written in.
 
-Last locked: 2026-10-29 (rev 48 — **the two see-through golds that read under the floor are
+Last locked: 2026-11-02 (rev 49 — **five steps of the ink grid are named, the README badges take the
+brand's colors, and the resolver sentence says what is true.** No value moves. Chris ruled on 1
+November that the five grays every desktop app owned for itself, `#444444`, `#555555`, `#666666`,
+`#888888` and `#cccccc`, are named here by step (#104), and that the badges are branded (#106).
+`engine/brand.py` gains `gray(n)` and `GRAY`, and checks at import that the three steps `APP` holds
+by role are still on the grid. And *Resolver vocabulary (MCP)* said the color server imports
+`RNV_BRAND`; it mirrors it, which the color chat found. rev 48 — **the two see-through golds that read under the floor are
 fixed in the apps.** No value moves. rev 47 measured the text transformer's find highlight at 3.36 in
 image mode and the mixer's harmony description at 4.49 in light mode, and routed both. Chris ruled
 both on 26 October in the desktop chat: the find highlight takes the gold at `0xA0` with black text
@@ -566,6 +572,32 @@ gray(n) = n * 0x11,  n in 0..15      TRUE_BLACK -> WHITE in fifteen steps
 | ink | `APP["text"]` | `#dddddd` | **13** |
 | ink | `APP["text-dim"]` | `#aaaaaa` | 10 |
 | edge | `APP["border"]` | `#333333` | 3 |
+
+### Five steps are named, by step — ruled 2026-11-01
+
+**Ruled by Chris (#104): the steps the apps draw are named here, by their step.** Until then each of
+the five desktop apps owned these five values itself, with the reason *gray(n) on the register's
+ink grid, which the register states as a rule and does not name*: one value in five places, and
+nothing that would notice them disagree.
+
+| key | value | n | drawn in the apps as |
+|---|---|---|---|
+| `GRAY["gray-4"]` | `#444444` | 4 | a pressed button, a chrome edge |
+| `GRAY["gray-5"]` | `#555555` | 5 | disabled text, a dimmed control |
+| `GRAY["gray-6"]` | `#666666` | 6 | secondary text, a handle in light mode |
+| `GRAY["gray-8"]` | `#888888` | 8 | muted text, a hint, a handle's edge |
+| `GRAY["gray-12"]` | `#cccccc` | 12 | the light-mode border |
+
+**Named by step, not by role,** because one step does different jobs in different apps; a role name
+would be true in one and false in the next. **No value moved:** every one equals what all five apps
+hold today, so each app's map points at a name instead of owning a value, and its color file is
+written byte for byte as before.
+
+**`gray(n)` is the rule as code**, so a step is computed, never typed, and it refuses anything but
+an integer from 0 to 15. **A step enters `GRAY` by decision, when a consumer draws it**, as a color
+enters `PERMANENT`: steps 1, 2, 7, 9, 11 and 14 are on the grid and unnamed because nothing draws them
+as a grid step. The three steps `APP` holds by role, `border`, `text-dim` and `text`, stay under their
+roles, and **`engine/brand.py` refuses to import if any of them leaves the grid.**
 
 **Primary text is one role with two mode values:** dark is a gray on the ink grid, light is
 `TRUE_BLACK`. Already true in all five apps with no app disagreeing — it had simply never been
@@ -2303,10 +2335,31 @@ sync. **This section's rule is wider than the check**, so the rest of it stays a
 
 ---
 
+## README badges — ruled 2026-11-01
+
+**Ruled by Chris (#106): a repository's static README badges take the brand's colors.** The label
+in `WEB["border"]` `#25253a` and the message in `BRAND_GOLD` `#d2bc93`:
+
+    https://img.shields.io/badge/<label>-<message>-d2bc93?labelColor=25253a
+
+A `logo=` and `logoColor=` may stay as they are. **Measured on shields.io's own output, 2 November**:
+it sets the label's text white and, on the gold, the message's text `#333`, choosing the second
+itself from the background. White on `#25253a` reads 14.95 and `#333` on the gold 6.83. The stock
+badges these replace put white text on bright green at 2.12 and on yellow at 1.98.
+
+**On GitHub's two themes each half carries the badge on one of them:** the gold stands 10.23 off the
+dark page `#0d1117`, and the label 14.95 off the light one. **A live CI status badge keeps its own
+colors**, because its color changes with the run it reports and the word beside it says the same.
+
+**This is a rule, not a check.** Nothing here reads a README. The badges are on the five desktop
+apps' READMEs and on the `RNVizion` profile; each is edited where it lives.
+
 ## Resolver vocabulary (MCP)
 
 What the color server resolves brand names to in chat. Defined once in `brand.py` as
-`RNV_BRAND`; the resolver imports it. **RNV names win over CSS names on collision, and three bare
+`RNV_BRAND`; the color server does not import it but **mirrors** it, in `rnv-color-mcp`'s
+`engine/brand_vocab.py`, pinned to a commit of this repository and checked against this file by its
+`scripts/check_brand_currency.py` (corrected at rev 49; found by the color chat, 1 November). **RNV names win over CSS names on collision, and three bare
 names collide: `gold`, `blue` and `teal` are brand colors and resolve to the brand values, not to
 CSS `#ffd700`, `#0000ff` and `#008080`.** Use `css:gold`, `css:blue`, `css:teal` to force the
 universal one. **Ruled 2026-09-28: all three stay bare, because they are colors set in the brand

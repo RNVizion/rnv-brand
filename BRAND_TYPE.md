@@ -3,7 +3,12 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-11-01 (rev 20 — **`rnv-live` draws from the brand's files, and `verify_type` reads
+Last locked: 2026-11-02 (rev 21 — **rev 18's Qt measurement was true on Linux only, and incomplete
+there.** The desktop chat built the apps' fonts and found both: Qt on Windows loads no `woff2`, and Qt
+keeps one file per family, weight and style, so registering a weight's two subset files leaves only
+the second. Rev 18 asked Qt whether each family resolved and never asked what a face could draw. The
+apps now ship TrueType faces joined from this register's files, landed in all five on 2 November.
+rev 20 — **`rnv-live` draws from the brand's files, and `verify_type` reads
 the command, not a mention of it.** The site chat's change landed at `rnv-live@f7b14be`, so the two
 bullets that described the old page are retired here, as rev 19 said they would be. And the site chat
 found, on its real workflow, that the check counted the copy from any mention of `engine/fonts`,
@@ -730,7 +735,8 @@ transformer's compare and regex dialogs; Courier in the font loaders; and Pillow
 file in all five, **with no license beside it**, which the SIL Open Font License requires wherever
 the font is redistributed.
 
-**Measured on Qt 6.12.0, PyQt6, 1 November: Qt loads this register's `woff2` files directly.**
+**Measured on Qt 6.12.0, PyQt6, 1 November, on Linux only: Qt loads this register's `woff2` files
+directly.** *Corrected 2 November, below: not on Windows, and not both subsets of a weight.*
 `QFontDatabase.addApplicationFont` on each file in `engine/fonts/`:
 - `Inter` at 400 and 600, and `JetBrains Mono` at 400 and 700, resolve exactly by family name.
 - **Montserrat 900 registers under the family name `Montserrat Thin`**, style Black, weight 900:
@@ -744,6 +750,41 @@ the font is redistributed.
 install `rnv-brand` at test time and write their colors from it, so the fonts need the same path: a
 copy written from the pinned commit, each family's license beside it, and a test that fails when
 the copy and the pin disagree, the way `test_colors_in_sync.py` does for colors.
+
+**What the measurement above missed, found by the desktop chat building it, 2 November:**
+- **Qt on Windows loads no `woff2`.** On Chris's machine Qt registered none of Inter's files, and the
+  font test went red in all five apps. By the desktop chat's reading of qtbase: on Linux Qt hands an
+  application font to FreeType, which reads `woff2`; on Windows to DirectWrite, the default since
+  6.8, or GDI, which take TrueType and OpenType only. Qt has no `woff` code of its own.
+- **Qt keeps one file per family, weight and style**, so the second file registered at a weight
+  replaces the first rather than adding to it. **Reproduced here on Linux:** after JetBrains Mono
+  500's Latin file and then its Latin Extended file, the face covered `Ł` and lost `!`, the digits and
+  every other character only the Latin file holds, 93 of printable ASCII.
+- **Rev 18's measurement could not see either.** It asked whether each family resolved, on one
+  system, and every family did. It never asked what a face could draw, or on Windows.
+
+**What the apps ship, landed in all five on 2 November** (`rnv-color-picker@163f18c`,
+`rnv-color-mixer@ab56dbe`, `rnv-icon-builder@c6cda52`, `rnv-color-palette-manager@6da6c96`,
+`rnv-text-transformer@e725df1`), read at those heads:
+- `tools/sync_fonts.py`, one file in all five, writes seven TrueType faces into `resources/fonts/`,
+  one per weight of `TYPE["body"]` and `TYPE["mono"]`, each **joined from this register's two
+  `woff2` files for that weight**, every character taken from the file whose `unicode-range`
+  `font_faces()` gives it, as a browser draws the site. Byte-identical across the five apps.
+- `fonts.json` records the pin and each face's source files and hashes, and `test_fonts_in_sync.py`
+  fails when the copy and the pin disagree, when a face is not TrueType or OpenType, when two files
+  share a weight, and unless Qt registers each face under its recorded family at its exact weight.
+- `OFL-Inter.txt`, `OFL-JetBrains-Mono.txt` and `OFL-Montserrat.txt` sit beside the faces, and
+  `test_font_license.py` fails on a shipped font without one. The mark stays the bundled
+  `Montserrat-Black.ttf`, now licensed.
+- **Scope, ruled by Chris in the desktop chat (#107 A):** Arial and Segoe UI became Inter; Consolas,
+  Courier and the interface's generic `monospace` became JetBrains Mono, as did Pillow's `arial.ttf`
+  fallback. Montserrat Black stays everywhere the apps used it. Exported files keep the fonts they
+  name, because they are read on other machines. No `QFont` in any app names Arial, Segoe UI,
+  Consolas or Courier now.
+- **Their measurement, recorded as theirs:** 570,069 shaped texts drew the same in each joined face
+  as in this register's file for that range, outlines, advances and kerning, apart from 90 letter and
+  combining-mark pairs the joined face draws as the single accented letter; the OpenType Sanitizer
+  passes all seven. **Windows is measured by Chris's run only.**
 
 ### `rnv-live` draws from the brand's files — confirmed 2026-11-01
 
