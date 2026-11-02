@@ -703,6 +703,35 @@ def check_bio(cfg, root, rep, scope):
             rep.checks += 1
 
 
+def _fact_sources(cfg, spec, scope, rep, name):
+    """[(source as written, path in this repository)] for one fact, in one repository.
+
+    A SOURCE MAY NAME ITS REPOSITORY, as `RNVizion:README.md`. Asked for by the
+    site chat on 2026-11-02: the profile README printed "Nine deterministic tools"
+    while this fact said ten, and nothing reported it, because a fact's sources
+    were bare paths and only the site runs `facts`. A qualified source is checked
+    only in the repository it names. A bare path keeps its old meaning, every
+    repository that runs `facts`, except one whose entry sets
+    `facts_qualified_only`: that repository is checked only for the sources that
+    name it, so the site's pages are never looked for in it. A prefix that names
+    no repository in the manifest is a FAIL, not a path with a colon in it."""
+    qualified_only = bool(cfg["repos"].get(scope, {}).get("facts_qualified_only"))
+    out = []
+    for src in spec.get("sources", []):
+        repo, sep, path = src.partition(":")
+        if sep:
+            if repo not in cfg["repos"]:
+                rep.fail(scope, "profile.json",
+                         f"facts.{name} names the source {src!r}, and {repo!r} is not a "
+                         f"repository in the manifest; that source is checked nowhere")
+                continue
+            if repo == scope:
+                out.append((src, path))
+        elif not qualified_only:
+            out.append((src, src))
+    return out
+
+
 def check_facts(cfg, root, rep, scope):
     for name, spec in cfg["facts"].items():
         if name.startswith("_"):
@@ -722,8 +751,8 @@ def check_facts(cfg, root, rep, scope):
         # total confidence. Fall back to value when no match is given, so a
         # fact without one keeps working exactly as before.
         match = spec.get("match") or spec["value"]
-        for src in sources:
-            p = root / src
+        for src, rel in _fact_sources(cfg, spec, scope, rep, name):
+            p = root / rel
             if not p.exists():
                 rep.warn(scope, src, f"declared source for '{name}' not found")
                 continue
