@@ -1620,9 +1620,15 @@ def _check_font_copy(name, root, css_rel, css_text, rep):
          byte-identical to the file of the same name in this tree's engine/fonts/.
       2. The license of every family it serves sits beside the files, identical,
          because the SIL OFL travels with the fonts by its own terms.
-      3. Its @font-face rules are the ones engine/brand.py --font-faces writes for
-         the folder the files are served from -- parsed, so a comment saying
-         where the file came from is allowed.
+      3. Its @font-face rules are the ones engine/brand.py --font-faces writes
+         with the prefix the rules are written with -- parsed, so a comment
+         saying where the file came from is allowed. The prefix is read from the
+         rules, not built here, because a copy need not be a website's: rnv-evcalc's
+         overlay is served by OBS from a local path, where a URL starting with /
+         resolves to nothing, so its rules are written with ./ (2026-11-02).
+         Comparison 1 has already resolved each URL to the copy, so reading the
+         prefix gives nothing away. Rules written with more than one prefix are
+         not the emitter's, which writes one, and fail.
 
     Returns the number of comparisons made. It reads what the stylesheet names
     and nothing else, so a font file in the folder that no rule names is not
@@ -1636,6 +1642,7 @@ def _check_font_copy(name, root, css_rel, css_text, rep):
     faces = _font_faces_in(css_text)
     where = f"{name}/{css_rel}"
     served_dirs, families, compared = set(), set(), 0
+    written_prefixes = set()
     for face in faces:
         for url in re.findall(r"url\(\s*['\"]?([^'\")]+)['\"]?\s*\)", face.get("src", "")):
             if re.match(r"(?i)^([a-z][a-z0-9+.-]*:)?//", url):
@@ -1647,6 +1654,7 @@ def _check_font_copy(name, root, css_rel, css_text, rep):
                    posixpath.normpath(posixpath.join(posixpath.dirname(css_rel), url)))
             fname = Path(rel).name
             served_dirs.add(posixpath.dirname(rel))
+            written_prefixes.add(url[: len(url) - len(url.split("/")[-1])])
             families.add(face["font-family"])
             compared += 1
             src = fonts / fname
@@ -1675,8 +1683,19 @@ def _check_font_copy(name, root, css_rel, css_text, rep):
                          f"SIL Open Font License travels with the files")
             elif theirs.read_bytes() != ours.read_bytes():
                 rep.fail("type", f"{name}/{d}/{lic}", "differs from rnv-brand's copy")
-    if len(served_dirs) == 1:
-        prefix = "/" + next(iter(served_dirs)).strip("/") + "/"
+    if len(written_prefixes) > 1:
+        compared += 1
+        rep.fail("type", where, f"its @font-face rules load from "
+                 f"{len(written_prefixes)} prefixes, "
+                 f"{', '.join(repr(p) for p in sorted(written_prefixes))}; "
+                 f"engine/brand.py --font-faces writes one. Regenerate it")
+    elif written_prefixes == {""}:
+        compared += 1
+        rep.fail("type", where, "its @font-face rules name bare file names; "
+                 "engine/brand.py --font-faces writes a folder ending in /, as ./. "
+                 "Regenerate it")
+    elif len(written_prefixes) == 1:
+        prefix = next(iter(written_prefixes))
         try:
             r = subprocess.run([sys.executable, str(REPO_ROOT / "engine" / "brand.py"),
                                 "--font-faces", prefix], capture_output=True, text=True, timeout=30)
@@ -2198,6 +2217,10 @@ def verify_type(cfg, rep, workdir: Path):
          own. No stored copy: the set defines itself, so there is nothing to go
          stale. Pages the register exempts are excluded first. When no page
          links either, it says so rather than comparing nothing in silence.
+         COMPARED WITHIN EACH REPOSITORY, since 2026-11-02: the canonical link
+         is one site's string, and a second repository's copy sits at its own
+         path. Pooled, rnv-evcalc's overlay "differed from the 19 pages" of the
+         site the day it linked the brand's faces.
       4. F13 -- any page redefining `--font-body` away from the body face, which
          must fail even on an initiative page permitted to *use* another face in
          its `body` selector. The two conditions read different layers, and a
@@ -2293,7 +2316,8 @@ def verify_type(cfg, rep, workdir: Path):
                     font_sheets.setdefault(rel_css, css)
                     if relpath not in exempt_link and not any(
                             relpath.endswith(e) for e in exempt_link):
-                        links.setdefault(f"<link href=\"{href}\">", []).append(where)
+                        links.setdefault(name, {}).setdefault(
+                            f"<link href=\"{href}\">", []).append(where)
             blocks = css_declarations(body)
             local = dict(tokens)
             for decls in blocks.values():
@@ -2348,7 +2372,7 @@ def verify_type(cfg, rep, workdir: Path):
             if relpath not in exempt_link and not any(
                     relpath.endswith(e) for e in exempt_link):
                 for m in re.finditer(r"https://fonts\.googleapis\.com/css2\?[^\"'>]+", body):
-                    links.setdefault(m.group(0), []).append(where)
+                    links.setdefault(name, {}).setdefault(m.group(0), []).append(where)
 
             for sel, decls in blocks.items():
                 if "--font-body" in decls and body_family.lower() not in decls["--font-body"].lower():
@@ -2366,13 +2390,16 @@ def verify_type(cfg, rep, workdir: Path):
         rep.note("type", "-",
                  "no page links a font stylesheet or a Google Fonts URL, so the "
                  "font-link comparison compared nothing")
-    if len(links) > 1:
-        ranked = sorted(links.items(), key=lambda kv: -len(kv[1]))
+    for repo_links in links.values():
+        if len(repo_links) < 2:
+            continue
+        ranked = sorted(repo_links.items(), key=lambda kv: -len(kv[1]))
         for link, pages in ranked[1:]:
             for pg in pages:
                 rep.fail("type", pg,
                          f"font link differs from the {len(ranked[0][1])} pages "
-                         f"that share one string; no exemption covers it")
+                         f"of its repository that share one string; no exemption "
+                         f"covers it")
     if checked == 0:
         rep.note("type", "-",
                  "no surface in the ecosystem renders the mark; nothing compared")
