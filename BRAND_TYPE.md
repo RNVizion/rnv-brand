@@ -3,7 +3,15 @@
 The register of RNVizion's **type system**. Machine source: `engine/brand.py` (`TYPE`) —
 import from there; never hardcode. This doc is the human-readable explanation.
 
-Last locked: 2026-11-02 (rev 21 — **rev 18's Qt measurement was true on Linux only, and incomplete
+Last locked: 2026-11-07 (rev 22 — **a fourth raster generator draws the mark.** Social's renderer,
+`rnv_social_assets.py`, was brought to the brand's type and colors by Chris on 7 November. It draws
+`RNVizion` in Montserrat Black, gold, tracked 1.8px, reads every face from the installed package's
+`fonts_dir()`, and checks each string against the file it draws it in, as the site's generators do.
+Until then it fetched its faces from Google and drew `RNVIZION` in JetBrains Mono. It carries its own
+`MARK_TRACK`, so a change to raster tracking is a four-file change across two owners, and the raster
+table, its widths and *Who takes them* say so. It is in no repository the checker reads, so nothing
+compares it. `profile.json` v1.3.13 prints the four-file coupling, and its font prompt no longer names
+`font.sh`, retired on 20 October. rev 21 — **rev 18's Qt measurement was true on Linux only, and incomplete
 there.** The desktop chat built the apps' fonts and found both: Qt on Windows loads no `woff2`, and Qt
 keeps one file per family, weight and style, so registering a weight's two subset files leaves only
 the second. Rev 18 asked Qt whether each family resolved and never asked what a face could draw. The
@@ -258,6 +266,11 @@ and code roles, and **since `9098d0a` the display role for its page heading**, b
 `rnv-ask-the-corpus@336cc99`. The same contract serves both: its pin at `db7dba0`, `fonts_dir()` served through Gradio's static
 paths, and `font_faces()` ahead of its own stylesheet. Its chat measured eight configurations, both
 rendering modes at two widths on a Light and a Dark device, and found no glyph in a device face.
+**Social's renderer, `rnv_social_assets.py`, since 7 November 2026**, by Chris's ruling: it reads
+`fonts_dir()` from the installed package at the commit it pins, `52a25c2`, and draws the mark, display,
+emphasis, body and mono roles from the Latin files. It stops by name on a missing file, a weight the
+brand does not ship, or a character a file cannot draw. **Nothing compares it**: it holds no copy, and
+it is in no repository the checker reads.
 
 **A copy is checked against the source.** `verify_type` follows every font stylesheet a page links,
 and where its rules declare a brand family it compares three things: each file the rules name,
@@ -429,10 +442,13 @@ raster generator drew `" ".join("RNVIZION")` for months on that confusion.
 | `generate_site_og.py` | 20px | `0.09em` | 1.80px |
 | `generate_og.py` | 30px | `0.06em` | 1.80px |
 | `generate_project_card.py` | 30px | `0.06em` | 1.80px |
+| `rnv_social_assets.py` (Social) | 26, 28 and 30px | `MARK_TRACK = 1.8` | 1.80px |
 
 **All three drew the mark at zero tracking until this ruling**, while every web surface tracked it.
 The same wordmark had two letterforms depending on where it was seen, and the OG image is the
-highest-reach artifact in the system — it renders in every link preview.
+highest-reach artifact in the system — it renders in every link preview. **The fourth, Social's
+renderer, drew `RNVIZION` in JetBrains Mono until 7 November 2026**, three months after decision #15,
+because it lived in a project's knowledge where nothing read it.
 
 **WHY RASTER IS RULED IN PIXELS AND THE WEB IS NOT.** An `em` value exists so tracking scales with
 type size. On the web that is right: type resizes, reflows, and responds to a root font size. **A
@@ -446,6 +462,8 @@ web is confirmation, not the reason.
 | Mark size | Untracked | At 1.8px | Change |
 |---|---|---|---|
 | 20px | 98.6px | **111.4px** | **+13.0%** |
+| 26px | 128.1px | **140.9px** | **+10.0%** |
+| 28px | 138.0px | **150.8px** | **+9.3%** |
 | 30px | 147.8px | **160.7px** | **+8.7%** |
 
 The change differs by size because the gap is constant while the word is not — seven gaps of 1.8px
@@ -455,20 +473,27 @@ and the handoff of 2026-08-15 published one: "a 12% width change", with the 30px
 `0.06em`. **That is the inverse-idiom failure recorded three paragraphs above, committed inside the
 table demonstrating the ruling.** Anyone re-measuring against 167 lands 6px off.
 
-**Nothing in the three generators measures the mark**, verified: every right-aligned element anchors
+**The 26px and 28px rows are Social's renderer's marks, measured on 7 November 2026** with Pillow
+12.3.0 and `montserrat-latin-900-normal.woff2`. The same measurement gives the 30px row exactly and
+the 20px row to within 0.1px.
+
+**Nothing in the site's three generators measures the mark**, verified: every right-aligned element anchors
 to the canvas edge as `W - MARGIN - dw`. The width change is real and worth publishing, but there is
-nothing downstream to re-measure in these files today.
+nothing downstream to re-measure in these files today. **Social's renderer does**: it centers each
+lockup with `mark_width()`, the advances plus the gaps, so the lockup re-centers when the width moves.
 
 **Per-glyph drawing discards kerning.** PIL has no letter-spacing, so tracking is drawn by advancing
 `textlength(ch)` per character, which sums the individual advances and loses the pair adjustments a
-single `draw.text()` would apply. The mark runs **0.20px wide at 20px and 0.30px at 30px** as a
+single `draw.text()` would apply. The mark runs **0.20px wide at 20px, 0.27px at 26px, 0.28px at 28px and 0.30px at 30px** as a
 result. Sub-pixel, recorded in each generator's docstring so a later reader does not file it as a
 defect, and it does not move the ruled 1.8px gap — only the total.
 
-**THE HELPER IS DUPLICATED IN ALL THREE GENERATORS, so a tracking change is a three-file change.**
-Correct for standalone scripts with no shared import, and the same shape as the nav's inline CSS —
-but written down here rather than discovered, because the failure mode is landing two of three and
-having one OG surface disagree with the other two.
+**THE HELPER IS DUPLICATED IN ALL FOUR GENERATORS, so a tracking change is a four-file change.**
+Three are the site's, in `rnvizion.github.io/scripts/`; the fourth is Social's renderer, in Social's
+folder, which no repository the checker reads holds. It was three until 7 November 2026. Correct for
+standalone scripts with no shared import, and the same shape as the nav's inline CSS — but written
+down here rather than discovered, because the failure mode is landing some of them and having one
+surface disagree with the rest.
 
 **A CONSTANT 1.8px ACROSS THE WEB TOO WAS CONSIDERED AND REJECTED ON MEASUREMENT.** It would have
 moved the nav from `0.09em` to `0.129em` and the card from `0.06em` to `0.052em`. The card change
@@ -720,6 +745,13 @@ files in the site's `assets/webfonts/`, the copy of `engine/fonts/` the site ser
 `bricolage-grotesque-latin-opsz-normal`, `jetbrains-mono-latin-500-normal` and
 `montserrat-latin-900-normal`. **That copy is the one `verify_type` compares**, byte for byte, because
 the site's font stylesheet names all three. `OG_FONT_DIR` still overrides the folder.
+
+**Social's Instagram renderer took the same faces on 7 November 2026**, by Chris's ruling. It had
+fetched Montserrat, Instrument Serif and JetBrains Mono from Google's font repository at `main`, and
+drew the mark as `RNVIZION` in JetBrains Mono. It now draws the mark as ruled, from the brand's own
+files (*Who takes them*). The brand ships Montserrat at 900 only, so its display lines are Montserrat
+Black, the Instagram card face Brand Book §6 records, and its slide body copy, which was Montserrat
+500, is Inter.
 
 ### The desktop apps take the body and mono faces — ruled 2026-11-01
 
@@ -977,9 +1009,12 @@ build.
   - **The three raster generators' files are inside it since `rnvizion.github.io@beeeb34`**, as part
     of the site's copy, and **their drawing is still outside it** — Python drawing with PIL, no
     markup to parse. Since `b798f55` the site's own build stops on a character a loaded file cannot
-    draw; that guard is the site's, and says nothing about tracking or layout. Their 1.8px is held true by the three-file coupling and, since 2026-08-16, by a
+    draw; that guard is the site's, and says nothing about tracking or layout. Their 1.8px is held true by the four-file coupling and, since 2026-08-16, by a
     prompt: a change to this document now prints the coupled manual work into the run summary. **A
     prompt, not a guard** — it does not verify the generators were updated and must never claim to.
+  - **Social's renderer is outside it entirely**, files and drawing: it reads the package's
+    `fonts_dir()` rather than a copy, and it is in no repository the checker reads. Its glyph guard is
+    its own.
 - **[confirm/fill] A formal mark spec** — clearspace, minimum sizes, ratios. Deferred until the
   first external use demands it. Decision #15 settles the *face*, not the spec.
 
