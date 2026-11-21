@@ -267,7 +267,12 @@ def fetch_repo(name: str, dest: Path) -> tuple[Path | None, str]:
             with tarfile.open(fileobj=io.BytesIO(data)) as tf:
                 members = [m for m in tf.getmembers()
                            if not m.name.startswith("/") and ".." not in m.name]
-                tf.extractall(out, members=members)
+                # filter="data" where tarfile has it (3.10.12, 3.11.4, 3.12+);
+                # older 3.10 and 3.11 reject the argument, so they keep the old call.
+                if hasattr(tarfile, "data_filter"):
+                    tf.extractall(out, members=members, filter="data")
+                else:
+                    tf.extractall(out, members=members)
             inner = next((c for c in out.iterdir() if c.is_dir()), None)
             return (inner or out), ""
         if not saw_transient:
